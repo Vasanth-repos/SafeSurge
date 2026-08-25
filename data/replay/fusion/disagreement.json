@@ -1,0 +1,33 @@
+{
+  "scenario": "disagreement",
+  "description": "Sensor exhibits significant disagreement against model baseline, lowering historical agreement score without corrupting spatial field.",
+  "observations": [
+    {
+      "sensor_id": "S001",
+      "cell_id": "C104",
+      "timestamp_seconds": 10,
+      "observed_depth_cm": 35.0,
+      "sensor_state": "ONLINE",
+      "measurement_status": "ACCEPTED",
+      "quality": 1.0
+    },
+    {
+      "sensor_id": "S001",
+      "cell_id": "C104",
+      "timestamp_seconds": 20,
+      "observed_depth_cm": 36.0,
+      "sensor_state": "ONLINE",
+      "measurement_status": "ACCEPTED",
+      "quality": 1.0
+    },
+    {
+      "sensor_id": "S001",
+      "cell_id": "C104",
+      "timestamp_seconds": 30,
+      "observed_depth_cm": 34.0,
+      "sensor_state": "ONLINE",
+      "measurement_status": "ACCEPTED",
+      "quality": 1.0
+    }
+  ]
+}

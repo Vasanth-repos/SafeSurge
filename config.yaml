@@ -31,3 +31,27 @@ risk:
       high: 15.0
       unsafe: 25.0
 
+fusion:
+  bias_alpha: 0.3
+  minimum_bias_observations: 3
+  max_residual_for_bias_update_cm: 20.0
+  max_bias_cm: 50.0
+  max_observation_time_difference_seconds: 30
+  minimum_model_depth_for_spatial_correction_cm: 1.0
+  spatial_correction:
+    power: 2.0
+    max_distance_m: 1000.0
+    max_absolute_correction_cm: 15.0
+    minimum_weight_sum: 0.000001
+  confidence:
+    weights:
+      coverage: 0.30
+      freshness: 0.30
+      agreement: 0.40
+    agreement_window_steps: 10
+    minimum_agreement_observations: 5
+    agreement_scale_cm: 20.0
+    max_sensor_age_seconds: 180
+    target_history_observations: 10
+
+

@@ -1,0 +1,24 @@
+{
+  "scenario": "stale",
+  "description": "Sensor packets arrive with increasing latency, demonstrating freshness attenuation and confidence decay.",
+  "observations": [
+    {
+      "sensor_id": "S001",
+      "cell_id": "C104",
+      "timestamp_seconds": 10,
+      "observed_depth_cm": 25.0,
+      "sensor_state": "ONLINE",
+      "measurement_status": "ACCEPTED",
+      "quality": 1.0
+    },
+    {
+      "sensor_id": "S001",
+      "cell_id": "C104",
+      "timestamp_seconds": 20,
+      "observed_depth_cm": 25.0,
+      "sensor_state": "STALE",
+      "measurement_status": "ACCEPTED",
+      "quality": 0.8
+    }
+  ]
+}
