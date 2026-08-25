@@ -1,0 +1,136 @@
+{
+  "validation_id": "val_1787641260",
+  "scenario_id": "e2e_validation_01",
+  "status": "PASS",
+  "started_at": "2026-08-25T07:00:58.588553Z",
+  "completed_at": "2026-08-25T07:01:00.051666Z",
+  "simulation_id": "e2e_validation_01",
+  "timestep_count": 181,
+  "summary": {
+    "total_checks": 10,
+    "passed_checks": 10,
+    "warning_checks": 0,
+    "failed_checks": 0
+  },
+  "checks": [
+    {
+      "check_id": "ENV-001",
+      "name": "Environment & Required Assets",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "All required project directories, configs, and assets are present",
+      "details": {
+        "checked_paths": [
+          "config.yaml",
+          "data/sensors/registry.yaml",
+          "config/scenarios/storm_01.yaml"
+        ]
+      }
+    },
+    {
+      "check_id": "GRID-001",
+      "name": "Grid Topology & D8 Acyclic Integrity",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "D8 terrain verified across 98 cells with zero cycles and valid boundary discharges",
+      "details": {
+        "total_cells": 98,
+        "has_cycle": false
+      }
+    },
+    {
+      "check_id": "PHYS-001",
+      "name": "No Negative Surface Storage",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "All 181 snapshots exhibited non-negative finite storage (min=0.0000 m\u00b3)",
+      "details": {
+        "min_storage_m3": 0.0,
+        "snapshots_checked": 181
+      }
+    },
+    {
+      "check_id": "PHYS-002",
+      "name": "No Negative Flood Depth",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "All 18100 evaluated cell-timesteps were non-negative (min=0.00 cm)",
+      "details": {
+        "min_depth_cm": 0.0,
+        "cell_timesteps_evaluated": 18100
+      }
+    },
+    {
+      "check_id": "HYD-001",
+      "name": "Continuous Mass Conservation",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "All 181 timesteps satisfied conservation invariant (max_err=0.000000 m\u00b3, max_rel=0.000000)",
+      "details": {
+        "max_error_m3": 1.1368683772161603e-13,
+        "max_relative_error": 1.6957679560961484e-16
+      }
+    },
+    {
+      "check_id": "SNAP-001",
+      "name": "Snapshot Timestamp Coherence",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "All 181 snapshots exhibited 100% synchronized internal temporal coherence",
+      "details": {
+        "snapshots_evaluated": 181
+      }
+    },
+    {
+      "check_id": "REPLAY-001",
+      "name": "Deterministic Scenario Replay",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "Exact numerical determinism verified across 181 snapshots (Run A == Run B)",
+      "details": {
+        "snapshots_compared": 181
+      }
+    },
+    {
+      "check_id": "SENS-001",
+      "name": "Sensor Rate Spike Filtering",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "Erroneous 90cm spike rejected (RATE_SPIKE) and subsequent 13cm valid reading accepted",
+      "details": {
+        "spike_status": "REJECTED",
+        "recovery_status": "ACCEPTED"
+      }
+    },
+    {
+      "check_id": "ROUTE-001",
+      "name": "Dynamic Safe Routing",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "Router dynamically diverted traffic from inundated R2 (B->D) to safe corridor A->C->D with explanation",
+      "details": {
+        "dry_route": [
+          "R1",
+          "R2"
+        ],
+        "flooded_route": [
+          "R3",
+          "R4"
+        ],
+        "avoided": [
+          "R2"
+        ]
+      }
+    },
+    {
+      "check_id": "API-001",
+      "name": "API & GIS Dashboard Contract Compatibility",
+      "severity": "CRITICAL",
+      "status": "PASS",
+      "message": "Dashboard state parsed validly with coherent snapshot metadata and geometry",
+      "details": {
+        "cell_count": 100
+      }
+    }
+  ]
+}

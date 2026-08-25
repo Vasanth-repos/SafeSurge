@@ -1,0 +1,41 @@
+============================================================
+URBAN FLOOD NOWCASTING & RESPONSE SYSTEM
+LAYER 26 — END-TO-END PROTOTYPE VALIDATION REPORT
+============================================================
+Validation ID:   val_1787641260
+Scenario ID:     e2e_validation_01
+Started At:      2026-08-25T07:00:58.588553Z
+Completed At:    2026-08-25T07:01:00.051666Z
+Timestep Count:  181
+Overall Status:  PASS
+------------------------------------------------------------
+SUMMARY OF CHECKS:
+  Total Checks:    10
+  Passed:          10
+  Warnings:        0
+  Failed:          0
+------------------------------------------------------------
+CHECK DETAILS:
+  [PASS]   ENV-001      Environment & Required Assets
+           Message: All required project directories, configs, and assets are present
+  [PASS]   GRID-001     Grid Topology & D8 Acyclic Integrity
+           Message: D8 terrain verified across 98 cells with zero cycles and valid boundary discharges
+  [PASS]   PHYS-001     No Negative Surface Storage
+           Message: All 181 snapshots exhibited non-negative finite storage (min=0.0000 m³)
+  [PASS]   PHYS-002     No Negative Flood Depth
+           Message: All 18100 evaluated cell-timesteps were non-negative (min=0.00 cm)
+  [PASS]   HYD-001      Continuous Mass Conservation
+           Message: All 181 timesteps satisfied conservation invariant (max_err=0.000000 m³, max_rel=0.000000)
+  [PASS]   SNAP-001     Snapshot Timestamp Coherence
+           Message: All 181 snapshots exhibited 100% synchronized internal temporal coherence
+  [PASS]   REPLAY-001   Deterministic Scenario Replay
+           Message: Exact numerical determinism verified across 181 snapshots (Run A == Run B)
+  [PASS]   SENS-001     Sensor Rate Spike Filtering
+           Message: Erroneous 90cm spike rejected (RATE_SPIKE) and subsequent 13cm valid reading accepted
+  [PASS]   ROUTE-001    Dynamic Safe Routing
+           Message: Router dynamically diverted traffic from inundated R2 (B->D) to safe corridor A->C->D with explanation
+  [PASS]   API-001      API & GIS Dashboard Contract Compatibility
+           Message: Dashboard state parsed validly with coherent snapshot metadata and geometry
+============================================================
+FINAL RESULT: PASS
+============================================================

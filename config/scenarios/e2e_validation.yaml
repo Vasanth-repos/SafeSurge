@@ -1,0 +1,5 @@
+scenario_id: "e2e_validation_01"
+description: "Master End-to-End Prototype Validation Scenario (180 minutes, 60s timestep)"
+total_minutes: 180
+timestep_seconds: 60
+faults: []
