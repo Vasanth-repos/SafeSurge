@@ -369,8 +369,13 @@ btnReset.addEventListener("click", () => {
 });
 
 // Scenario Selector
+const btnDownloadDocx = document.getElementById("btn-download-docx");
 if (scenarioSelect) {
   scenarioSelect.addEventListener("change", () => {
+    const scId = scenarioSelect.value;
+    if (btnDownloadDocx) {
+      btnDownloadDocx.href = `/api/reports/download-docx?scenario_id=${scId}`;
+    }
     loadSnapshot(parseInt(slider.value));
   });
 }

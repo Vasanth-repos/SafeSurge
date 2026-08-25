@@ -1,9 +1,9 @@
 {
   "suite": "Urban Flood Nowcasting P0 Verification",
-  "timestamp_utc": "2026-08-25T07:01:35.441268Z",
+  "timestamp_utc": "2026-08-25T07:24:24.608566Z",
   "status": "PASS",
   "exit_code": 0,
-  "execution_time_seconds": 8.56,
+  "execution_time_seconds": 9.33,
   "subsystem_coverage": {
     "Layer_00_Environment": "PASS",
     "Layer_01_02_DEM_D8_Terrain": "PASS",
