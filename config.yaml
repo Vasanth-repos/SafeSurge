@@ -16,3 +16,18 @@ sensor:
   heartbeat_timeout_seconds: 180
   bias_alpha: 0.3
   agreement_window_steps: 10
+
+risk:
+  threshold_profile:
+    id: "prototype_v1"
+    type: "PROTOTYPE"
+    unit: "cm"
+    description: >
+      Prototype depth classifications for
+      hackathon visualization. These are not
+      universal flood-safety standards.
+    thresholds:
+      watch: 5.0
+      high: 15.0
+      unsafe: 25.0
+
