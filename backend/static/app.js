@@ -147,44 +147,123 @@ function renderSvgMap(data) {
     });
   }
 
-  // B. Render Road Network Overlay
-  const roadCoords = {
-    "R001": { x1: 34, y1: 34, x2: 466, y2: 34 },
-    "R002": { x1: 466, y1: 34, x2: 466, y2: 466 },
-    "R003": { x1: 34, y1: 34, x2: 34, y2: 466 },
-    "R004": { x1: 34, y1: 466, x2: 466, y2: 466 },
+  // B. Define SVG Arrow Markers if not present
+  if (!document.getElementById("arrow-marker-safe")) {
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML = `
+      <marker id="arrow-safe" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="#22c55e" />
+      </marker>
+      <marker id="arrow-watch" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="#eab308" />
+      </marker>
+      <marker id="arrow-high" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="#f97316" />
+      </marker>
+      <marker id="arrow-unsafe" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="#ef4444" />
+      </marker>
+    `;
+    svgMap.appendChild(defs);
+  }
+
+  // C. Render Road Network with Double-Lane Asphalt & Street Badges
+  const streetMeta = {
+    "R001": { name: "North Ave (A → B)", x1: 34, y1: 34, x2: 466, y2: 34, labelX: 250, labelY: 34, isVertical: false },
+    "R002": { name: "East Expwy (B → D)", x1: 466, y1: 34, x2: 466, y2: 466, labelX: 466, labelY: 250, isVertical: true },
+    "R003": { name: "West Bypass (A → C)", x1: 34, y1: 34, x2: 34, y2: 466, labelX: 34, labelY: 250, isVertical: true },
+    "R004": { name: "South Blvd (C → D)", x1: 34, y1: 466, x2: 466, y2: 466, labelX: 250, labelY: 466, isVertical: false },
   };
 
   if (data.roads) {
     data.roads.forEach(road => {
-      const pts = roadCoords[road.road_id];
-      if (!pts) return;
-      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("x1", pts.x1);
-      line.setAttribute("y1", pts.y1);
-      line.setAttribute("x2", pts.x2);
-      line.setAttribute("y2", pts.y2);
+      const sm = streetMeta[road.road_id];
+      if (!sm) return;
 
+      let statusCls = "safe";
       let strokeColor = "#22c55e"; // SAFE
       let strokeDash = "none";
       if (road.risk === "UNSAFE") {
+        statusCls = "unsafe";
         strokeColor = "#ef4444";
         strokeDash = "6,4";
       } else if (road.risk === "HIGH") {
+        statusCls = "high";
         strokeColor = "#f97316";
       } else if (road.risk === "WATCH") {
+        statusCls = "watch";
         strokeColor = "#eab308";
       }
 
-      line.setAttribute("stroke", strokeColor);
-      line.setAttribute("stroke-width", "5");
-      line.setAttribute("stroke-dasharray", strokeDash);
-      line.setAttribute("stroke-linecap", "round");
-      svgMap.appendChild(line);
+      // 1. Outer Asphalt Base
+      const asphalt = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      asphalt.setAttribute("x1", sm.x1);
+      asphalt.setAttribute("y1", sm.y1);
+      asphalt.setAttribute("x2", sm.x2);
+      asphalt.setAttribute("y2", sm.y2);
+      asphalt.setAttribute("stroke", "#090d16");
+      asphalt.setAttribute("stroke-width", "12");
+      asphalt.setAttribute("stroke-linecap", "round");
+      svgMap.appendChild(asphalt);
+
+      // 2. Colored Lane Surface
+      const lane = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      lane.setAttribute("x1", sm.x1);
+      lane.setAttribute("y1", sm.y1);
+      lane.setAttribute("x2", sm.x2);
+      lane.setAttribute("y2", sm.y2);
+      lane.setAttribute("stroke", strokeColor);
+      lane.setAttribute("stroke-width", "6");
+      lane.setAttribute("stroke-dasharray", strokeDash);
+      lane.setAttribute("stroke-linecap", "round");
+      lane.setAttribute("marker-end", `url(#arrow-${statusCls})`);
+      svgMap.appendChild(lane);
+
+      // 3. Center White Dashed Line (for safe/watch roads)
+      if (road.risk !== "UNSAFE") {
+        const divider = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        divider.setAttribute("x1", sm.x1);
+        divider.setAttribute("y1", sm.y1);
+        divider.setAttribute("x2", sm.x2);
+        divider.setAttribute("y2", sm.y2);
+        divider.setAttribute("stroke", "rgba(255,255,255,0.7)");
+        divider.setAttribute("stroke-width", "1.2");
+        divider.setAttribute("stroke-dasharray", "4,4");
+        svgMap.appendChild(divider);
+      }
+
+      // 4. Street Label Pill Badge
+      const badgeG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      const badgeWidth = sm.isVertical ? 110 : 130;
+      const badgeHeight = 18;
+
+      const pillRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      pillRect.setAttribute("x", sm.labelX - badgeWidth / 2);
+      pillRect.setAttribute("y", sm.labelY - badgeHeight / 2);
+      pillRect.setAttribute("width", badgeWidth);
+      pillRect.setAttribute("height", badgeHeight);
+      pillRect.setAttribute("rx", 9);
+      pillRect.setAttribute("fill", "#0f172a");
+      pillRect.setAttribute("stroke", strokeColor);
+      pillRect.setAttribute("stroke-width", "1.5");
+      badgeG.appendChild(pillRect);
+
+      const pillText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      pillText.setAttribute("x", sm.labelX);
+      pillText.setAttribute("y", sm.labelY + 4);
+      pillText.setAttribute("fill", "#f8fafc");
+      pillText.setAttribute("font-size", "9");
+      pillText.setAttribute("font-weight", "600");
+      pillText.setAttribute("font-family", "Inter, sans-serif");
+      pillText.setAttribute("text-anchor", "middle");
+      pillText.textContent = `${road.road_id}: ${sm.name.split(' ')[0]} ${sm.name.split(' ')[1]}`;
+      badgeG.appendChild(pillText);
+
+      svgMap.appendChild(badgeG);
     });
   }
 
-  // C. Render Node Markers: A, B, C, D
+  // D. Render Node Markers: A, B, C, D
   const nodes = [
     { id: "A", name: "Origin A", x: 34, y: 34, color: "#38bdf8", isEndpoint: true },
     { id: "B", name: "Node B", x: 466, y: 34, color: "#f59e0b", isEndpoint: false },
@@ -192,33 +271,12 @@ function renderSvgMap(data) {
     { id: "D", name: "Dest D", x: 466, y: 466, color: "#22c55e", isEndpoint: true },
   ];
 
-  // Road labels
-  const roadLabels = [
-    { id: "R001", x: 250, y: 22 },
-    { id: "R002", x: 472, y: 250 },
-    { id: "R003", x: 24, y: 250 },
-    { id: "R004", x: 250, y: 480 },
-  ];
-
-  roadLabels.forEach(rl => {
-    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    txt.setAttribute("x", rl.x);
-    txt.setAttribute("y", rl.y);
-    txt.setAttribute("fill", "#94a3b8");
-    txt.setAttribute("font-size", "10");
-    txt.setAttribute("font-weight", "600");
-    txt.setAttribute("font-family", "JetBrains Mono, monospace");
-    txt.setAttribute("text-anchor", "middle");
-    txt.textContent = rl.id;
-    svgMap.appendChild(txt);
-  });
-
   nodes.forEach(n => {
     // Outer glow halo
     const halo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     halo.setAttribute("cx", n.x);
     halo.setAttribute("cy", n.y);
-    halo.setAttribute("r", 18);
+    halo.setAttribute("r", 20);
     halo.setAttribute("fill", n.color);
     halo.setAttribute("opacity", "0.25");
     svgMap.appendChild(halo);
@@ -227,10 +285,10 @@ function renderSvgMap(data) {
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circle.setAttribute("cx", n.x);
     circle.setAttribute("cy", n.y);
-    circle.setAttribute("r", 13);
+    circle.setAttribute("r", 14);
     circle.setAttribute("fill", "#0f172a");
     circle.setAttribute("stroke", n.color);
-    circle.setAttribute("stroke-width", "2.5");
+    circle.setAttribute("stroke-width", "3");
     svgMap.appendChild(circle);
 
     // Letter Label A, B, C, D
@@ -247,12 +305,12 @@ function renderSvgMap(data) {
 
     // Subtitle caption (e.g. Origin / Dest)
     const caption = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    let capY = n.y < 250 ? n.y - 18 : n.y + 26;
+    let capY = n.y < 250 ? n.y - 20 : n.y + 28;
     caption.setAttribute("x", n.x);
     caption.setAttribute("y", capY);
     caption.setAttribute("fill", n.color);
-    caption.setAttribute("font-size", "9");
-    caption.setAttribute("font-weight", "600");
+    caption.setAttribute("font-size", "10");
+    caption.setAttribute("font-weight", "700");
     caption.setAttribute("font-family", "Inter, sans-serif");
     caption.setAttribute("text-anchor", "middle");
     caption.textContent = n.name;
@@ -267,15 +325,15 @@ function updateRouteInfo(data) {
 
   const r2 = data.roads?.find(r => r.road_id === "R002");
   if (r2 && r2.risk === "UNSAFE") {
-    corridorTag.innerText = "A → C → D (Safe Alternate)";
+    corridorTag.innerText = "A → C → D via West Bypass (R003) & South Blvd (R004)";
     corridorTag.className = "route-tag safe";
     avoidedView.innerHTML = `<span class="label">Avoided Road Segments:</span>
-      <span class="avoided-item">⛔ R002 (B→D flooded: ${r2.mean_depth_cm.toFixed(1)}cm)</span>`;
+      <span class="avoided-item">⛔ East Expwy (R002: B→D flooded ${r2.mean_depth_cm.toFixed(1)}cm)</span>`;
   } else {
-    corridorTag.innerText = "A → B → D (Optimal Direct)";
+    corridorTag.innerText = "A → B → D via North Ave (R001) & East Expwy (R002)";
     corridorTag.className = "route-tag safe";
     avoidedView.innerHTML = `<span class="label">Avoided Road Segments:</span>
-      <span class="avoided-item none">None (All corridors safe)</span>`;
+      <span class="avoided-item none">None (All direct streets safe)</span>`;
   }
 }
 
