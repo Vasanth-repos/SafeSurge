@@ -15,6 +15,7 @@ def get_sim_service():
 
 
 @router.get("/mass_balance", response_model=MassBalanceResponse)
+@router.get("/mass-balance", response_model=MassBalanceResponse)
 def get_mass_balance_diagnostic(sim=Depends(get_sim_service)):
     """
     Returns current mass conservation diagnostic verification status.
