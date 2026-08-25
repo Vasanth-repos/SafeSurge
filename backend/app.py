@@ -58,7 +58,17 @@ app.include_router(scenarios_router)
 app.include_router(snapshots_router)
 app.include_router(dashboard_router)
 
+from fastapi.responses import FileResponse
+
 # Mount static frontend build if present
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+    @app.get("/", tags=["Dashboard"])
+    def root_dashboard():
+        """Serves the interactive Web GIS Dashboard."""
+        index_file = os.path.join(static_dir, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        return {"status": "ok", "message": "Urban Flood Nowcasting System"}
