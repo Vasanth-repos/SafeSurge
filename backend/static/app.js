@@ -183,6 +183,81 @@ function renderSvgMap(data) {
       svgMap.appendChild(line);
     });
   }
+
+  // C. Render Node Markers: A, B, C, D
+  const nodes = [
+    { id: "A", name: "Origin A", x: 34, y: 34, color: "#38bdf8", isEndpoint: true },
+    { id: "B", name: "Node B", x: 466, y: 34, color: "#f59e0b", isEndpoint: false },
+    { id: "C", name: "Node C", x: 34, y: 466, color: "#f59e0b", isEndpoint: false },
+    { id: "D", name: "Dest D", x: 466, y: 466, color: "#22c55e", isEndpoint: true },
+  ];
+
+  // Road labels
+  const roadLabels = [
+    { id: "R001", x: 250, y: 22 },
+    { id: "R002", x: 472, y: 250 },
+    { id: "R003", x: 24, y: 250 },
+    { id: "R004", x: 250, y: 480 },
+  ];
+
+  roadLabels.forEach(rl => {
+    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txt.setAttribute("x", rl.x);
+    txt.setAttribute("y", rl.y);
+    txt.setAttribute("fill", "#94a3b8");
+    txt.setAttribute("font-size", "10");
+    txt.setAttribute("font-weight", "600");
+    txt.setAttribute("font-family", "JetBrains Mono, monospace");
+    txt.setAttribute("text-anchor", "middle");
+    txt.textContent = rl.id;
+    svgMap.appendChild(txt);
+  });
+
+  nodes.forEach(n => {
+    // Outer glow halo
+    const halo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    halo.setAttribute("cx", n.x);
+    halo.setAttribute("cy", n.y);
+    halo.setAttribute("r", 18);
+    halo.setAttribute("fill", n.color);
+    halo.setAttribute("opacity", "0.25");
+    svgMap.appendChild(halo);
+
+    // Inner node badge circle
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", n.x);
+    circle.setAttribute("cy", n.y);
+    circle.setAttribute("r", 13);
+    circle.setAttribute("fill", "#0f172a");
+    circle.setAttribute("stroke", n.color);
+    circle.setAttribute("stroke-width", "2.5");
+    svgMap.appendChild(circle);
+
+    // Letter Label A, B, C, D
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", n.x);
+    label.setAttribute("y", n.y + 4);
+    label.setAttribute("fill", "#f8fafc");
+    label.setAttribute("font-size", "12");
+    label.setAttribute("font-weight", "bold");
+    label.setAttribute("font-family", "Inter, sans-serif");
+    label.setAttribute("text-anchor", "middle");
+    label.textContent = n.id;
+    svgMap.appendChild(label);
+
+    // Subtitle caption (e.g. Origin / Dest)
+    const caption = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    let capY = n.y < 250 ? n.y - 18 : n.y + 26;
+    caption.setAttribute("x", n.x);
+    caption.setAttribute("y", capY);
+    caption.setAttribute("fill", n.color);
+    caption.setAttribute("font-size", "9");
+    caption.setAttribute("font-weight", "600");
+    caption.setAttribute("font-family", "Inter, sans-serif");
+    caption.setAttribute("text-anchor", "middle");
+    caption.textContent = n.name;
+    svgMap.appendChild(caption);
+  });
 }
 
 // Update Route View
