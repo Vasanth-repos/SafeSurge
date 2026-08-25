@@ -1,0 +1,15 @@
+{
+  "grid_id": "SYNTHETIC_DEMO_20x20_10M_V1",
+  "catchment_id": "CHENNAI_URBAN_DEMO",
+  "grid_version": "1.1.0",
+  "layer": "Layer 2 \u2014 DEM + D8 Terrain",
+  "resolution_m": 10.0,
+  "crs": "EPSG:32644",
+  "total_cells": 400,
+  "valid_cells": 398,
+  "downstream_cells": 360,
+  "outlet_cells": 1,
+  "boundary_cells": 11,
+  "sink_cells": 26,
+  "validation_status": "PASS"
+}
