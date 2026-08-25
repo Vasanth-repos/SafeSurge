@@ -1,0 +1,18 @@
+simulation:
+  timestep_seconds: 60
+  forecast_minutes: 180
+
+surface:
+  routing_coefficient: 0.0008
+  max_routing_fraction: 0.35
+
+hydrology:
+  default_cn: 85
+
+drainage:
+  default_capacity_m3_s: 0.01
+
+sensor:
+  heartbeat_timeout_seconds: 180
+  bias_alpha: 0.3
+  agreement_window_steps: 10
