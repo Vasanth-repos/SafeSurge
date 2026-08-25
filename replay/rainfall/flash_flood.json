@@ -1,0 +1,12 @@
+[
+  {"step": 0, "rainfall_mm_hr": 5.0, "description": "Light showers begin"},
+  {"step": 1, "rainfall_mm_hr": 15.0, "description": "Rain intensifies across catchment"},
+  {"step": 2, "rainfall_mm_hr": 35.0, "description": "Heavy downpour"},
+  {"step": 3, "rainfall_mm_hr": 60.0, "description": "Cloudburst peak intensity"},
+  {"step": 4, "rainfall_mm_hr": 50.0, "description": "Sustained heavy rainfall"},
+  {"step": 5, "rainfall_mm_hr": 30.0, "description": "Rain starts moderating"},
+  {"step": 6, "rainfall_mm_hr": 15.0, "description": "Storm subsiding"},
+  {"step": 7, "rainfall_mm_hr": 5.0, "description": "Drizzle, surface drainage dominating"},
+  {"step": 8, "rainfall_mm_hr": 0.0, "description": "Rain stopped, flood recessing"},
+  {"step": 9, "rainfall_mm_hr": 0.0, "description": "Recession phase"}
+]

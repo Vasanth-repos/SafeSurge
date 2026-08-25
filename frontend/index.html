@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Flood Nowcasting & Response System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </div>
+        <div>
+          <h1 class="brand-title">AURA-FLOOD NOWCAST</h1>
+          <span class="brand-tag">Autonomous Urban Drainage & Response MVP</span>
+        </div>
+      </div>
+
+      <div class="header-status-strip">
+        <div class="status-pill" id="massBalancePill">
+          <div class="status-dot"></div>
+          <span>MASS BALANCE: <strong id="mbStatusText">PASS (0.0000 m³)</strong></span>
+        </div>
+        <div class="status-pill" id="systemStatePill">
+          <div class="status-dot"></div>
+          <span>ENGINE: <strong id="engineStateText">ONLINE (Δt=60s)</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="main-workspace">
+      <!-- Left Panel: Scenario, Replay & Hydrology Diagnostics -->
+      <aside class="panel left-panel">
+        <!-- Scenario Presets -->
+        <div class="card">
+          <div class="card-title">
+            <span>Scenario Selector</span>
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </div>
+          <div class="control-group">
+            <select id="scenarioSelect">
+              <option value="flash_flood">Cloudburst Flash Flood (60mm/hr)</option>
+              <option value="moderate_rain">Monsoon Moderate (15mm/hr)</option>
+              <option value="blockage_storm">Storm + Inlet #3 Blockage (30%)</option>
+            </select>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" id="btnRunStep" style="flex: 1;">▶ Step Next</button>
+              <button class="btn" id="btnResetSim">↺ Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mass Balance Diagnostic -->
+        <div class="card">
+          <div class="card-title">
+            <span>Mass Conservation</span>
+            <svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span class="stat-label">Total Inflow</span>
+              <span class="stat-value cyan" id="statInflow">0.0 m³</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Surface Storage</span>
+              <span class="stat-value orange" id="statStorage">0.0 m³</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Drained Inlets</span>
+              <span class="stat-value green" id="statDrained">0.0 m³</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Boundary Outflow</span>
+              <span class="stat-value" id="statOutflow">0.0 m³</span>
+            </div>
+          </div>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary); display: flex; justify-content: space-between;">
+            <span>Balance Error:</span>
+            <strong id="statError" style="color: var(--accent-green);">0.0000 m³ (PASS)</strong>
+          </div>
+        </div>
+
+        <!-- Real-Time Fault Injection (Judges Demo Deck) -->
+        <div class="card">
+          <div class="card-title">
+            <span>Fault Injection Deck</span>
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div class="control-group">
+            <button class="btn btn-danger" id="btnFaultSpike">⚡ Inject Sensor #1 Spike (+80cm)</button>
+            <button class="btn btn-danger" id="btnFaultDisconnect">🔌 Disconnect Sensor #2 (Offline)</button>
+            <button class="btn btn-danger" id="btnFaultBlockage">🚫 Choke Inlet #3 (Cap to 30%)</button>
+            <button class="btn" id="btnRestoreAll" style="border-color: var(--accent-green); color: var(--accent-green);">✓ Restore All Systems</button>
+          </div>
+        </div>
+
+        <!-- Audit Event Logs -->
+        <div class="card" style="flex: 1;">
+          <div class="card-title">
+            <span>Event & Anomaly Log</span>
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          </div>
+          <div class="event-ticker" id="eventTicker">
+            <div class="ticker-item">[SYS] Hydrological Engine initialized.</div>
+            <div class="ticker-item">[DEM] 20x20 Catchment loaded with D8 flow.</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Panel: Interactive GIS 2D Map & Playback -->
+      <main class="map-workspace">
+        <div class="map-toolbar">
+          <div class="layer-toggles">
+            <button class="layer-toggle-btn active" data-layer="water">🌊 Water Layer</button>
+            <button class="layer-toggle-btn active" data-layer="dem">🏔 DEM Elevation</button>
+            <button class="layer-toggle-btn active" data-layer="flow">⮡ D8 Flow Vectors</button>
+            <button class="layer-toggle-btn active" data-layer="drainage">🚰 Drainage Network</button>
+            <button class="layer-toggle-btn active" data-layer="roads">🛣 Roads & Risk</button>
+            <button class="layer-toggle-btn active" data-layer="sensors">📡 Sensors</button>
+          </div>
+          <div style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--accent-cyan);" id="currentStepIndicator">
+            STEP 0 / TIME: 00:00:00
+          </div>
+        </div>
+
+        <div class="canvas-container" id="canvasContainer">
+          <canvas id="gisCanvas" width="640" height="640"></canvas>
+          <div class="map-legend">
+            <div class="legend-item"><div class="legend-color" style="background: rgba(56, 189, 248, 0.4);"></div> Safe (&lt; 5 cm)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div> Watch (5 - 15 cm)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #f97316;"></div> High (15 - 30 cm)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div> Unsafe (&gt;= 30 cm)</div>
+          </div>
+        </div>
+
+        <div class="playback-bar">
+          <div class="playback-controls">
+            <button class="btn btn-primary" id="btnPlayPause">▶ Play</button>
+            <button class="btn" id="btnStep">Step</button>
+          </div>
+          <div class="timeline-slider-container">
+            <span style="font-size: 0.75rem; color: var(--text-muted);">00:00</span>
+            <input type="range" min="0" max="10" value="0" class="timeline-slider" id="timelineSlider">
+            <span style="font-size: 0.75rem; color: var(--text-muted);" id="timelineMaxText">10:00</span>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Panel: Safe Routing & Sensor Telemetry -->
+      <aside class="panel right-panel">
+        <!-- Emergency Route Planner -->
+        <div class="card">
+          <div class="card-title">
+            <span>Flood-Aware Emergency Route</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+          </div>
+          <div class="control-group">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <label style="font-size: 0.7rem; color: var(--text-muted);">ORIGIN</label>
+                <select id="routeOrigin">
+                  <option value="J1">Junction 1 (NW)</option>
+                  <option value="J4">Junction 4 (NE)</option>
+                  <option value="J13">Junction 13 (SW)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 0.7rem; color: var(--text-muted);">DESTINATION</label>
+                <select id="routeDestination">
+                  <option value="J16" selected>Junction 16 (SE)</option>
+                  <option value="J11">Junction 11 (Center)</option>
+                  <option value="J6">Junction 6 (North)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.7rem; color: var(--text-muted);">ROUTING MODE</label>
+              <select id="routeMode">
+                <option value="emergency">🚑 Emergency Response Vehicle</option>
+                <option value="vehicle">🚗 Standard Vehicle</option>
+                <option value="pedestrian">🚶 Pedestrian / Evacuation</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="btnCalculateRoute">⚡ Calculate Safe Corridor</button>
+            <div id="routeResultsCard" style="background: rgba(10, 13, 20, 0.7); padding: 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid var(--border-color);">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Estimated ETA:</span>
+                <strong id="routeEta" style="color: var(--accent-cyan);">-- min</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Max Flood Exposure:</span>
+                <strong id="routeExposure" style="color: var(--accent-green);">0.0 (SAFE)</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>Route Confidence:</span>
+                <strong id="routeConfidence">100%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensor Network Health & Telemetry Grid -->
+        <div class="card" style="flex: 1;">
+          <div class="card-title">
+            <span>Sensor Network Telemetry</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/></svg>
+          </div>
+          <div class="sensor-list" id="sensorListContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Road Network Vulnerability Table -->
+        <div class="card">
+          <div class="card-title">
+            <span>Critical Road Segments</span>
+            <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v8H2z"/></svg>
+          </div>
+          <div class="sensor-list" id="roadListContainer" style="max-height: 140px;">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

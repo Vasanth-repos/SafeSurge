@@ -1,0 +1,29 @@
+{
+  "1": [
+    {"step": 0, "water_level_cm": 2.1, "float_state": false, "battery": 98, "signal_quality": 0.95, "heartbeat": true},
+    {"step": 1, "water_level_cm": 6.8, "float_state": false, "battery": 98, "signal_quality": 0.94, "heartbeat": true},
+    {"step": 2, "water_level_cm": 15.4, "float_state": true, "battery": 97, "signal_quality": 0.92, "heartbeat": true},
+    {"step": 3, "water_level_cm": 26.2, "float_state": true, "battery": 97, "signal_quality": 0.90, "heartbeat": true},
+    {"step": 4, "water_level_cm": 22.0, "float_state": true, "battery": 96, "signal_quality": 0.91, "heartbeat": true},
+    {"step": 5, "water_level_cm": 14.5, "float_state": false, "battery": 96, "signal_quality": 0.93, "heartbeat": true},
+    {"step": 6, "water_level_cm": 7.3, "float_state": false, "battery": 95, "signal_quality": 0.95, "heartbeat": true}
+  ],
+  "2": [
+    {"step": 0, "water_level_cm": 3.0, "float_state": false, "battery": 92, "signal_quality": 0.88, "heartbeat": true},
+    {"step": 1, "water_level_cm": 8.5, "float_state": false, "battery": 92, "signal_quality": 0.88, "heartbeat": true},
+    {"step": 2, "water_level_cm": 20.1, "float_state": true, "battery": 91, "signal_quality": 0.86, "heartbeat": true},
+    {"step": 3, "water_level_cm": 33.4, "float_state": true, "battery": 91, "signal_quality": 0.85, "heartbeat": true},
+    {"step": 4, "water_level_cm": 28.1, "float_state": true, "battery": 90, "signal_quality": 0.87, "heartbeat": true},
+    {"step": 5, "water_level_cm": 17.8, "float_state": true, "battery": 90, "signal_quality": 0.89, "heartbeat": true},
+    {"step": 6, "water_level_cm": 9.2, "float_state": false, "battery": 89, "signal_quality": 0.91, "heartbeat": true}
+  ],
+  "3": [
+    {"step": 0, "water_level_cm": 4.5, "float_state": false, "battery": 85, "signal_quality": 0.79, "heartbeat": true},
+    {"step": 1, "water_level_cm": 12.0, "float_state": false, "battery": 85, "signal_quality": 0.79, "heartbeat": true},
+    {"step": 2, "water_level_cm": 28.5, "float_state": true, "battery": 84, "signal_quality": 0.77, "heartbeat": true},
+    {"step": 3, "water_level_cm": 44.0, "float_state": true, "battery": 84, "signal_quality": 0.75, "heartbeat": true},
+    {"step": 4, "water_level_cm": 38.2, "float_state": true, "battery": 83, "signal_quality": 0.76, "heartbeat": true},
+    {"step": 5, "water_level_cm": 24.6, "float_state": true, "battery": 83, "signal_quality": 0.78, "heartbeat": true},
+    {"step": 6, "water_level_cm": 13.0, "float_state": false, "battery": 82, "signal_quality": 0.80, "heartbeat": true}
+  ]
+}

@@ -1,0 +1,9 @@
+[
+  {"step": 0, "rainfall_mm_hr": 10.0, "description": "Rain begins"},
+  {"step": 1, "rainfall_mm_hr": 25.0, "description": "Rain increases"},
+  {"step": 2, "rainfall_mm_hr": 45.0, "description": "Heavy rain; Inlet #3 capacity degraded to 30%"},
+  {"step": 3, "rainfall_mm_hr": 45.0, "description": "High runoff accumulation in low basin"},
+  {"step": 4, "rainfall_mm_hr": 35.0, "description": "Localized waterlogging around low road nodes"},
+  {"step": 5, "rainfall_mm_hr": 20.0, "description": "Storm subsiding"},
+  {"step": 6, "rainfall_mm_hr": 5.0, "description": "Drainage recovery"}
+]

@@ -1,0 +1,10 @@
+[
+  {"step": 0, "rainfall_mm_hr": 10.0, "description": "Steady rain onset"},
+  {"step": 1, "rainfall_mm_hr": 15.0, "description": "Steady rain"},
+  {"step": 2, "rainfall_mm_hr": 15.0, "description": "Steady rain"},
+  {"step": 3, "rainfall_mm_hr": 18.0, "description": "Moderate peak"},
+  {"step": 4, "rainfall_mm_hr": 12.0, "description": "Steady rain"},
+  {"step": 5, "rainfall_mm_hr": 8.0, "description": "Tapering rain"},
+  {"step": 6, "rainfall_mm_hr": 5.0, "description": "Light showers"},
+  {"step": 7, "rainfall_mm_hr": 0.0, "description": "Dry"}
+]
