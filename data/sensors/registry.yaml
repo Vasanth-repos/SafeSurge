@@ -1,0 +1,54 @@
+sensors:
+  S001:
+    enabled: true
+    location_id: "C104"
+    reference_height_cm: 100.0
+    distance:
+      min_cm: 2.0
+      max_cm: 400.0
+    level:
+      min_cm: 0.0
+      max_cm: 95.0
+    ultrasonic:
+      samples_per_measurement: 5
+      minimum_valid_samples: 3
+    float_switch:
+      enabled: true
+      trigger_level_cm: 20.0
+      tolerance_cm: 3.0
+
+  S002:
+    enabled: true
+    location_id: "C00001"
+    reference_height_cm: 120.0
+    distance:
+      min_cm: 2.0
+      max_cm: 400.0
+    level:
+      min_cm: 0.0
+      max_cm: 115.0
+    ultrasonic:
+      samples_per_measurement: 5
+      minimum_valid_samples: 3
+    float_switch:
+      enabled: true
+      trigger_level_cm: 25.0
+      tolerance_cm: 3.0
+
+  S003_DISABLED:
+    enabled: false
+    location_id: "C00002"
+    reference_height_cm: 100.0
+    distance:
+      min_cm: 2.0
+      max_cm: 400.0
+    level:
+      min_cm: 0.0
+      max_cm: 95.0
+    ultrasonic:
+      samples_per_measurement: 5
+      minimum_valid_samples: 3
+    float_switch:
+      enabled: false
+      trigger_level_cm: 20.0
+      tolerance_cm: 3.0

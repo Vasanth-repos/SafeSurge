@@ -1,0 +1,28 @@
+{
+  "sensor_id": "S001",
+  "boot_id": "boot-001",
+  "reference_height_cm": 100.0,
+  "readings": [
+    {
+      "sequence": 1,
+      "measured_at_seconds": 0,
+      "received_at_seconds": 1,
+      "distance_samples_cm": [90.0, 90.1, 90.0, 89.9, 90.0],
+      "float_triggered": false
+    },
+    {
+      "sequence": 2,
+      "measured_at_seconds": 10,
+      "received_at_seconds": 11,
+      "distance_samples_cm": [89.0, 89.1, 89.0, 89.2, 88.9],
+      "float_triggered": false
+    },
+    {
+      "sequence": 3,
+      "measured_at_seconds": 20,
+      "received_at_seconds": 21,
+      "distance_samples_cm": [88.0, 88.2, 88.0, 87.9, 88.1],
+      "float_triggered": false
+    }
+  ]
+}
