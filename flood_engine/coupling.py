@@ -268,6 +268,7 @@ class SurfaceDrainageCouplingEngine:
         self,
         timestamp_seconds: int,
         runoff_volume_m3_by_cell: Mapping[str, float],
+        capacity_factor_by_edge: Optional[Mapping[str, float]] = None,
     ) -> CouplingStepResult:
         """
         Executes one coupled surface-drainage simulation timestep:
@@ -373,9 +374,11 @@ class SurfaceDrainageCouplingEngine:
         )
 
         # 6. Advance Layer 6 Subsurface Drainage Network
+        cap_factors_dict = dict(capacity_factor_by_edge) if capacity_factor_by_edge is not None else None
         drainage_result: DrainageStepResult = self.drainage_network.step(
             timestamp_seconds=t,
             inflow_volume_m3_by_node=drainage_inflow_by_node,
+            capacity_factor_by_edge=cap_factors_dict,
             dt_seconds=int(self.dt_seconds),
         )
 

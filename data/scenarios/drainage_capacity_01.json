@@ -1,0 +1,32 @@
+{
+  "scenario_id": "drainage_capacity_01",
+  "name": "Controlled reduced drainage-capacity scenario",
+  "mode": "SCENARIO",
+  "description": "Synthetic demonstration: E002 changes from nominal to 30% capacity at minute 45 and returns to nominal at minute 75.",
+  "affected_edges": [
+    "E002"
+  ],
+  "events": [
+    {
+      "timestamp_seconds": 0,
+      "edge_ids": [
+        "E002"
+      ],
+      "capacity_factor": 1.0
+    },
+    {
+      "timestamp_seconds": 2700,
+      "edge_ids": [
+        "E002"
+      ],
+      "capacity_factor": 0.3
+    },
+    {
+      "timestamp_seconds": 4500,
+      "edge_ids": [
+        "E002"
+      ],
+      "capacity_factor": 1.0
+    }
+  ]
+}
