@@ -1,0 +1,5 @@
+scenario_id: "storm_01"
+description: "Baseline 180-minute synthetic storm event with peak precipitation at t=60m"
+total_minutes: 180
+timestep_seconds: 60
+faults: []

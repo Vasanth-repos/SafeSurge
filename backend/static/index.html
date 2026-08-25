@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Flood Nowcasting & Response System — GIS Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <!-- System Status Banner -->
+  <header class="header-banner" id="status-banner">
+    <div class="banner-left">
+      <div class="status-badge" id="system-status-badge">🟢 SYSTEM NORMAL</div>
+      <div class="system-title">Urban Flood Nowcasting & Response System</div>
+    </div>
+    <div class="banner-right">
+      <div class="scenario-selector">
+        <label for="scenario-select">Scenario:</label>
+        <select id="scenario-select">
+          <option value="storm_01">Baseline Storm (180 min)</option>
+          <option value="sensor_offline">Fault: Sensor S001 Offline (t=30m..60m)</option>
+          <option value="sensor_spike">Fault: S001 Rate Spike 90cm (t=30m)</option>
+          <option value="capacity_reduction">Fault: Reduced Drainage Capacity 30% (t=45m..60m)</option>
+        </select>
+      </div>
+      <div class="degraded-reasons" id="degraded-reasons-text">All sensors online & telemetry valid</div>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <main class="dashboard-grid">
+    <!-- Left Column: Map & Timeline -->
+    <section class="panel map-panel">
+      <div class="panel-header">
+        <h2>2D Catchment Hydrology & GIS Road Network</h2>
+        <div class="map-legend">
+          <span class="legend-item"><span class="color-box safe"></span> SAFE (&lt;5cm)</span>
+          <span class="legend-item"><span class="color-box watch"></span> WATCH (5-15cm)</span>
+          <span class="legend-item"><span class="color-box high"></span> HIGH (15-25cm)</span>
+          <span class="legend-item"><span class="color-box unsafe"></span> UNSAFE (&ge;25cm)</span>
+        </div>
+      </div>
+      
+      <!-- Interactive SVG Map -->
+      <div class="svg-container" id="map-container">
+        <svg id="flood-map" viewBox="0 0 500 500"></svg>
+        <div id="cell-tooltip" class="tooltip hidden"></div>
+      </div>
+
+      <!-- Timeline & Replay Controls -->
+      <div class="timeline-card">
+        <div class="timeline-controls">
+          <button id="btn-play" class="btn btn-primary">▶ Play</button>
+          <button id="btn-pause" class="btn btn-secondary">⏸ Pause</button>
+          <button id="btn-reset" class="btn btn-secondary">↻ Reset</button>
+          <div class="time-display">
+            <span class="label">Lead Time:</span>
+            <span id="time-display-val" class="value">+0 min (t=0s)</span>
+          </div>
+        </div>
+        <div class="slider-wrapper">
+          <input type="range" id="timeline-slider" min="0" max="180" value="0" step="1">
+          <div class="slider-ticks">
+            <span>0m (NOW)</span>
+            <span>+30m</span>
+            <span>+60m (PEAK)</span>
+            <span>+90m</span>
+            <span>+120m</span>
+            <span>+150m</span>
+            <span>+180m</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Observability Panels -->
+    <aside class="sidebar-column">
+      <!-- Forecast & Uncertainty Card -->
+      <div class="panel forecast-card">
+        <div class="panel-header">
+          <h3>Flood Forecast & Uncertainty</h3>
+          <span id="forecast-status-badge" class="badge badge-success">AVAILABLE</span>
+        </div>
+        <div class="forecast-stats">
+          <div class="stat-box">
+            <span class="stat-label">Peak Flood Depth</span>
+            <span id="forecast-peak-depth" class="stat-value">0.0 cm</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Prototype Range</span>
+            <span id="forecast-range" class="stat-value">0.0 – 0.0 cm</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Fusion Confidence</span>
+            <span id="forecast-confidence" class="stat-value">100%</span>
+          </div>
+        </div>
+        <p class="disclaimer-note">Prototype uncertainty range based on calibrated physics model & sensor fusion history.</p>
+      </div>
+
+      <!-- Emergency Routing Card -->
+      <div class="panel routing-card">
+        <div class="panel-header">
+          <h3>Risk-Aware Safe Routing</h3>
+          <button id="btn-recompute-route" class="btn btn-sm btn-outline">Compute Route (A → D)</button>
+        </div>
+        <div class="route-details" id="route-details-view">
+          <div class="route-path-display">
+            <span class="label">Recommended Safe Corridor:</span>
+            <span id="route-corridor" class="route-tag safe">A → B → D</span>
+          </div>
+          <div class="avoidance-list" id="avoided-roads-view">
+            <span class="label">Avoided Road Segments:</span>
+            <span class="avoided-item none">None (All corridors safe)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mass Balance Ledger Card -->
+      <div class="panel mass-balance-card">
+        <div class="panel-header">
+          <h3>Hydrological Mass Balance</h3>
+          <span id="mb-status-badge" class="badge badge-success">PASS</span>
+        </div>
+        <div class="ledger-table">
+          <div class="ledger-row"><span>Runoff Input ($I_t$):</span><strong id="mb-runoff">0.00 m³</strong></div>
+          <div class="ledger-row"><span>Storage Change ($\Delta S_t$):</span><strong id="mb-storage-change">0.00 m³</strong></div>
+          <div class="ledger-row"><span>Drainage Capture ($D_t$):</span><strong id="mb-drainage">0.00 m³</strong></div>
+          <div class="ledger-row"><span>Boundary Outflow ($B_t$):</span><strong id="mb-boundary">0.00 m³</strong></div>
+          <div class="ledger-row total"><span>Residual Error ($E_t$):</span><strong id="mb-error">0.000000 m³</strong></div>
+        </div>
+      </div>
+
+      <!-- Sensor Health Table -->
+      <div class="panel sensors-card">
+        <div class="panel-header">
+          <h3>Telemetry & Sensor Health</h3>
+        </div>
+        <div class="sensor-table-wrapper">
+          <table class="sensor-table">
+            <thead>
+              <tr>
+                <th>Sensor</th>
+                <th>Location</th>
+                <th>Reading</th>
+                <th>Status</th>
+                <th>Bias</th>
+              </tr>
+            </thead>
+            <tbody id="sensor-table-body">
+              <tr>
+                <td>S001</td>
+                <td>C012</td>
+                <td>0.0 cm</td>
+                <td><span class="badge badge-success">ONLINE</span></td>
+                <td>+0.0 cm</td>
+              </tr>
+              <tr>
+                <td>S002</td>
+                <td>C025</td>
+                <td>0.0 cm</td>
+                <td><span class="badge badge-success">ONLINE</span></td>
+                <td>+0.0 cm</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

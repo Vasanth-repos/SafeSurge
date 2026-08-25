@@ -1,0 +1,11 @@
+scenario_id: "sensor_offline"
+description: "Sensor S001 drop-out fault between t=1800s and 3600s"
+total_minutes: 180
+timestep_seconds: 60
+faults:
+  - fault_id: "F_SENSOR_OFFLINE_01"
+    fault_type: "SENSOR_OFFLINE"
+    start_seconds: 1800
+    end_seconds: 3600
+    parameters:
+      sensor_id: "S001"

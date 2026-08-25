@@ -17,6 +17,8 @@ from backend.api.roads import router as roads_router
 from backend.api.routes import router as routes_router
 from backend.api.diagnostics import router as diagnostics_router
 from backend.api.scenarios import router as scenarios_router
+from backend.api.snapshots import router as snapshots_router
+from backend.api.dashboard import router as dashboard_router
 from backend.services.simulation_service import SimulationService
 
 # Core simulation service instance for legacy scenario endpoints
@@ -53,6 +55,8 @@ app.include_router(roads_router)
 app.include_router(routes_router)
 app.include_router(diagnostics_router)
 app.include_router(scenarios_router)
+app.include_router(snapshots_router)
+app.include_router(dashboard_router)
 
 # Mount static frontend build if present
 static_dir = os.path.join(os.path.dirname(__file__), "static")

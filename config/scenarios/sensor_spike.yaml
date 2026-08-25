@@ -1,0 +1,12 @@
+scenario_id: "sensor_spike"
+description: "Erroneous rate spike of 90cm injected on S001 at t=1800s"
+total_minutes: 180
+timestep_seconds: 60
+faults:
+  - fault_id: "F_SENSOR_SPIKE_01"
+    fault_type: "SENSOR_SPIKE"
+    start_seconds: 1800
+    end_seconds: 1860
+    parameters:
+      sensor_id: "S001"
+      depth_cm: 90.0

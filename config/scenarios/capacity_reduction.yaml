@@ -1,0 +1,11 @@
+scenario_id: "capacity_reduction"
+description: "Reduced drainage capacity factor (0.3) scenario between t=2700s and 3600s"
+total_minutes: 180
+timestep_seconds: 60
+faults:
+  - fault_id: "F_CAPACITY_01"
+    fault_type: "DRAINAGE_CAPACITY"
+    start_seconds: 2700
+    end_seconds: 3600
+    parameters:
+      capacity_factor: 0.3
