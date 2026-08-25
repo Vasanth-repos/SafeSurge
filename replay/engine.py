@@ -89,21 +89,34 @@ class ReplayEngine:
                 ])
                 self.cell_elevations[cid] = 20.0 - (r + c) * 0.5
 
-        # Road Network
+        # Complex 7-Node, 10-Segment Road Network with Drainage Edge Cases
+        # Nodes: A(5,5), B(95,5), C(5,95), D(95,95), M(55,45), E(95,55), W(5,55)
         self.roads = [
-            Road("R001", "A", "B", LineString([(5.0, 5.0), (45.0, 5.0)]), length_m=40.0, nominal_travel_time_seconds=60.0),
-            Road("R002", "B", "D", LineString([(45.0, 5.0), (45.0, 45.0)]), length_m=40.0, nominal_travel_time_seconds=60.0),
-            Road("R003", "A", "C", LineString([(5.0, 5.0), (5.0, 45.0)]), length_m=40.0, nominal_travel_time_seconds=60.0),
-            Road("R004", "C", "D", LineString([(5.0, 45.0), (45.0, 45.0)]), length_m=40.0, nominal_travel_time_seconds=60.0),
+            Road("R001", "A", "B", LineString([(5.0, 5.0), (95.0, 5.0)]), length_m=90.0, nominal_travel_time_seconds=45.0),
+            Road("R002", "B", "E", LineString([(95.0, 5.0), (95.0, 55.0)]), length_m=50.0, nominal_travel_time_seconds=30.0),
+            Road("R003", "A", "W", LineString([(5.0, 5.0), (5.0, 55.0)]), length_m=50.0, nominal_travel_time_seconds=30.0),
+            Road("R004", "C", "D", LineString([(5.0, 95.0), (95.0, 95.0)]), length_m=90.0, nominal_travel_time_seconds=45.0),
+            Road("R005", "E", "D", LineString([(95.0, 55.0), (95.0, 95.0)]), length_m=40.0, nominal_travel_time_seconds=25.0),
+            Road("R006", "A", "M", LineString([(5.0, 5.0), (55.0, 45.0)]), length_m=65.0, nominal_travel_time_seconds=35.0),
+            Road("R007", "M", "D", LineString([(55.0, 45.0), (95.0, 95.0)]), length_m=65.0, nominal_travel_time_seconds=35.0),
+            Road("R008", "W", "M", LineString([(5.0, 55.0), (55.0, 45.0)]), length_m=50.0, nominal_travel_time_seconds=30.0),
+            Road("R009", "M", "E", LineString([(55.0, 45.0), (95.0, 55.0)]), length_m=40.0, nominal_travel_time_seconds=25.0),
+            Road("R010", "W", "C", LineString([(5.0, 55.0), (5.0, 95.0)]), length_m=40.0, nominal_travel_time_seconds=25.0),
         ]
         self.road_mapper = RoadSpatialMapper(self.roads, self.cell_geometries)
 
         # Directed Road Graph
         edges = [
-            RoadEdge("R001", "A", "B", 60.0, 40.0),
-            RoadEdge("R002", "B", "D", 60.0, 40.0),
-            RoadEdge("R003", "A", "C", 60.0, 40.0),
-            RoadEdge("R004", "C", "D", 60.0, 40.0),
+            RoadEdge("R001", "A", "B", 45.0, 90.0),
+            RoadEdge("R002", "B", "E", 30.0, 50.0),
+            RoadEdge("R003", "A", "W", 30.0, 50.0),
+            RoadEdge("R004", "C", "D", 45.0, 90.0),
+            RoadEdge("R005", "E", "D", 25.0, 40.0),
+            RoadEdge("R006", "A", "M", 35.0, 65.0),
+            RoadEdge("R007", "M", "D", 35.0, 65.0),
+            RoadEdge("R008", "W", "M", 30.0, 50.0),
+            RoadEdge("R009", "M", "E", 25.0, 40.0),
+            RoadEdge("R010", "W", "C", 25.0, 40.0),
         ]
         self.directed_graph = DirectedRoadGraph(edges)
         self.router = EmergencyRouter(self.directed_graph)
@@ -227,18 +240,20 @@ class ReplayEngine:
                 cell_depths_by_id=cell_depth_map,
                 cell_confidences_by_id=cell_conf_map,
             )
+            road_by_id = {r.road_id: r for r in self.roads}
             road_snapshots = [
                 RoadSnapshot(
                     road_id=rr.road_id,
-                    from_node=self.roads[i].from_node,
-                    to_node=self.roads[i].to_node,
+                    from_node=road_by_id[rr.road_id].from_node,
+                    to_node=road_by_id[rr.road_id].to_node,
                     mean_depth_cm=rr.mean_depth_cm,
                     max_relevant_depth_cm=rr.max_relevant_depth_cm,
                     affected_fraction=rr.affected_fraction,
                     risk=rr.risk,
                     confidence=rr.confidence,
                 )
-                for i, rr in enumerate(road_risks_dict.values())
+                for rr in road_risks_dict.values()
+                if rr.road_id in road_by_id
             ]
 
             # 8. Mass Balance Accounting

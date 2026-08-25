@@ -1,9 +1,9 @@
 {
-  "validation_id": "val_1787641260",
+  "validation_id": "val_1787643110",
   "scenario_id": "e2e_validation_01",
   "status": "PASS",
-  "started_at": "2026-08-25T07:00:58.588553Z",
-  "completed_at": "2026-08-25T07:01:00.051666Z",
+  "started_at": "2026-08-25T07:31:49.087952Z",
+  "completed_at": "2026-08-25T07:31:50.575112Z",
   "simulation_id": "e2e_validation_01",
   "timestep_count": 181,
   "summary": {
