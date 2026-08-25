@@ -172,12 +172,24 @@ class ReplayEngine:
             runoff_input_m3 = (rain_mm / 1000.0) * 10000.0 * 0.4  # Runoff volume across domain
             active_fault_list = [f.fault_type.value for f in self.fault_engine.get_active_faults(t)]
 
-            # 3. Model Flood Depth Field
+            # 3. Model Flood Depth Field Across All 100 Catchment Cells
             model_depths = {}
+            int_factor = math.sin(min(math.pi, (step_idx / max(1, num_steps)) * math.pi))
             for cid, (x, y) in self.cell_coords.items():
-                ne_factor = ((x / 50.0) ** 3) * (math.exp(-((y - 25.0) / 15.0) ** 2))
-                int_factor = math.sin(min(math.pi, (step_idx / max(1, num_steps)) * math.pi))
-                d = max(0.0, 45.0 * ne_factor * int_factor)
+                r, c = self.cell_rc[cid]
+                # High ground sheetflow across entire catchment
+                base_sheet = (2.2 + 1.1 * math.sin(x / 18.0) * math.cos(y / 18.0)) * int_factor
+                # Topographic gravity drainage from NW(high) to SE(low)
+                slope_drainage = max(0.0, (20.0 - self.cell_elevations[cid]) * 0.9) * int_factor
+                # Natural diagonal midtown drainage valley channel
+                valley_dist = abs((x - y) / 14.14)
+                valley_channel = max(0.0, 6.0 - 0.7 * valley_dist) * int_factor
+                # Eastern Underpass depression hotspot (E001/Lowland E)
+                lowland_sink = 16.0 * math.exp(-(((x - 85.0) / 24.0) ** 2 + ((y - 55.0) / 26.0) ** 2)) * int_factor
+                # Southern drainage canal flow
+                south_canal = max(0.0, (y - 40.0) / 50.0) * 6.5 * int_factor
+
+                d = max(0.0, base_sheet + slope_drainage + valley_channel + lowland_sink + south_canal)
                 model_depths[cid] = d
 
             # 4. Sensor Telemetry Ingestion with Fault Injection

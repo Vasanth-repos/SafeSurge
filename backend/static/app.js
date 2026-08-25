@@ -116,14 +116,28 @@ function renderSvgMap(data) {
       rect.setAttribute("rx", 3);
       
       let fillColor = "#1e293b";
-      if (cell.risk === "UNSAFE") fillColor = "#ef4444";
-      else if (cell.risk === "HIGH") fillColor = "#f97316";
-      else if (cell.risk === "WATCH") fillColor = "#eab308";
-      else if (cell.depth_cm > 0.5) fillColor = "#3b82f6";
+      let opacity = "0.45";
+
+      if (cell.risk === "UNSAFE" || cell.depth_cm >= 25) {
+        fillColor = "#ef4444";
+        opacity = "0.90";
+      } else if (cell.risk === "HIGH" || cell.depth_cm >= 15) {
+        fillColor = "#f97316";
+        opacity = "0.85";
+      } else if (cell.risk === "WATCH" || cell.depth_cm >= 5) {
+        fillColor = "#eab308";
+        opacity = "0.80";
+      } else if (cell.depth_cm > 0.5) {
+        fillColor = "#3b82f6";
+        opacity = "0.75";
+      } else if (cell.depth_cm > 0.02) {
+        fillColor = "#0284c7";
+        opacity = "0.60";
+      }
 
       rect.setAttribute("fill", fillColor);
-      rect.setAttribute("opacity", cell.depth_cm > 0 ? "0.85" : "0.4");
-      rect.setAttribute("stroke", "#334155");
+      rect.setAttribute("opacity", opacity);
+      rect.setAttribute("stroke", "#1e293b");
       rect.setAttribute("stroke-width", "1");
 
       // Hover tooltip with full verified cell provenance
