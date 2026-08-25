@@ -70,6 +70,7 @@ class ReplayEngine:
     def _build_catchment(self):
         # 10x10 computational grid (100 cells)
         self.cell_coords: Dict[str, Tuple[float, float]] = {}
+        self.cell_rc: Dict[str, Tuple[int, int]] = {}
         self.cell_geometries: Dict[str, Polygon] = {}
         self.cell_elevations: Dict[str, float] = {}
 
@@ -79,6 +80,7 @@ class ReplayEngine:
                 x = c * 10.0 + 5.0
                 y = r * 10.0 + 5.0
                 self.cell_coords[cid] = (x, y)
+                self.cell_rc[cid] = (r, c)
                 self.cell_geometries[cid] = Polygon([
                     (c * 10.0, r * 10.0),
                     ((c + 1) * 10.0, r * 10.0),
@@ -268,8 +270,8 @@ class ReplayEngine:
             cell_snapshots = tuple(
                 CellSnapshot(
                     cell_id=cid,
-                    row=int(cid[1:3]),
-                    col=int(cid[3:]) if len(cid) > 3 else 0,
+                    row=self.cell_rc[cid][0],
+                    col=self.cell_rc[cid][1],
                     elevation_m=self.cell_elevations[cid],
                     model_depth_cm=cr.model_depth_cm,
                     correction_cm=cr.correction_cm,

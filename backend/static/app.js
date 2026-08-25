@@ -126,21 +126,43 @@ function renderSvgMap(data) {
       rect.setAttribute("stroke", "#334155");
       rect.setAttribute("stroke-width", "1");
 
-      // Hover tooltip
+      // Hover tooltip with full verified cell provenance
       rect.addEventListener("mouseenter", (e) => {
         tooltip.classList.remove("hidden");
+        const riskColor = cell.risk === "UNSAFE" ? "#ef4444" : (cell.risk === "HIGH" ? "#f97316" : (cell.risk === "WATCH" ? "#eab308" : "#22c55e"));
         tooltip.innerHTML = `
-          <strong>Cell: ${cell.cell_id}</strong><br/>
-          Depth: <strong>${cell.depth_cm.toFixed(1)} cm</strong><br/>
-          Model: ${cell.model_depth_cm.toFixed(1)} cm (Corr: ${cell.correction_cm >= 0 ? '+' : ''}${cell.correction_cm.toFixed(1)}cm)<br/>
-          Risk: <strong>${cell.risk}</strong> | Conf: ${(cell.confidence * 100).toFixed(0)}%
+          <div style="font-size: 11px; font-weight: 700; color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 4px; margin-bottom: 4px;">
+            Grid Cell: ${cell.cell_id} (R${cell.row}, C${cell.col})
+          </div>
+          <div style="display: grid; grid-template-columns: auto auto; gap: 4px 10px; font-size: 11px;">
+            <span style="color: #94a3b8;">Elevation:</span> <span>${cell.elevation_m ? cell.elevation_m.toFixed(1) : (20.0 - (cell.row + cell.col)*0.5).toFixed(1)} m</span>
+            <span style="color: #94a3b8;">Fused Depth:</span> <strong style="color: ${cell.depth_cm > 0 ? '#38bdf8' : '#f8fafc'};">${cell.depth_cm.toFixed(1)} cm</strong>
+            <span style="color: #94a3b8;">Model Depth:</span> <span>${cell.model_depth_cm.toFixed(1)} cm</span>
+            <span style="color: #94a3b8;">Sensor Bias Corr:</span> <span>${cell.correction_cm >= 0 ? '+' : ''}${cell.correction_cm.toFixed(1)} cm</span>
+            <span style="color: #94a3b8;">Risk State:</span> <strong style="color: ${riskColor};">${cell.risk}</strong>
+            <span style="color: #94a3b8;">Trust Confidence:</span> <span>${(cell.confidence * 100).toFixed(0)}%</span>
+          </div>
         `;
       });
+
       rect.addEventListener("mousemove", (e) => {
-        const bounds = svgMap.getBoundingClientRect();
-        tooltip.style.left = `${e.clientX - bounds.left + 15}px`;
-        tooltip.style.top = `${e.clientY - bounds.top + 15}px`;
+        const container = document.getElementById("map-container");
+        const bounds = container ? container.getBoundingClientRect() : svgMap.getBoundingClientRect();
+        let posX = e.clientX - bounds.left + 15;
+        let posY = e.clientY - bounds.top + 15;
+
+        // Smart boundary clamping
+        if (posX + 210 > bounds.width) {
+          posX = e.clientX - bounds.left - 215;
+        }
+        if (posY + 130 > bounds.height) {
+          posY = e.clientY - bounds.top - 135;
+        }
+
+        tooltip.style.left = `${Math.max(10, posX)}px`;
+        tooltip.style.top = `${Math.max(10, posY)}px`;
       });
+
       rect.addEventListener("mouseleave", () => {
         tooltip.classList.add("hidden");
       });
