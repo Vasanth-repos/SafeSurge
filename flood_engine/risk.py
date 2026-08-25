@@ -338,6 +338,10 @@ class RiskEngine:
         else:
             self.profile = load_risk_profile_from_yaml("config.yaml")
 
+    @classmethod
+    def load_from_config(cls, config_path: Union[str, Path] = "config.yaml") -> RiskEngine:
+        return cls(profile=load_risk_profile_from_yaml(config_path))
+
     def classify_cells(
         self,
         cell_depths: Mapping[str, Any],

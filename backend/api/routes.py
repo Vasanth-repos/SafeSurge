@@ -1,41 +1,46 @@
 """
-Safe route planning API endpoints.
+API Endpoints — Emergency Safe Routing:
+Calculates dynamic risk-avoidance shortest paths and returns route explanation and avoided roads.
 """
 
-from fastapi import APIRouter, Depends
-from backend.models.schemas import SafeRouteRequest, SafeRouteResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from backend.schemas import RouteRequest
+from backend.dependencies import get_simulation_manager
+from backend.services.simulation_manager import SimulationManager
 
-router = APIRouter(prefix="/api/routes", tags=["Routing"])
+router = APIRouter(prefix="/api/routes", tags=["Routes"])
 
 
-def get_sim_service():
+@router.post("/safe")
+def calculate_safe_route(
+    request: RouteRequest,
+    manager: SimulationManager = Depends(get_simulation_manager),
+):
     from backend.app import sim_service
-    return sim_service
+    if request.simulation_id is not None:
+        try:
+            route_result = manager.route_emergency(
+                simulation_id=request.simulation_id,
+                origin=request.origin,
+                destination=request.destination,
+                lead_time_minutes=request.lead_time_minutes,
+            )
+            return route_result.to_dict()
+        except KeyError as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={"error": str(e)},
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={"error": str(e)},
+            )
 
-
-@router.post("/safe", response_model=SafeRouteResponse)
-def compute_safe_route_endpoint(payload: SafeRouteRequest, sim=Depends(get_sim_service)):
-    """
-    Computes flood-aware multi-objective shortest path avoiding unsafe flooded corridors.
-    """
-    res = sim.compute_safe_route(
-        origin=payload.origin,
-        destination=payload.destination,
-        mode=payload.mode or "emergency",
+    # Legacy routing via sim_service
+    res = sim_service.compute_safe_route(
+        origin=request.origin,
+        destination=request.destination,
+        mode=request.mode,
     )
     return res
-
-
-@router.get("/nodes")
-def get_road_nodes(sim=Depends(get_sim_service)):
-    """
-    Returns all road junction nodes and their coordinates.
-    """
-    nodes = []
-    for nid, pos in sim.roads.nodes.items():
-        nodes.append({
-            "node_id": nid,
-            "row": pos[0],
-            "col": pos[1],
-        })
-    return nodes

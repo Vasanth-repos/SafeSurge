@@ -48,10 +48,33 @@ fusion:
       coverage: 0.30
       freshness: 0.30
       agreement: 0.40
-    agreement_window_steps: 10
-    minimum_agreement_observations: 5
-    agreement_scale_cm: 20.0
-    max_sensor_age_seconds: 180
-    target_history_observations: 10
+simulation:
+  timestep_seconds: 60
+  forecast_minutes: 180
+
+anomaly:
+  rapid_rise:
+    threshold_cm_per_minute: 5.0
+  model_disagreement:
+    threshold_cm: 20.0
+  sensor_inconsistency:
+    ultrasonic_water_threshold_cm: 2.0
+    max_time_difference_seconds: 10
+  capacity_anomaly:
+    minimum_depth_cm: 10.0
+    minimum_rise_rate_cm_per_minute: 2.0
+    expected_capacity_factor: 1.0
+    capture_efficiency_drop: 0.40
+
+roads:
+  minimum_exposure_fraction: 0.10
+
+routing:
+  risk_penalty:
+    SAFE: 0.0
+    WATCH: 120.0
+    HIGH: 600.0
+  uncertainty_weight: 120.0
+  unsafe_edges_blocked: true
 
 

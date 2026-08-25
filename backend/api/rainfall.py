@@ -1,28 +1,33 @@
 """
-Rainfall ingestion API endpoints.
+API Endpoints — Rainfall Replay & Storm Execution:
+Initiates and controls storm replay simulation lifecycles.
 """
 
-from fastapi import APIRouter, HTTPException, Depends
-from backend.models.schemas import RainfallIngestRequest
+from fastapi import APIRouter, Depends, HTTPException, status
+from backend.schemas import ReplayRequest
+from backend.dependencies import get_simulation_manager
+from backend.services.simulation_manager import SimulationManager
 
 router = APIRouter(prefix="/api/rainfall", tags=["Rainfall"])
 
 
-def get_sim_service():
-    from backend.app import sim_service
-    return sim_service
-
-
-@router.post("/ingest")
-def ingest_rainfall(payload: RainfallIngestRequest, sim=Depends(get_sim_service)):
-    """
-    Ingests rainfall data for a specific cell or catchment-wide.
-    """
-    rain_input = {payload.cell_id: payload.rainfall_mm} if payload.cell_id is not None else payload.rainfall_mm
-    res = sim.step(rainfall_input=rain_input)
-    return {
-        "status": "success",
-        "step": res["step"],
-        "rainfall_mm": payload.rainfall_mm,
-        "mass_balance": res["mass_balance"],
-    }
+@router.post("/replay", status_code=status.HTTP_200_OK)
+def trigger_replay(
+    request: ReplayRequest,
+    manager: SimulationManager = Depends(get_simulation_manager),
+):
+    try:
+        instance = manager.start_simulation(scenario=request.scenario)
+        return {
+            "simulation_id": instance.simulation_id,
+            "status": instance.status.value,
+            "scenario": instance.scenario,
+            "forecast_minutes": instance.forecast_minutes,
+        }
+    except RuntimeError as e:
+        if "SIMULATION_ALREADY_RUNNING" in str(e):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={"error": "SIMULATION_ALREADY_RUNNING"},
+            )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

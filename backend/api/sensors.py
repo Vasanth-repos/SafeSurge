@@ -1,75 +1,58 @@
 """
-Sensor reading ingestion and status query API endpoints.
+API Endpoints — Sensor Telemetry Ingestion & Health:
+Ingests physical/simulated sensor packets, applies Layer 11-12 validation, and reports device health.
 """
 
-from typing import List
-from fastapi import APIRouter, HTTPException, Depends
-from backend.models.schemas import SensorReadingRequest, SensorStatusResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from backend.schemas import SensorReadingRequest
+from backend.dependencies import get_simulation_manager
+from backend.services.simulation_manager import SimulationManager
+from sensors.models import SensorEnvelope, MeasurementStatus
 
 router = APIRouter(prefix="/api/sensors", tags=["Sensors"])
 
 
-def get_sim_service():
-    from backend.app import sim_service
-    return sim_service
-
-
 @router.post("/reading")
-def ingest_sensor_reading(payload: SensorReadingRequest, sim=Depends(get_sim_service)):
-    """
-    Ingests live telemetry from an ultrasonic or float sensor node.
-    """
-    if payload.sensor_id not in sim.sensors:
-        raise HTTPException(status_code=404, detail=f"Sensor ID {payload.sensor_id} not found")
+def ingest_sensor_reading(
+    reading: SensorReadingRequest,
+    manager: SimulationManager = Depends(get_simulation_manager),
+):
+    float_trig = reading.float_state.upper() in ("WATER_PRESENT", "TRUE", "1")
+    env = SensorEnvelope(
+        sensor_id=reading.sensor_id,
+        boot_id=reading.boot_id,
+        sequence=reading.sequence,
+        measured_at_seconds=reading.timestamp_seconds,
+        received_at_seconds=reading.timestamp_seconds,
+        distance_samples_cm=(reading.distance_cm, reading.distance_cm, reading.distance_cm),
+        float_triggered=float_trig,
+    )
 
-    sensor_dict = {
-        payload.sensor_id: {
-            "water_level_cm": payload.water_level_cm,
-            "float_state": payload.float_state,
-            "battery": payload.battery,
-            "signal_quality": payload.signal_quality,
-            "heartbeat": payload.heartbeat,
-        }
-    }
-    res = sim.step(rainfall_input=0.0, sensor_readings=sensor_dict)
-    sensor = sim.sensors[payload.sensor_id]
+    res = manager.sensor_validator.validate(env)
     return {
-        "status": "success",
-        "sensor_id": payload.sensor_id,
-        "health": sensor.status,
-        "quality_flag": sensor.last_quality_flag,
-        "current_bias_cm": round(sensor.current_bias, 2),
+        "sensor_id": res.sensor_id,
+        "accepted": (res.measurement_status == MeasurementStatus.ACCEPTED),
+        "measurement_status": res.measurement_status.value,
+        "rejection_reason": res.rejection_reason.value,
+        "sensor_state": res.sensor_state.value,
+        "water_level_cm": res.water_level_cm,
+        "timestamp_seconds": res.measured_at_seconds,
     }
 
 
-@router.get("", response_model=List[SensorStatusResponse])
-def get_all_sensors(sim=Depends(get_sim_service)):
-    """
-    Lists all deployed sensors and their real-time telemetry/health.
-    """
-    return sim.get_sensors_state()
-
-
-@router.get("/{sensor_id}/status", response_model=SensorStatusResponse)
-def get_sensor_status(sensor_id: int, sim=Depends(get_sim_service)):
-    """
-    Gets status and recent reading details for a specific sensor.
-    """
-    if sensor_id not in sim.sensors:
-        raise HTTPException(status_code=404, detail=f"Sensor ID {sensor_id} not found")
-
-    s = sim.sensors[sensor_id]
+@router.get("/status")
+def get_sensors_status(
+    manager: SimulationManager = Depends(get_simulation_manager),
+):
+    now_t = 0
     return {
-        "sensor_id": s.sensor_id,
-        "name": s.name,
-        "cell_id": s.cell_id,
-        "status": s.status,
-        "sensor_type": s.sensor_type,
-        "last_reading_cm": round(s.last_reading_cm, 1) if s.last_reading_cm is not None else None,
-        "last_valid_reading_cm": round(s.last_valid_reading_cm, 1) if s.last_valid_reading_cm is not None else None,
-        "last_quality_flag": s.last_quality_flag,
-        "battery": s.battery,
-        "signal_quality": s.signal_quality,
-        "current_bias_cm": round(s.current_bias, 2),
-        "float_state": s.float_state,
+        "sensors": [
+            {
+                "sensor_id": sid,
+                "location_id": cfg.location_id,
+                "enabled": cfg.enabled,
+                "health": manager.sensor_validator.health_tracker.get_state(sid, now_t).value,
+            }
+            for sid, cfg in manager.sensor_registry._sensors.items()
+        ]
     }
