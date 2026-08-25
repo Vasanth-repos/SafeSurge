@@ -199,6 +199,21 @@ class ComputationalGrid:
             is_outlet=bool(self.outlet_mask[r, c]),
         )
 
+    @property
+    def cells(self) -> Dict[str, GridCell]:
+        """Returns all valid computational cells in the grid indexed by cell_id."""
+        cell_dict = {}
+        for r in range(self.rows):
+            for c in range(self.columns):
+                if self.valid_mask[r, c]:
+                    cid = self.indices_to_cell_id(r, c)
+                    cell_dict[cid] = self.get_cell(cid)
+        return cell_dict
+
+    def iter_cells(self) -> List[GridCell]:
+        """Iterates across all valid computational cells in the grid."""
+        return list(self.cells.values())
+
     def save_to_file(self, output_path: Union[str, Path]) -> Tuple[Path, Path]:
         """
         Exports the computational grid to a compressed .npz archive alongside a .json metadata sidecar.

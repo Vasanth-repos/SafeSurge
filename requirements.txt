@@ -2,8 +2,10 @@ pytest
 PyYAML
 fastapi
 uvicorn
-pydantic
+pydantic>=2.0
 numpy
 scipy
-networkx
+networkx>=3.0
 httpx
+shapely>=2.0
+pyproj>=3.5
