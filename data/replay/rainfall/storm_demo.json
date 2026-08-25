@@ -1,0 +1,11 @@
+{
+  "schema_version": "rainfall-replay-v1",
+  "timestep_seconds": 60,
+  "steps": [
+    { "minute": 1, "rainfall_mm": 5.0 },
+    { "minute": 2, "rainfall_mm": 12.0 },
+    { "minute": 3, "rainfall_mm": 20.0 },
+    { "minute": 4, "rainfall_mm": 15.0 },
+    { "minute": 5, "rainfall_mm": 8.0 }
+  ]
+}
