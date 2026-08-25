@@ -23,8 +23,10 @@ async function loadSnapshot(leadTimeMinutes) {
   slider.value = leadTimeMinutes;
   timeDisplay.innerText = `+${leadTimeMinutes} min (t=${leadTimeMinutes * 60}s)`;
 
+  const scenarioId = scenarioSelect ? scenarioSelect.value : "storm_01";
+
   try {
-    const res = await fetch(`/api/dashboard/state?lead_time_minutes=${leadTimeMinutes}`);
+    const res = await fetch(`/api/dashboard/state?lead_time_minutes=${leadTimeMinutes}&scenario_id=${scenarioId}`);
     if (!res.ok) return;
     const data = await res.json();
     updateDashboardUI(data);
@@ -365,6 +367,26 @@ btnReset.addEventListener("click", () => {
   clearInterval(playInterval);
   loadSnapshot(0);
 });
+
+// Scenario Selector
+if (scenarioSelect) {
+  scenarioSelect.addEventListener("change", () => {
+    loadSnapshot(parseInt(slider.value));
+  });
+}
+
+// Recompute Route Button
+if (btnRecomputeRoute) {
+  btnRecomputeRoute.addEventListener("click", () => {
+    btnRecomputeRoute.classList.add("loading");
+    btnRecomputeRoute.innerText = "⏳ Computing...";
+    setTimeout(() => {
+      loadSnapshot(parseInt(slider.value));
+      btnRecomputeRoute.classList.remove("loading");
+      btnRecomputeRoute.innerText = "🔄 Recompute Safe Route";
+    }, 250);
+  });
+}
 
 // Initial load
 loadSnapshot(0);

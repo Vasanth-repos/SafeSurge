@@ -1,10 +1,5 @@
-"""
-Snapshot Service (Layers 20–25):
-Central store and query coordinator for immutable time-indexed SimulationSnapshots.
-"""
-
-from __future__ import annotations
-
+import os
+from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 from flood_engine.snapshot import SimulationSnapshot
 from replay.engine import ReplayEngine
@@ -27,6 +22,25 @@ class SnapshotService:
             self._store[(snap.simulation_id, snap.timestamp_seconds)] = snap
         self.active_simulation_id = "storm_01"
 
+    def ensure_scenario_loaded(self, scenario_id: str) -> str:
+        """Loads a scenario into memory if not already cached."""
+        matching = [t for (s, t) in self._store.keys() if s == scenario_id]
+        if matching:
+            self.active_simulation_id = scenario_id
+            return scenario_id
+
+        # Look for YAML scenario file
+        yaml_candidates = [
+            f"config/scenarios/{scenario_id}.yaml",
+            f"config/scenarios/{scenario_id}.yml",
+        ]
+        for ypath in yaml_candidates:
+            if os.path.exists(ypath):
+                return self.run_scenario(ypath)
+
+        # Fallback to active simulation if not found
+        return self.active_simulation_id or "storm_01"
+
     def run_scenario(self, scenario_yaml_path: str) -> str:
         snapshots = self.runner.run(scenario_yaml_path)
         sim_id = snapshots[0].simulation_id if snapshots else "custom_storm"
@@ -44,17 +58,18 @@ class SnapshotService:
         if not sim_id:
             return None
 
-        if timestamp_seconds is None:
-            # Return latest or initial available timestamp
+        # Check if scenario is loaded
+        matching = [t for (s, t) in self._store.keys() if s == sim_id]
+        if not matching:
+            self.ensure_scenario_loaded(sim_id)
             matching = [t for (s, t) in self._store.keys() if s == sim_id]
-            if not matching:
-                return None
+
+        if not matching:
+            return None
+
+        if timestamp_seconds is None:
             target_t = max(matching)
         else:
-            # Find exact or nearest timestamp
-            matching = [t for (s, t) in self._store.keys() if s == sim_id]
-            if not matching:
-                return None
             target_t = min(matching, key=lambda t: abs(t - timestamp_seconds))
 
         return self._store.get((sim_id, target_t))
@@ -65,8 +80,17 @@ class SnapshotService:
             return []
         return sorted([t for (s, t) in self._store.keys() if s == sim_id])
 
-    def get_dashboard_state(self, lead_time_minutes: int = 0) -> Dict[str, Any]:
-        sim_id = self.active_simulation_id
+    def get_dashboard_state(
+        self,
+        lead_time_minutes: int = 0,
+        scenario_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        if scenario_id:
+            self.ensure_scenario_loaded(scenario_id)
+            sim_id = scenario_id
+        else:
+            sim_id = self.active_simulation_id or "storm_01"
+
         target_t = lead_time_minutes * 60
         snap = self.get_snapshot(sim_id, target_t)
         if not snap:
