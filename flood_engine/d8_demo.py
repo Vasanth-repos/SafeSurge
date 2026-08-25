@@ -17,19 +17,20 @@ def main():
 
     # 2. Compute D8 Terrain Topology
     terrain = D8Terrain.compute_from_grid(grid)
+    meta = terrain.metadata
     print(f"Computed D8 Terrain across {terrain.valid_cell_count} valid cells.")
 
-    # 3. Validate D8 Constraints
-    val = terrain.validate_d8()
+    # 3. Terrain QA & Topology Statistics
     print("-" * 50)
-    print(f"Valid Cells:          {val['total_valid_cells']}")
-    print(f"Downstream Cells:     {val['downstream_count']}")
-    print(f"Configured Outlets:   {val['outlet_count']}")
-    print(f"Boundary Terminals:   {val['boundary_count']}")
-    print(f"Local Sinks:          {val['local_sink_count']}")
-    print(f"Flat Sinks:           {val['flat_sink_count']}")
-    print(f"Violations:           {val['violation_count']}")
-    print(f"Topology Validation:  {'PASS' if val['is_valid'] else 'FAIL'}")
+    print(f"Valid Cells:          {meta['valid_cells']}")
+    print(f"Downstream Cells:     {meta['downstream_count']} ({meta['downstream_pct']}%)")
+    print(f"Configured Outlets:   {meta['outlet_count']} ({meta['outlet_pct']}%)")
+    print(f"Boundary Exits:       {meta['boundary_exit_count']} ({meta['boundary_exit_pct']}%)")
+    print(f"Local Sinks:          {meta['local_sink_count']} ({meta['local_sink_pct']}%)")
+    print(f"Flat Sinks:           {meta['flat_sink_count']} ({meta['flat_sink_pct']}%)")
+    print(f"Elevation Range:      {meta['elevation_min_m']}m - {meta['elevation_max_m']}m")
+    print(f"Mean Slope Ratio:     {meta['mean_slope_ratio']:.4f} (Max: {meta['max_slope_ratio']:.4f})")
+    print(f"Topology Validation:  {meta['validation_status']}")
 
     # 4. Demonstrate Sample Flow Path Tracing
     sample_start = "C00001"
@@ -38,8 +39,9 @@ def main():
     print(f"Flow Path Trace from {sample_start} ({len(flow_path)} steps):")
     for idx, cid in enumerate(flow_path):
         c = terrain.get_cell(cid.split()[0])
+        dist_str = f", dist={c.flow_distance_m:.1f}m" if c.flow_distance_m > 0 else ""
         arrow = " --> " if idx < len(flow_path) - 1 else f" [{c.state.upper()}]"
-        print(f"  {c.cell_id} (elev={c.elevation_m:.2f}m, dir={c.direction or 'None'}){arrow}")
+        print(f"  {c.cell_id} (elev={c.elevation_m:.2f}m, slope={c.slope_ratio:.4f}{dist_str}, dir={c.direction or 'None'}){arrow}")
 
     # 5. Export D8 Artifacts
     export_dir = Path("data/processed/grid")

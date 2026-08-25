@@ -1,7 +1,7 @@
 """
-Layer 2 — DEM + D8 Terrain Flow Analysis Tests:
-Verifies D8 steepest descent, tie-breaking ordering, terminal states,
-flow-path tracing, validation constraints, and export artifacts.
+Layer 2 (Hardened) — DEM + D8 Terrain Flow Analysis Tests:
+Verifies D8 steepest descent, tie-breaking, terminal state semantics (boundary_exit, outlet, sinks),
+flow distance measurements, irregular catchment geometries, multiple outlets, and QA diagnostics.
 """
 
 import pytest
@@ -17,14 +17,14 @@ def test_d8_slope_and_direction_calculation():
     Verifies that the centre cell selects southeast neighbour:
     30.0  29.5  29.0
     29.5  29.0  28.5
-    29.0  28.5  28.0
-    slope_SE = (29.0 - 28.0)/(10 * sqrt(2)) ≈ 0.0707
-    or for 2m drop: slope = 2 / (10 * sqrt(2)) ≈ 0.1414
+    29.0  28.5  27.0
+    slope_SE = 2 / (10 * sqrt(2)) ≈ 0.1414
+    distance = 10 * sqrt(2) ≈ 14.14m
     """
     elev = np.array([
         [30.0, 29.5, 29.0],
         [29.5, 29.0, 28.5],
-        [29.0, 28.5, 27.0],  # SE cell drops 2.0m -> slope = 2/(10*sqrt(2)) ≈ 0.1414
+        [29.0, 28.5, 27.0],
     ])
     lat = np.zeros((3, 3))
     lon = np.zeros((3, 3))
@@ -42,7 +42,9 @@ def test_d8_slope_and_direction_calculation():
     assert center_cell.direction == "SE"
     assert center_cell.downstream_cell == "C00009"  # (row 2, col 2)
     expected_slope = 2.0 / (10.0 * math.sqrt(2.0))
-    assert math.isclose(center_cell.slope, expected_slope, rel_tol=1e-4)
+    expected_dist = 10.0 * math.sqrt(2.0)
+    assert math.isclose(center_cell.slope_ratio, expected_slope, rel_tol=1e-4)
+    assert math.isclose(center_cell.flow_distance_m, expected_dist, rel_tol=1e-4)
     assert center_cell.state == "downstream"
 
 
@@ -66,18 +68,16 @@ def test_deterministic_tie_breaking():
     terrain = D8Terrain.compute_from_grid(grid)
     center_cell = terrain.get_cell("C00005")
 
-    # Both N (C00002) and E (C00006) have slope = 2.0 / 10.0 = 0.2
-    # Because N appears before E in NEIGHBOR_ORDER, N must win
     assert center_cell.direction == "N"
     assert center_cell.downstream_cell == "C00002"
-    assert math.isclose(center_cell.slope, 0.2, rel_tol=1e-4)
+    assert math.isclose(center_cell.slope_ratio, 0.2, rel_tol=1e-4)
+    assert math.isclose(center_cell.flow_distance_m, 10.0, rel_tol=1e-4)
 
 
 def test_terminal_states_classification():
     """
-    Verifies that every cell is classified into: downstream, outlet, boundary, local_sink, or flat_sink.
+    Verifies that every cell is classified into: downstream, outlet, boundary_exit, local_sink, or flat_sink.
     """
-    # 5x5 terrain with center local sink (elev 10) surrounded by high ridge (elev 25)
     elev = np.full((5, 5), 25.0)
     elev[2, 2] = 10.0  # local sink
     elev[2, 3] = 10.0  # flat neighbor
@@ -97,9 +97,9 @@ def test_terminal_states_classification():
     assert outlet_cell.state == "outlet"
     assert outlet_cell.downstream_cell is None
 
-    # Boundary cell without lower neighbor
+    # Boundary cell without downhill neighbor becomes boundary_exit
     b_cell = terrain.get_cell("C00001")
-    assert b_cell.state == "boundary"
+    assert b_cell.state == "boundary_exit"
     assert b_cell.downstream_cell is None
 
     # Ridge cell sloping down into sink
@@ -125,19 +125,73 @@ def test_flow_path_tracing():
     # Terminal cell should have no downstream target
     terminal_cell = terrain.get_cell(path[-1])
     assert terminal_cell.downstream_cell is None
-    assert terminal_cell.state in ("outlet", "boundary", "local_sink", "flat_sink")
+    assert terminal_cell.state in ("outlet", "boundary_exit", "boundary", "local_sink", "flat_sink")
 
 
-def test_d8_validation_rules():
-    """Verifies D8 topological validation checks."""
-    grid = ComputationalGrid.create_synthetic_demo_grid(rows=10, cols=10, resolution_m=10.0)
+def test_irregular_catchment_and_multiple_outlets():
+    """
+    Stress test: Irregular concave catchment shape with interior missing cells (nodata)
+    and multiple distinct catchment outlets (Outlet A and Outlet B).
+    """
+    rows, cols = 8, 8
+    elev = np.zeros((rows, cols))
+    for r in range(rows):
+        for c in range(cols):
+            elev[r, c] = 30.0 - 1.5 * r - 1.0 * c
+
+    # Create irregular C-shaped catchment mask
+    catchment = np.ones((rows, cols), dtype=bool)
+    catchment[0:2, 6:8] = False  # Cut NE corner
+    catchment[6:8, 0:2] = False  # Cut SW corner
+
+    # Nodata hole in interior
+    nodata = np.zeros((rows, cols), dtype=bool)
+    nodata[3, 3] = True
+
+    grid = ComputationalGrid(
+        elevation_m=elev,
+        latitude=np.zeros((rows, cols)),
+        longitude=np.zeros((rows, cols)),
+        resolution_m=10.0,
+        catchment_mask=catchment,
+        dem_nodata_mask=nodata,
+    )
+
+    # Configure multiple valid outlets on boundary
+    outlets = [(rows - 1, cols - 1), (rows - 1, cols - 2)]
+    grid.set_outlets(outlets)
+
     terrain = D8Terrain.compute_from_grid(grid)
 
+    # 1. No valid cell routes into the nodata hole (3, 3)
+    hole_id = grid.indices_to_cell_id(3, 3)
+    for c in terrain.cells.values():
+        assert c.downstream_cell != hole_id, f"Cell {c.cell_id} routed into invalid nodata hole!"
+
+    # 2. Both outlets exist and have state 'outlet'
+    for out_r, out_c in outlets:
+        out_id = grid.indices_to_cell_id(out_r, out_c)
+        out_cell = terrain.get_cell(out_id)
+        assert out_cell.state == "outlet"
+        assert out_cell.downstream_cell is None
+
+    # 3. Validation must pass cleanly
     val = terrain.validate_d8()
     assert val["is_valid"] is True
-    assert val["violation_count"] == 0
-    assert val["outlet_count"] == 1
-    assert val["downstream_count"] > 0
+    assert val["outlet_count"] == 2
+
+
+def test_terrain_qa_metadata():
+    """Verifies that terrain QA metadata calculates statistics correctly."""
+    grid = ComputationalGrid.create_synthetic_demo_grid(rows=10, cols=10, resolution_m=10.0)
+    terrain = D8Terrain.compute_from_grid(grid)
+    meta = terrain.metadata
+
+    assert meta["valid_cells"] > 0
+    assert meta["mean_slope_ratio"] > 0.0
+    assert meta["elevation_min_m"] <= meta["elevation_max_m"]
+    assert "depression_policy" in meta
+    assert meta["validation_status"] == "PASS"
 
 
 def test_d8_serialization_and_csv_export(tmp_path):
@@ -152,7 +206,7 @@ def test_d8_serialization_and_csv_export(tmp_path):
     assert json_path.exists()
     assert csv_path.exists()
 
-    # Verify CSV has headers and rows
+    # Verify CSV has headers and correct line count
     lines = csv_path.read_text(encoding="utf-8").strip().splitlines()
     assert len(lines) == 1 + terrain.valid_cell_count
-    assert "cell_id,row,col,elevation_m" in lines[0]
+    assert "cell_id,row,col,elevation_m,slope_ratio,flow_distance_m" in lines[0]
