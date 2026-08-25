@@ -139,6 +139,14 @@ class StatefulDrainageNetwork:
             for e in edges:
                 self.add_edge(e)
 
+    @property
+    def node_ids(self) -> List[str]:
+        return [str(k) for k in self.nodes.keys() if isinstance(k, str)]
+
+    @property
+    def dt_seconds(self) -> float:
+        return float(self.expected_timestep_seconds)
+
     def add_node(self, node: DrainageNode) -> None:
         self.nodes[str(node.node_id)] = node
         try:

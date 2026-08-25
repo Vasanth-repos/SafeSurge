@@ -106,6 +106,17 @@ class SurfaceStorageEngine:
         self.last_timestamp_seconds: Optional[int] = None
         self.history: List[SurfaceStep] = []
 
+    @property
+    def cell_ids(self) -> List[str]:
+        return list(self.terrain.cells.keys())
+
+    @property
+    def dt_seconds(self) -> float:
+        return float(self.expected_timestep_seconds)
+
+    def storage(self, cell_id: str) -> float:
+        return float(self.storage_m3.get(cell_id, 0.0))
+
     def reset(self) -> None:
         """Resets all cell storage levels, boundary discharges, and timestamp history."""
         for cid in self.storage_m3.keys():
@@ -115,6 +126,63 @@ class SurfaceStorageEngine:
         self.cumulative_drainage_capture_m3 = 0.0
         self.last_timestamp_seconds = None
         self.history.clear()
+
+    def route_available_water(
+        self,
+        available_surface_m3_by_cell: Dict[str, float],
+        dt_seconds: Optional[float] = None,
+    ) -> Tuple[Dict[str, float], float, Dict[str, CellSurfaceState]]:
+        """
+        Routes remaining available surface water across the D8 terrain network:
+        O_t = min(S_avail, f * S_avail)
+        S_{t+1} = S_avail - O_t + I_downstream
+        """
+        outflows_m3: Dict[str, float] = {}
+        inflows_m3: Dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        step_boundary_outflow_m3 = 0.0
+
+        for cid, cell in self.terrain.cells.items():
+            avail = max(0.0, float(available_surface_m3_by_cell.get(cid, 0.0)))
+            f = self.routing_fractions[cid]
+            outflow = min(avail, f * avail)
+            outflows_m3[cid] = outflow
+
+            if cell.state == "downstream" and cell.downstream_cell is not None:
+                inflows_m3[cell.downstream_cell] += outflow
+            elif cell.state in ("boundary_exit", "outlet") and self.boundary_condition == "open":
+                step_boundary_outflow_m3 += outflow
+
+        new_storage_by_cell: Dict[str, float] = {}
+        cell_states: Dict[str, CellSurfaceState] = {}
+
+        for cid, cell in sorted(self.terrain.cells.items()):
+            avail = max(0.0, float(available_surface_m3_by_cell.get(cid, 0.0)))
+            i_in = inflows_m3[cid]
+            o_out = outflows_m3[cid]
+            s_new = max(0.0, avail - o_out + i_in)
+
+            self.storage_m3[cid] = s_new
+            new_storage_by_cell[cid] = s_new
+
+            eff_area = self.effective_areas_m2[cid]
+            depth_m = s_new / eff_area
+
+            cell_states[cid] = CellSurfaceState(
+                cell_id=cid,
+                old_storage_m3=avail,
+                runoff_input_m3=0.0,
+                upstream_inflow_m3=i_in,
+                available_water_m3=avail + i_in,
+                routing_fraction=self.routing_fractions[cid],
+                surface_outflow_m3=o_out,
+                drainage_capture_m3=0.0,
+                new_storage_m3=s_new,
+                water_depth_m=depth_m,
+                downstream_cell=cell.downstream_cell,
+                terminal_state=cell.state,
+            )
+
+        return new_storage_by_cell, step_boundary_outflow_m3, cell_states
 
     def validate_timestamp(self, timestamp_seconds: int, dt_seconds: Optional[int] = None) -> None:
         """Enforces strictly advancing timestamps and timestep validation."""
