@@ -124,6 +124,18 @@ class ReplayEngine:
         self.sensor_coords = {
             "S001": (15.0, 15.0),
             "S002": (45.0, 25.0),
+            "S003": (45.0, 45.0),
+            "S004": (75.0, 65.0),
+            "S005": (15.0, 65.0),
+            "S006": (75.0, 85.0),
+        }
+        self.sensor_locs = {
+            "S001": "C012",
+            "S002": "C025",
+            "S003": "C045",
+            "S004": "C068",
+            "S005": "C061",
+            "S006": "C088",
         }
 
     def run_scenario(
@@ -196,7 +208,7 @@ class ReplayEngine:
             observations = []
             sensor_snapshots_list = []
             for sid, sc in self.sensor_coords.items():
-                loc_id = "C012" if sid == "S001" else "C025"
+                loc_id = self.sensor_locs.get(sid, "C012")
                 nom_depth = model_depths.get(loc_id, 5.0)
                 obs_depth, s_stat, is_mod = self.fault_engine.apply_sensor_override(sid, t, nom_depth, "ONLINE")
 

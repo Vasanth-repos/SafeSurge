@@ -96,6 +96,95 @@ class SnapshotService:
         if not snap:
             return {"status": "NO_ACTIVE_SIMULATION"}
 
+        # Compute dynamic safe route for emergency dispatch (Origin A -> Hospital D)
+        road_map = {r.road_id: r for r in snap.road_risks}
+        graph_def = [
+            ("R001", "A", "B", 50.0),
+            ("R002", "B", "E", 30.0),
+            ("R003", "A", "W", 30.0),
+            ("R004", "C", "D", 40.0),
+            ("R005", "E", "D", 30.0),
+            ("R006", "A", "M", 35.0),
+            ("R007", "M", "D", 35.0),
+            ("R008", "W", "M", 30.0),
+            ("R009", "M", "E", 25.0),
+            ("R010", "W", "C", 30.0),
+        ]
+        
+        # Dijkstra search
+        adj = {}
+        for rid, u, v, base_t in graph_def:
+            adj.setdefault(u, []).append((v, rid, base_t))
+            adj.setdefault(v, []).append((u, rid, base_t))
+
+        def get_edge_weight(rid, base_t):
+            r = road_map.get(rid)
+            if not r:
+                return base_t
+            d = getattr(r, "max_relevant_depth_cm", getattr(r, "mean_depth_cm", 0.0))
+            risk = getattr(r, "risk", "SAFE")
+            if risk == "UNSAFE" or d >= 25.0:
+                return float("inf")
+            elif risk == "HIGH" or d >= 15.0:
+                return base_t + 500.0 + d * 10.0
+            elif risk == "WATCH" or d >= 5.0:
+                return base_t + 20.0 + d * 2.0
+            return base_t
+
+        # Dijkstra algorithm
+        import heapq
+        pq = [(0.0, "A", ["A"], [], 0.0, 0.0)]
+        visited = set()
+        best_route = None
+
+        while pq:
+            cost, curr, path, rids, total_time, max_d = heapq.heappop(pq)
+            if curr == "D":
+                best_route = {
+                    "success": True,
+                    "origin": "A",
+                    "destination": "D",
+                    "path": path,
+                    "road_ids": rids,
+                    "eta_seconds": round(total_time, 1),
+                    "max_exposure_depth_cm": round(max_d, 1),
+                }
+                break
+
+            if curr in visited:
+                continue
+            visited.add(curr)
+
+            for neighbor, rid, base_t in adj.get(curr, []):
+                if neighbor in visited:
+                    continue
+                w = get_edge_weight(rid, base_t)
+                if w < float("inf"):
+                    r_obj = road_map.get(rid)
+                    depth = getattr(r_obj, "max_relevant_depth_cm", getattr(r_obj, "mean_depth_cm", 0.0)) if r_obj else 0.0
+                    heapq.heappush(
+                        pq,
+                        (
+                            cost + w,
+                            neighbor,
+                            path + [neighbor],
+                            rids + [rid],
+                            total_time + base_t,
+                            max(max_d, depth),
+                        ),
+                    )
+
+        if not best_route:
+            best_route = {
+                "success": False,
+                "origin": "A",
+                "destination": "D",
+                "path": ["A", "W", "C", "D"],
+                "road_ids": ["R003", "R010", "R004"],
+                "eta_seconds": 100.0,
+                "max_exposure_depth_cm": 0.0,
+            }
+
         return {
             "simulation_id": snap.simulation_id,
             "timestamp_seconds": snap.timestamp_seconds,
@@ -110,4 +199,6 @@ class SnapshotService:
             "anomalies": list(snap.anomalies),
             "mass_balance": snap.mass_balance.to_dict(),
             "active_faults": list(snap.active_faults),
+            "safe_route": best_route,
         }
+
