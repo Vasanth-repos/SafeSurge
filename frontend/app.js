@@ -441,7 +441,14 @@ async function loadSnapshot(leadTimeMinutes) {
 
   let data = null;
   try {
-    const res = await fetch(`/api/dashboard/state?lead_time_minutes=${leadTimeMinutes}&scenario_id=${scenarioId}`);
+    const params = new URLSearchParams({
+      lead_time_minutes: leadTimeMinutes,
+      scenario_id: scenarioId,
+      fault_spike: activeFaults.spike ? "true" : "false",
+      fault_offline: activeFaults.offline ? "true" : "false",
+      fault_blockage: activeFaults.blockage ? "true" : "false"
+    });
+    const res = await fetch(`/api/dashboard/state?${params.toString()}`);
     if (res.ok) {
       data = await res.json();
     }
@@ -1085,6 +1092,28 @@ function renderSvgMap(data) {
         pulse.setAttribute("stroke-width", "1.2");
         pulse.setAttribute("opacity", "0.5");
         sg.appendChild(pulse);
+      } else if (s.status === "STALE") {
+        const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        pulse.setAttribute("cx", coord.x);
+        pulse.setAttribute("cy", coord.y);
+        pulse.setAttribute("r", 15);
+        pulse.setAttribute("fill", "rgba(245, 158, 11, 0.25)");
+        pulse.setAttribute("stroke", "#f59e0b");
+        pulse.setAttribute("stroke-width", "1.5");
+        pulse.setAttribute("stroke-dasharray", "3,2");
+        pulse.setAttribute("filter", "url(#glow-pulse)");
+        sg.appendChild(pulse);
+      } else {
+        const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        pulse.setAttribute("cx", coord.x);
+        pulse.setAttribute("cy", coord.y);
+        pulse.setAttribute("r", 15);
+        pulse.setAttribute("fill", "rgba(239, 68, 68, 0.3)");
+        pulse.setAttribute("stroke", "#ef4444");
+        pulse.setAttribute("stroke-width", "1.5");
+        pulse.setAttribute("stroke-dasharray", "2,2");
+        pulse.setAttribute("filter", "url(#glow-pulse)");
+        sg.appendChild(pulse);
       }
 
       const pin = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -1103,7 +1132,8 @@ function renderSvgMap(data) {
       pinText.setAttribute("font-size", "6.5");
       pinText.setAttribute("font-weight", "bold");
       pinText.setAttribute("text-anchor", "middle");
-      pinText.textContent = s.sensor_id.slice(-2);
+      pinText.textContent = s.status === "OFFLINE" ? "X" : (s.status === "STALE" ? "!" : s.sensor_id.slice(-2));
+      sg.appendChild(pinText);
       sg.appendChild(pinText);
 
       svgMap.appendChild(sg);

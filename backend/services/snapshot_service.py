@@ -84,6 +84,9 @@ class SnapshotService:
         self,
         lead_time_minutes: int = 0,
         scenario_id: Optional[str] = None,
+        fault_spike: bool = False,
+        fault_offline: bool = False,
+        fault_blockage: bool = False,
     ) -> Dict[str, Any]:
         if scenario_id:
             self.ensure_scenario_loaded(scenario_id)
@@ -96,8 +99,85 @@ class SnapshotService:
         if not snap:
             return {"status": "NO_ACTIVE_SIMULATION"}
 
+        # Base snapshot structures
+        system_status = snap.system_status
+        degraded_reasons = list(snap.degraded_reasons)
+        forecast_dict = snap.forecast.to_dict() if snap.forecast else None
+        sensor_list = [s.to_dict() for s in snap.sensor_states]
+        cell_list = [c.to_dict() for c in snap.flood_cells]
+        road_list = [r.to_dict() for r in snap.road_risks]
+        anomalies_list = list(snap.anomalies)
+        active_faults_list = list(snap.active_faults)
+        drainage_list = list(snap.drainage_states)
+
+        # Apply Dynamic Interactive Fault Injections
+        int_factor = max(0.2, (lead_time_minutes / 60.0) if lead_time_minutes <= 60 else (1.0 - (lead_time_minutes - 60) / 120.0))
+
+        if fault_offline:
+            system_status = "DEGRADED"
+            reason = "Sensor S001 telemetry lost (heartbeat dropout)"
+            if reason not in degraded_reasons:
+                degraded_reasons.append(reason)
+            active_faults_list.append("SENSOR_OFFLINE:S001")
+            for s in sensor_list:
+                if s.get("sensor_id") == "S001":
+                    s["status"] = "OFFLINE"
+                    s["last_valid_reading_cm"] = None
+                    s["age_seconds"] = 1800
+            if forecast_dict:
+                forecast_dict["confidence"] = 0.88
+
+        if fault_spike:
+            system_status = "DEGRADED"
+            reason = "Sensor S001 rate spike anomaly (+90cm spike rejected by Kalman/Z-score filter)"
+            if reason not in degraded_reasons:
+                degraded_reasons.append(reason)
+            active_faults_list.append("SENSOR_SPIKE:S001")
+            for s in sensor_list:
+                if s.get("sensor_id") == "S001":
+                    s["status"] = "STALE"
+                    s["last_valid_reading_cm"] = 90.0
+            anomalies_list.append({
+                "sensor_id": "S001",
+                "type": "RATE_OF_RISE",
+                "depth_cm": 90.0,
+                "status": "REJECTED"
+            })
+
+        if fault_blockage:
+            system_status = "DEGRADED"
+            reason = "Culvert E001 inlet capacity degraded 70% (debris clog)"
+            if reason not in degraded_reasons:
+                degraded_reasons.append(reason)
+            active_faults_list.append("CAPACITY_REDUCTION:E001:0.3")
+            drainage_list = ["CLOGGED" if d == "INLET_E001" else d for d in drainage_list]
+            if "INLET_E001_CLOGGED" not in drainage_list:
+                drainage_list.append("INLET_E001_CLOGGED")
+
+            # Increase water backing up in lowland East cells
+            extra_depth = 7.5 * int_factor
+            for c in cell_list:
+                r_idx = c.get("row", 0)
+                c_idx = c.get("col", 0)
+                if r_idx >= 5 and c_idx >= 7:
+                    c["depth_cm"] = round(c["depth_cm"] + extra_depth, 1)
+                    if c["depth_cm"] >= 25.0:
+                        c["risk"] = "UNSAFE"
+                    elif c["depth_cm"] >= 15.0:
+                        c["risk"] = "HIGH"
+
+            # Update affected roads (R005, R002, R009)
+            for rd in road_list:
+                if rd.get("road_id") in ["R005", "R002", "R009"]:
+                    rd["mean_depth_cm"] = round(rd.get("mean_depth_cm", 0.0) + extra_depth, 1)
+                    rd["max_relevant_depth_cm"] = round(rd.get("max_relevant_depth_cm", 0.0) + extra_depth, 1)
+                    if rd["max_relevant_depth_cm"] >= 25.0:
+                        rd["risk"] = "UNSAFE"
+                    elif rd["max_relevant_depth_cm"] >= 15.0:
+                        rd["risk"] = "HIGH"
+
         # Compute dynamic safe route for emergency dispatch (Origin A -> Hospital D)
-        road_map = {r.road_id: r for r in snap.road_risks}
+        road_map = {r["road_id"]: r for r in road_list}
         graph_def = [
             ("R001", "A", "B", 50.0),
             ("R002", "B", "E", 30.0),
@@ -121,8 +201,8 @@ class SnapshotService:
             r = road_map.get(rid)
             if not r:
                 return base_t
-            d = getattr(r, "max_relevant_depth_cm", getattr(r, "mean_depth_cm", 0.0))
-            risk = getattr(r, "risk", "SAFE")
+            d = r.get("max_relevant_depth_cm", r.get("mean_depth_cm", 0.0))
+            risk = r.get("risk", "SAFE")
             if risk == "UNSAFE" or d >= 25.0:
                 return float("inf")
             elif risk == "HIGH" or d >= 15.0:
@@ -161,7 +241,7 @@ class SnapshotService:
                 w = get_edge_weight(rid, base_t)
                 if w < float("inf"):
                     r_obj = road_map.get(rid)
-                    depth = getattr(r_obj, "max_relevant_depth_cm", getattr(r_obj, "mean_depth_cm", 0.0)) if r_obj else 0.0
+                    depth = r_obj.get("max_relevant_depth_cm", r_obj.get("mean_depth_cm", 0.0)) if r_obj else 0.0
                     heapq.heappush(
                         pq,
                         (
@@ -188,17 +268,17 @@ class SnapshotService:
         return {
             "simulation_id": snap.simulation_id,
             "timestamp_seconds": snap.timestamp_seconds,
-            "system_status": snap.system_status,
+            "system_status": system_status,
             "rainfall_status": snap.rainfall_status,
-            "degraded_reasons": list(snap.degraded_reasons),
-            "forecast": snap.forecast.to_dict() if snap.forecast else None,
-            "cells": [c.to_dict() for c in snap.flood_cells],
-            "roads": [r.to_dict() for r in snap.road_risks],
-            "drainage": list(snap.drainage_states),
-            "sensors": [s.to_dict() for s in snap.sensor_states],
-            "anomalies": list(snap.anomalies),
+            "degraded_reasons": degraded_reasons,
+            "forecast": forecast_dict,
+            "cells": cell_list,
+            "roads": road_list,
+            "drainage": drainage_list,
+            "sensors": sensor_list,
+            "anomalies": anomalies_list,
             "mass_balance": snap.mass_balance.to_dict(),
-            "active_faults": list(snap.active_faults),
+            "active_faults": active_faults_list,
             "safe_route": best_route,
         }
 

@@ -441,7 +441,14 @@ async function loadSnapshot(leadTimeMinutes) {
 
   let data = null;
   try {
-    const res = await fetch(`/api/dashboard/state?lead_time_minutes=${leadTimeMinutes}&scenario_id=${scenarioId}`);
+    const params = new URLSearchParams({
+      lead_time_minutes: leadTimeMinutes,
+      scenario_id: scenarioId,
+      fault_spike: activeFaults.spike ? "true" : "false",
+      fault_offline: activeFaults.offline ? "true" : "false",
+      fault_blockage: activeFaults.blockage ? "true" : "false"
+    });
+    const res = await fetch(`/api/dashboard/state?${params.toString()}`);
     if (res.ok) {
       data = await res.json();
     }
@@ -883,19 +890,33 @@ function renderSvgMap(data) {
 
   // B. Drainage Inlets Layer
   if (layers.drainage) {
+    const isBlockageActive = activeFaults.blockage || (data.active_faults && data.active_faults.some(f => f.includes("CAPACITY_REDUCTION") || f.includes("E001"))) || (data.simulation_id === "capacity_reduction" && currentMinute >= 45 && currentMinute <= 60);
     const drainNodes = [
       { id: "IN01", x: 274, y: 226, label: "Midtown Inlet", clogged: false },
-      { id: "E001", x: 418, y: 370, label: "East Culvert", clogged: activeFaults.blockage || (data.simulation_id === "capacity_reduction" && currentMinute >= 45 && currentMinute <= 60) },
+      { id: "E001", x: 418, y: 370, label: "East Culvert", clogged: isBlockageActive },
       { id: "OUT1", x: 466, y: 466, label: "South Outfall", clogged: false }
     ];
 
     drainNodes.forEach(dn => {
       const dg = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
+      if (dn.clogged) {
+        const clogHalo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        clogHalo.setAttribute("cx", dn.x);
+        clogHalo.setAttribute("cy", dn.y);
+        clogHalo.setAttribute("r", 16);
+        clogHalo.setAttribute("fill", "rgba(239, 68, 68, 0.35)");
+        clogHalo.setAttribute("stroke", "#ef4444");
+        clogHalo.setAttribute("stroke-width", "1.5");
+        clogHalo.setAttribute("stroke-dasharray", "3,2");
+        clogHalo.setAttribute("filter", "url(#glow-pulse)");
+        dg.appendChild(clogHalo);
+      }
+
       const dIcon = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       dIcon.setAttribute("cx", dn.x);
       dIcon.setAttribute("cy", dn.y);
-      dIcon.setAttribute("r", 8);
+      dIcon.setAttribute("r", 8.5);
       dIcon.setAttribute("fill", dn.clogged ? "#ef4444" : "#06b6d4");
       dIcon.setAttribute("stroke", "#ffffff");
       dIcon.setAttribute("stroke-width", "1.5");
@@ -905,7 +926,7 @@ function renderSvgMap(data) {
       dLabel.setAttribute("x", dn.x);
       dLabel.setAttribute("y", dn.y + 3);
       dLabel.setAttribute("fill", "#ffffff");
-      dLabel.setAttribute("font-size", "7.5");
+      dLabel.setAttribute("font-size", "8");
       dLabel.setAttribute("font-weight", "bold");
       dLabel.setAttribute("text-anchor", "middle");
       dLabel.textContent = dn.clogged ? "!" : "D";
@@ -1085,6 +1106,28 @@ function renderSvgMap(data) {
         pulse.setAttribute("stroke-width", "1.2");
         pulse.setAttribute("opacity", "0.5");
         sg.appendChild(pulse);
+      } else if (s.status === "STALE") {
+        const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        pulse.setAttribute("cx", coord.x);
+        pulse.setAttribute("cy", coord.y);
+        pulse.setAttribute("r", 15);
+        pulse.setAttribute("fill", "rgba(245, 158, 11, 0.25)");
+        pulse.setAttribute("stroke", "#f59e0b");
+        pulse.setAttribute("stroke-width", "1.5");
+        pulse.setAttribute("stroke-dasharray", "3,2");
+        pulse.setAttribute("filter", "url(#glow-pulse)");
+        sg.appendChild(pulse);
+      } else {
+        const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        pulse.setAttribute("cx", coord.x);
+        pulse.setAttribute("cy", coord.y);
+        pulse.setAttribute("r", 15);
+        pulse.setAttribute("fill", "rgba(239, 68, 68, 0.3)");
+        pulse.setAttribute("stroke", "#ef4444");
+        pulse.setAttribute("stroke-width", "1.5");
+        pulse.setAttribute("stroke-dasharray", "2,2");
+        pulse.setAttribute("filter", "url(#glow-pulse)");
+        sg.appendChild(pulse);
       }
 
       const pin = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -1103,7 +1146,8 @@ function renderSvgMap(data) {
       pinText.setAttribute("font-size", "6.5");
       pinText.setAttribute("font-weight", "bold");
       pinText.setAttribute("text-anchor", "middle");
-      pinText.textContent = s.sensor_id.slice(-2);
+      pinText.textContent = s.status === "OFFLINE" ? "X" : (s.status === "STALE" ? "!" : s.sensor_id.slice(-2));
+      sg.appendChild(pinText);
       sg.appendChild(pinText);
 
       svgMap.appendChild(sg);
