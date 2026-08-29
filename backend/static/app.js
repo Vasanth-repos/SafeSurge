@@ -778,27 +778,27 @@ function renderSvgMap(data) {
 
       if (layers.depth) {
         if (cell.risk === "UNSAFE" || cell.depth_cm >= 25) {
-          fillColor = "#ef4444";
-          opacity = "0.88";
+          fillColor = "#dc2626";
+          opacity = "0.85";
         } else if (cell.risk === "HIGH" || cell.depth_cm >= 15) {
-          fillColor = "#f97316";
-          opacity = "0.82";
-        } else if (cell.risk === "WATCH" || cell.depth_cm >= 5) {
-          fillColor = "#f59e0b";
+          fillColor = "#ea580c";
           opacity = "0.78";
+        } else if (cell.risk === "WATCH" || cell.depth_cm >= 5) {
+          fillColor = "#d97706";
+          opacity = "0.70";
         } else if (cell.depth_cm > 0.5) {
-          fillColor = "#0284c7";
-          opacity = "0.72";
+          fillColor = "#2563eb";
+          opacity = "0.65";
         } else if (cell.depth_cm > 0.02) {
-          fillColor = "#0369a1";
-          opacity = "0.55";
+          fillColor = "#1e3a8a";
+          opacity = "0.45";
         }
       }
 
       rect.setAttribute("fill", fillColor);
       rect.setAttribute("opacity", opacity);
-      rect.setAttribute("stroke", "rgba(56, 189, 248, 0.1)");
-      rect.setAttribute("stroke-width", "1");
+      rect.setAttribute("stroke", "rgba(255, 255, 255, 0.04)");
+      rect.setAttribute("stroke-width", "0.8");
 
       rect.addEventListener("mouseenter", () => {
         tooltip.classList.remove("hidden");
@@ -1072,28 +1072,26 @@ function renderSvgMap(data) {
       const vCoord = NODE_COORDS[vKey];
       if (!uCoord || !vCoord) continue;
 
-      // Glow halo
-      const glowLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      glowLine.setAttribute("x1", uCoord.x);
-      glowLine.setAttribute("y1", uCoord.y);
-      glowLine.setAttribute("x2", vCoord.x);
-      glowLine.setAttribute("y2", vCoord.y);
-      glowLine.setAttribute("stroke", "#38bdf8");
-      glowLine.setAttribute("stroke-width", "9");
-      glowLine.setAttribute("stroke-linecap", "round");
-      glowLine.setAttribute("opacity", "0.6");
-      glowLine.setAttribute("filter", "url(#glow-pulse)");
-      routeG.appendChild(glowLine);
+      // Under-casing shadow line
+      const shadowLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      shadowLine.setAttribute("x1", uCoord.x);
+      shadowLine.setAttribute("y1", uCoord.y);
+      shadowLine.setAttribute("x2", vCoord.x);
+      shadowLine.setAttribute("y2", vCoord.y);
+      shadowLine.setAttribute("stroke", "#0f172a");
+      shadowLine.setAttribute("stroke-width", "6.5");
+      shadowLine.setAttribute("stroke-linecap", "round");
+      shadowLine.setAttribute("opacity", "0.85");
+      routeG.appendChild(shadowLine);
 
-      // Bright core corridor
+      // Clean transit route line
       const coreLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
       coreLine.setAttribute("x1", uCoord.x);
       coreLine.setAttribute("y1", uCoord.y);
       coreLine.setAttribute("x2", vCoord.x);
       coreLine.setAttribute("y2", vCoord.y);
-      coreLine.setAttribute("stroke", "#38bdf8");
+      coreLine.setAttribute("stroke", "#3b82f6");
       coreLine.setAttribute("stroke-width", "3.5");
-      coreLine.setAttribute("stroke-dasharray", "8,4");
       coreLine.setAttribute("stroke-linecap", "round");
       routeG.appendChild(coreLine);
     }

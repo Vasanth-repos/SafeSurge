@@ -1,26 +1,26 @@
 :root {
-  --bg-dark: #070b14;
-  --bg-header: #0d1527;
-  --bg-panel: #111a2e;
-  --bg-panel-inner: #0a101f;
+  --bg-dark: #090d16;
+  --bg-header: #0e1422;
+  --bg-panel: #121929;
+  --bg-panel-inner: #0a0f1c;
   --bg-pill: rgba(255, 255, 255, 0.04);
-  --bg-pill-hover: rgba(56, 189, 248, 0.12);
-  --bg-pill-active: rgba(6, 182, 212, 0.2);
+  --bg-pill-hover: rgba(255, 255, 255, 0.07);
+  --bg-pill-active: #1e293b;
 
   --text-main: #f8fafc;
   --text-sub: #94a3b8;
   --text-dim: #64748b;
-  --text-cyan: #38bdf8;
+  --text-cyan: #60a5fa;
 
-  --border-subtle: rgba(56, 189, 248, 0.15);
-  --border-card: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(148, 163, 184, 0.14);
+  --border-card: rgba(255, 255, 255, 0.07);
 
-  --accent-cyan: #06b6d4;
-  --accent-blue: #38bdf8;
+  --accent-cyan: #0284c7;
+  --accent-blue: #3b82f6;
   --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-orange: #f97316;
-  --accent-rose: #ef4444;
+  --accent-amber: #d97706;
+  --accent-orange: #ea580c;
+  --accent-rose: #dc2626;
 
   --safe-color: #10b981;
   --watch-color: #f59e0b;
@@ -60,11 +60,11 @@ html, body {
   background: var(--bg-panel-inner);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.2);
+  background: rgba(148, 163, 184, 0.2);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-cyan);
+  background: rgba(148, 163, 184, 0.35);
 }
 
 /* 1. TOP NAVIGATION HEADER */
@@ -90,16 +90,14 @@ html, body {
 }
 
 .brand-logo {
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .brand-title {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #f8fafc;
 }
 
 .brand-subtitle {
@@ -107,22 +105,21 @@ html, body {
   color: var(--text-dim);
   font-weight: 500;
   border-left: 1px solid var(--border-card);
-  padding-left: 8px;
+  padding-left: 10px;
 }
 
 .status-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--accent-emerald);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  padding: 3px 8px;
+  background: rgba(16, 185, 129, 0.08);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  padding: 3px 9px;
   border-radius: 12px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
   flex-shrink: 0;
 }
 
@@ -130,28 +127,25 @@ html, body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-emerald);
-  box-shadow: 0 0 6px var(--accent-emerald);
+  background: #10b981;
 }
 
 .status-badge.degraded {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--accent-amber);
-  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.08);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.25);
 }
 .status-badge.degraded .dot {
-  background: var(--accent-amber);
-  box-shadow: 0 0 6px var(--accent-amber);
+  background: #f59e0b;
 }
 
 .status-badge.unavailable {
-  background: rgba(239, 68, 68, 0.12);
-  color: var(--accent-rose);
-  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.25);
 }
 .status-badge.unavailable .dot {
-  background: var(--accent-rose);
-  box-shadow: 0 0 6px var(--accent-rose);
+  background: #ef4444;
 }
 
 /* Header Telemetry Pills */
@@ -168,7 +162,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--bg-pill);
+  background: var(--bg-panel-inner);
   border: 1px solid var(--border-card);
   padding: 4px 10px;
   border-radius: 6px;
@@ -186,11 +180,11 @@ html, body {
 
 .kpi-pill .kpi-val {
   color: var(--text-main);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .kpi-pill .kpi-val.highlight {
-  color: var(--text-cyan);
+  color: #93c5fd;
 }
 
 /* Header Right Actions */
@@ -213,7 +207,7 @@ html, body {
   background: var(--bg-panel);
   color: var(--text-main);
   border: 1px solid var(--border-subtle);
-  padding: 4px 8px;
+  padding: 4px 9px;
   border-radius: 6px;
   outline: none;
   font-size: 11px;
@@ -222,35 +216,36 @@ html, body {
 }
 
 .scenario-select:hover, .scenario-select:focus {
-  border-color: var(--accent-cyan);
+  border-color: #475569;
 }
 
 .btn-export {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(16, 185, 129, 0.2));
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  padding: 4px 10px;
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #334155;
+  padding: 4px 11px;
   border-radius: 6px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .btn-export:hover {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.35), rgba(16, 185, 129, 0.35));
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  background: #334155;
+  border-color: #475569;
 }
 
 /* 2. SUB-TOOLBAR */
 .sub-toolbar {
-  height: 36px;
-  min-height: 36px;
-  background: rgba(11, 17, 32, 0.95);
+  height: 38px;
+  min-height: 38px;
+  background: var(--bg-header);
   border-bottom: 1px solid var(--border-card);
   padding: 0 16px;
   display: flex;
@@ -266,11 +261,11 @@ html, body {
 }
 
 .toolbar-lbl {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 10.5px;
+  font-weight: 600;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   margin-right: 2px;
 }
 
@@ -281,7 +276,7 @@ html, body {
   padding: 3px 9px;
   border-radius: 5px;
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -293,8 +288,7 @@ html, body {
 .chip-btn:hover {
   background: var(--bg-pill-hover);
   color: var(--text-main);
-  border-color: var(--border-subtle);
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .chip-btn:active {
@@ -302,50 +296,47 @@ html, body {
 }
 
 .chip-btn#fault-spike.active {
-  background: rgba(245, 158, 11, 0.25);
-  color: #fef08a;
-  border-color: #f59e0b;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.12);
+  color: #fde68a;
+  border-color: rgba(245, 158, 11, 0.5);
 }
 
 .chip-btn#fault-offline.active {
-  background: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.12);
   color: #fca5a5;
-  border-color: #ef4444;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+  border-color: rgba(239, 68, 68, 0.5);
 }
 
 .chip-btn#fault-blockage.active {
-  background: rgba(249, 115, 22, 0.25);
+  background: rgba(249, 115, 22, 0.12);
   color: #fed7aa;
-  border-color: #f97316;
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+  border-color: rgba(249, 115, 22, 0.5);
 }
 
 .chip-btn.reset-btn {
-  color: var(--text-cyan);
-  border-color: rgba(56, 189, 248, 0.3);
+  color: var(--text-sub);
+  border-color: var(--border-card);
 }
 
 .chip-btn.reset-btn:hover {
-  background: rgba(56, 189, 248, 0.15);
-  border-color: var(--text-cyan);
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+  background: var(--bg-pill-hover);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 .layer-deck {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
 .layer-chip {
   background: var(--bg-pill);
   border: 1px solid var(--border-card);
-  color: var(--text-sub);
-  padding: 2px 7px;
+  color: var(--text-dim);
+  padding: 3px 8px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -353,13 +344,14 @@ html, body {
 }
 
 .layer-chip:hover {
-  color: var(--text-main);
+  color: var(--text-sub);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .layer-chip.active {
-  background: var(--bg-pill-active);
-  color: var(--text-cyan);
-  border-color: rgba(6, 182, 212, 0.4);
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #475569;
 }
 
 /* 3. MAIN WORKSPACE */
@@ -711,55 +703,52 @@ html, body {
 }
 
 .pgml-status-strip {
-  margin-top: 8px;
-  background: rgba(6, 182, 212, 0.08);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-card);
   border-radius: 5px;
   padding: 5px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 10.5px;
-  color: var(--text-main);
+  color: var(--text-sub);
 }
 
 .pgml-tag {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .pulse-dot-cyan {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-cyan);
-  box-shadow: 0 0 6px var(--accent-cyan);
-  animation: pulse-glow 2s infinite ease-in-out;
+  background: #3b82f6;
 }
 
 .pgml-meta {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--text-sub);
+  color: var(--text-dim);
 }
 
 .card-subtext {
   font-size: 9.5px;
   color: var(--text-dim);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
-/* ENHANCED SAFE ROUTING STYLES */
+/* REFINED SAFE ROUTING STYLES */
 .route-hero-box {
-  background: linear-gradient(180deg, #090e1a, #060a14);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: var(--bg-panel-inner);
+  border: 1px solid var(--border-card);
   border-radius: 6px;
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .route-meta-row {
@@ -770,20 +759,20 @@ html, body {
 
 .route-lbl-title {
   font-size: 9.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .route-eta-pill {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  padding: 1px 6px;
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #334155;
+  padding: 2px 7px;
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 9.5px;
 }
 
@@ -791,7 +780,7 @@ html, body {
 .stepper-flow {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
@@ -799,45 +788,45 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 2px 7px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  padding: 2px 8px;
   border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  color: #f8fafc;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: #f1f5f9;
 }
 
 .node-pill.origin {
-  border-color: #38bdf8;
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.12);
+  border-color: #3b82f6;
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.12);
 }
 
 .node-pill.dest {
   border-color: #10b981;
-  color: #10b981;
+  color: #6ee7b7;
   background: rgba(16, 185, 129, 0.12);
 }
 
 .node-pill.waypoint {
-  border-color: #c084fc;
+  border-color: #475569;
   color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .flow-arrow {
-  color: var(--accent-cyan);
+  color: #64748b;
   font-size: 11px;
-  font-weight: bold;
 }
 
 .route-desc-row {
-  font-size: 10px;
-  color: #94a3b8;
+  font-size: 10.5px;
+  color: var(--text-sub);
 }
 .route-desc-row strong {
-  color: #38bdf8;
+  color: #f8fafc;
 }
 
 /* Route Micro-Stats Bar */
@@ -866,12 +855,12 @@ html, body {
 
 .metric-chip .chip-value {
   font-size: 10.5px;
-  font-weight: 700;
+  font-weight: 600;
   font-family: var(--font-mono);
   color: var(--text-main);
 }
 .metric-chip .chip-value.safe { color: #10b981; }
-.metric-chip .chip-value.highlight { color: #38bdf8; }
+.metric-chip .chip-value.highlight { color: #93c5fd; }
 
 /* Avoidance Cards Deck */
 .avoidance-deck {
@@ -895,7 +884,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
@@ -918,29 +907,29 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 4px;
   font-size: 9.5px;
-  font-family: var(--font-mono);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
 }
 
 .avoid-pill.unsafe {
-  background: rgba(239, 68, 68, 0.16);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
 }
 
 .avoid-pill.high {
-  background: rgba(249, 115, 22, 0.16);
-  border: 1px solid rgba(249, 115, 22, 0.4);
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.3);
   color: #fdba74;
 }
 
 .avoid-pill.clear {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #86efac;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
   font-family: var(--font-sans);
   font-size: 9.5px;
 }
