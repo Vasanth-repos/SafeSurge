@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/app.css?v=2.9">
+  <link rel="stylesheet" href="/static/app.css?v=3.0">
 </head>
 <body>
 
@@ -26,19 +26,19 @@
     <!-- Telemetry KPI Row -->
     <div class="telemetry-row">
       <div class="kpi-pill">
-        <span class="kpi-lbl">🌧️ Rainfall:</span>
+        <span class="kpi-lbl">Rain:</span>
         <span class="kpi-val" id="top-rain-val">0.0 mm/h</span>
       </div>
       <div class="kpi-pill">
-        <span class="kpi-lbl">🌊 Max Depth:</span>
+        <span class="kpi-lbl">Peak:</span>
         <span class="kpi-val highlight" id="top-depth-val">0.0 cm</span>
       </div>
       <div class="kpi-pill">
-        <span class="kpi-lbl">⚖️ Water Balance:</span>
-        <span class="kpi-val" id="top-mb-val">Balanced (0.00 m³)</span>
+        <span class="kpi-lbl">Balance:</span>
+        <span class="kpi-val" id="top-mb-val">0.00 m³ (OK)</span>
       </div>
       <div class="kpi-pill">
-        <span class="kpi-lbl">🚑 Emergency Route:</span>
+        <span class="kpi-lbl">Route:</span>
         <span class="kpi-val highlight" id="top-route-val">A → M → D (70s)</span>
       </div>
     </div>
@@ -178,10 +178,10 @@
         <!-- Physics-Guided ML Surrogate Status Strip -->
         <div class="pgml-status-strip" title="Fast Machine Learning Nowcasting Surrogate">
           <div class="pgml-tag"><span class="pulse-dot-cyan"></span> <strong>Fast AI Nowcast:</strong> <span id="pgml-latency-val">0.15 ms</span></div>
-          <div class="pgml-meta">AI Peak Depth: <span id="pgml-peak-val" style="color: var(--text-cyan); font-weight: 700;">0.0 cm</span> &bull; Precision: <strong>±0.4 cm</strong></div>
+          <div class="pgml-meta">AI Peak Depth: <span id="pgml-peak-val" style="color: #ffffff; font-weight: 700;">0.0 cm</span> &bull; Precision: <strong>±0.4 cm</strong></div>
         </div>
 
-        <div class="card-subtext" id="degraded-reasons-text">Continuous urban flood monitoring combining physical drainage simulation with AI nowcasting.</div>
+        <div class="card-subtext" id="degraded-reasons-text">Continuous live city monitoring combining physical drainage simulation with AI nowcasting.</div>
       </div>
 
       <!-- Card 2: Risk-Aware Safe Routing Guidance -->
@@ -208,7 +208,7 @@
           </div>
 
           <div class="route-desc-row" id="route-corridor-desc">
-            Fastest path via <strong>Midtown Expressway</strong> (Direct Arterial Corridor)
+            Fastest route via <strong>Midtown Expressway</strong> (R006 → R007) &bull; Clear arterial passage
           </div>
         </div>
 
@@ -306,6 +306,6 @@
     </aside>
   </main>
 
-  <script src="/static/app.js?v=2.9"></script>
+  <script src="/static/app.js?v=3.0"></script>
 </body>
 </html>

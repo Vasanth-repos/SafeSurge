@@ -27,13 +27,13 @@ const layers = {
 
 // Node Coordinates Map (500x500 SVG Space)
 const NODE_COORDS = {
-  "A": { x: 34, y: 34, name: "Origin A", color: "#38bdf8" },
-  "B": { x: 466, y: 34, name: "Hub B", color: "#f59e0b" },
-  "C": { x: 34, y: 466, name: "South C", color: "#f59e0b" },
+  "A": { x: 34, y: 34, name: "Origin A", color: "#f4f4f5" },
+  "B": { x: 466, y: 34, name: "Hub B", color: "#a1a1aa" },
+  "C": { x: 34, y: 466, name: "South C", color: "#a1a1aa" },
   "D": { x: 466, y: 466, name: "Hospital D", color: "#10b981" },
-  "M": { x: 274, y: 226, name: "Midtown M", color: "#c084fc" },
-  "E": { x: 466, y: 274, name: "Lowland E", color: "#f43f5e" },
-  "W": { x: 34, y: 274, name: "West W", color: "#38bdf8" }
+  "M": { x: 274, y: 226, name: "Midtown M", color: "#d4d4d8" },
+  "E": { x: 466, y: 274, name: "Lowland E", color: "#ea580c" },
+  "W": { x: 34, y: 274, name: "West W", color: "#a1a1aa" }
 };
 
 // Graph Edge Map for Dijkstra & Visuals
@@ -505,7 +505,7 @@ function updateDashboardUI(data) {
   const rainRate = data.rainfall_rate_mmh !== undefined ? data.rainfall_rate_mmh : (data.forecast?.depth_cm > 0 ? (data.forecast.depth_cm * 0.45) : 0.0);
   if (topRain) topRain.innerText = `${rainRate.toFixed(1)} mm/h`;
   if (topDepth && data.forecast) topDepth.innerText = `${data.forecast.depth_cm.toFixed(1)} cm`;
-  if (topMb && data.mass_balance) topMb.innerText = `Balanced (0.00 m³)`;
+  if (topMb && data.mass_balance) topMb.innerText = `0.00 m³ (OK)`;
 
   // 3. Forecast Card
   if (data.forecast) {
@@ -773,8 +773,8 @@ function renderSvgMap(data) {
       rect.setAttribute("height", 46);
       rect.setAttribute("rx", 3);
 
-      let fillColor = "#0f172a";
-      let opacity = "0.4";
+      let fillColor = "#14151b";
+      let opacity = "0.7";
 
       if (layers.depth) {
         if (cell.risk === "UNSAFE" || cell.depth_cm >= 25) {
@@ -782,38 +782,38 @@ function renderSvgMap(data) {
           opacity = "0.85";
         } else if (cell.risk === "HIGH" || cell.depth_cm >= 15) {
           fillColor = "#ea580c";
-          opacity = "0.78";
+          opacity = "0.80";
         } else if (cell.risk === "WATCH" || cell.depth_cm >= 5) {
           fillColor = "#d97706";
-          opacity = "0.70";
+          opacity = "0.72";
         } else if (cell.depth_cm > 0.5) {
-          fillColor = "#2563eb";
-          opacity = "0.65";
+          fillColor = "#0d9488";
+          opacity = "0.55";
         } else if (cell.depth_cm > 0.02) {
-          fillColor = "#1e3a8a";
-          opacity = "0.45";
+          fillColor = "#115e59";
+          opacity = "0.35";
         }
       }
 
       rect.setAttribute("fill", fillColor);
       rect.setAttribute("opacity", opacity);
-      rect.setAttribute("stroke", "rgba(255, 255, 255, 0.04)");
+      rect.setAttribute("stroke", "#1f2028");
       rect.setAttribute("stroke-width", "0.8");
 
       rect.addEventListener("mouseenter", () => {
         tooltip.classList.remove("hidden");
         const riskColor = cell.risk === "UNSAFE" ? "#ef4444" : (cell.risk === "HIGH" ? "#f97316" : (cell.risk === "WATCH" ? "#f59e0b" : "#10b981"));
         tooltip.innerHTML = `
-          <div style="font-size: 11px; font-weight: 700; color: #38bdf8; border-bottom: 1px solid rgba(56,189,248,0.2); padding-bottom: 3px; margin-bottom: 5px;">
+          <div style="font-size: 11px; font-weight: 700; color: #ffffff; border-bottom: 1px solid #2d2f3c; padding-bottom: 3px; margin-bottom: 5px;">
             📍 Grid ${cell.cell_id} (R${cell.row}, C${cell.col})
           </div>
           <div style="display: grid; grid-template-columns: auto auto; gap: 3px 10px; font-size: 10.5px;">
-            <span style="color: #94a3b8;">Elevation:</span> <span>${(cell.elevation_m || 20.0 - (cell.row+cell.col)*0.5).toFixed(1)} m</span>
-            <span style="color: #94a3b8;">Fused Depth:</span> <strong style="color: ${cell.depth_cm > 0 ? '#38bdf8' : '#f8fafc'};">${cell.depth_cm.toFixed(1)} cm</strong>
-            <span style="color: #94a3b8;">Model Depth:</span> <span>${cell.model_depth_cm.toFixed(1)} cm</span>
-            <span style="color: #94a3b8;">Bias Corr:</span> <span>${cell.correction_cm >= 0 ? '+' : ''}${cell.correction_cm.toFixed(1)} cm</span>
-            <span style="color: #94a3b8;">Risk State:</span> <strong style="color: ${riskColor};">${cell.risk}</strong>
-            <span style="color: #94a3b8;">Confidence:</span> <span>${(cell.confidence * 100).toFixed(0)}%</span>
+            <span style="color: #9ca3af;">Elevation:</span> <span>${(cell.elevation_m || 20.0 - (cell.row+cell.col)*0.5).toFixed(1)} m</span>
+            <span style="color: #9ca3af;">Water Depth:</span> <strong style="color: ${cell.depth_cm > 0 ? '#fbbf24' : '#f4f4f7'};">${cell.depth_cm.toFixed(1)} cm</strong>
+            <span style="color: #9ca3af;">Model Depth:</span> <span>${cell.model_depth_cm.toFixed(1)} cm</span>
+            <span style="color: #9ca3af;">Correction:</span> <span>${cell.correction_cm >= 0 ? '+' : ''}${cell.correction_cm.toFixed(1)} cm</span>
+            <span style="color: #9ca3af;">Risk State:</span> <strong style="color: ${riskColor};">${cell.risk}</strong>
+            <span style="color: #9ca3af;">Accuracy:</span> <span>${(cell.confidence * 100).toFixed(0)}%</span>
           </div>
         `;
       });
@@ -848,13 +848,8 @@ function renderSvgMap(data) {
 
         // Influence of Lowland Basin Sink (at row 5, col 8)
         if (c < 8 && r <= 6) {
-          const pullEast = Math.max(0, 8 - c);
-          dCol += pullEast * 0.22;
-        }
-
-        // Influence of South Canal / Hospital Outfall (at row >= 6)
-        if (r >= 6) {
-          dRow += 0.9;
+          dRow += 0.8;
+          dCol += 0.8;
         }
 
         // True screen-space angle from +X (East) clockwise towards +Y (South)
@@ -871,34 +866,25 @@ function renderSvgMap(data) {
         arrowShadow.setAttribute("transform", "scale(1.1) translate(0.5, 0.5)");
         flowG.appendChild(arrowShadow);
 
-        // High-contrast bright arrow core (Crisp White / Light Blue with Dark Border)
+        // High-contrast neutral arrow core
         const arrowCore = document.createElementNS("http://www.w3.org/2000/svg", "path");
         arrowCore.setAttribute("d", "M 8 0 L 1 -5 L 1 -2 L -7 -2 L -7 2 L 1 2 L 1 5 Z");
         
-        let arrowFill = "#ffffff";
-        if (cell.depth_cm >= 25.0) {
-          arrowFill = "#ffffff";
-        } else if (cell.depth_cm >= 15.0) {
-          arrowFill = "#f0fdf4";
-        } else if (cell.depth_cm >= 5.0) {
-          arrowFill = "#e0f2fe";
-        } else {
-          arrowFill = "#38bdf8";
-        }
+        let arrowFill = cell.depth_cm >= 5.0 ? "#ffffff" : "#71717a";
 
         arrowCore.setAttribute("fill", arrowFill);
-        arrowCore.setAttribute("stroke", "#020617");
+        arrowCore.setAttribute("stroke", "#0b0c10");
         arrowCore.setAttribute("stroke-width", "1.2");
         arrowCore.setAttribute("stroke-linejoin", "round");
         flowG.appendChild(arrowCore);
 
-        // Dynamic center pulse dot for high-velocity flow
+        // Dynamic center dot for high-velocity flow
         if (cell.depth_cm >= 10.0) {
           const flowDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
           flowDot.setAttribute("cx", "1");
           flowDot.setAttribute("cy", "0");
           flowDot.setAttribute("r", "1.2");
-          flowDot.setAttribute("fill", "#0284c7");
+          flowDot.setAttribute("fill", "#f59e0b");
           flowG.appendChild(flowDot);
         }
 
@@ -1078,19 +1064,19 @@ function renderSvgMap(data) {
       shadowLine.setAttribute("y1", uCoord.y);
       shadowLine.setAttribute("x2", vCoord.x);
       shadowLine.setAttribute("y2", vCoord.y);
-      shadowLine.setAttribute("stroke", "#0f172a");
+      shadowLine.setAttribute("stroke", "#000000");
       shadowLine.setAttribute("stroke-width", "6.5");
       shadowLine.setAttribute("stroke-linecap", "round");
-      shadowLine.setAttribute("opacity", "0.85");
+      shadowLine.setAttribute("opacity", "0.9");
       routeG.appendChild(shadowLine);
 
-      // Clean transit route line
+      // Clean amber navigation transit corridor line
       const coreLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
       coreLine.setAttribute("x1", uCoord.x);
       coreLine.setAttribute("y1", uCoord.y);
       coreLine.setAttribute("x2", vCoord.x);
       coreLine.setAttribute("y2", vCoord.y);
-      coreLine.setAttribute("stroke", "#3b82f6");
+      coreLine.setAttribute("stroke", "#f59e0b");
       coreLine.setAttribute("stroke-width", "3.5");
       coreLine.setAttribute("stroke-linecap", "round");
       routeG.appendChild(coreLine);
@@ -1119,33 +1105,30 @@ function renderSvgMap(data) {
         const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         pulse.setAttribute("cx", coord.x);
         pulse.setAttribute("cy", coord.y);
-        pulse.setAttribute("r", 13);
+        pulse.setAttribute("r", 12);
         pulse.setAttribute("fill", "none");
-        pulse.setAttribute("stroke", "#38bdf8");
+        pulse.setAttribute("stroke", "rgba(16, 185, 129, 0.4)");
         pulse.setAttribute("stroke-width", "1.2");
-        pulse.setAttribute("opacity", "0.5");
         sg.appendChild(pulse);
       } else if (s.status === "STALE") {
         const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         pulse.setAttribute("cx", coord.x);
         pulse.setAttribute("cy", coord.y);
-        pulse.setAttribute("r", 15);
-        pulse.setAttribute("fill", "rgba(245, 158, 11, 0.25)");
+        pulse.setAttribute("r", 14);
+        pulse.setAttribute("fill", "rgba(245, 158, 11, 0.15)");
         pulse.setAttribute("stroke", "#f59e0b");
-        pulse.setAttribute("stroke-width", "1.5");
+        pulse.setAttribute("stroke-width", "1.2");
         pulse.setAttribute("stroke-dasharray", "3,2");
-        pulse.setAttribute("filter", "url(#glow-pulse)");
         sg.appendChild(pulse);
       } else {
         const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         pulse.setAttribute("cx", coord.x);
         pulse.setAttribute("cy", coord.y);
-        pulse.setAttribute("r", 15);
-        pulse.setAttribute("fill", "rgba(239, 68, 68, 0.3)");
-        pulse.setAttribute("stroke", "#ef4444");
-        pulse.setAttribute("stroke-width", "1.5");
+        pulse.setAttribute("r", 14);
+        pulse.setAttribute("fill", "rgba(220, 38, 38, 0.15)");
+        pulse.setAttribute("stroke", "#dc2626");
+        pulse.setAttribute("stroke-width", "1.2");
         pulse.setAttribute("stroke-dasharray", "2,2");
-        pulse.setAttribute("filter", "url(#glow-pulse)");
         sg.appendChild(pulse);
       }
 
@@ -1153,20 +1136,19 @@ function renderSvgMap(data) {
       pin.setAttribute("cx", coord.x);
       pin.setAttribute("cy", coord.y);
       pin.setAttribute("r", 7.5);
-      pin.setAttribute("fill", s.status === "ONLINE" ? "#38bdf8" : (s.status === "STALE" ? "#f59e0b" : "#ef4444"));
+      pin.setAttribute("fill", s.status === "ONLINE" ? "#10b981" : (s.status === "STALE" ? "#f59e0b" : "#dc2626"));
       pin.setAttribute("stroke", "#ffffff");
-      pin.setAttribute("stroke-width", "1.5");
+      pin.setAttribute("stroke-width", "1.2");
       sg.appendChild(pin);
 
       const pinText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       pinText.setAttribute("x", coord.x);
       pinText.setAttribute("y", coord.y + 2.5);
-      pinText.setAttribute("fill", "#070b14");
+      pinText.setAttribute("fill", "#0b0c10");
       pinText.setAttribute("font-size", "6.5");
       pinText.setAttribute("font-weight", "bold");
       pinText.setAttribute("text-anchor", "middle");
       pinText.textContent = s.status === "OFFLINE" ? "X" : (s.status === "STALE" ? "!" : s.sensor_id.slice(-2));
-      sg.appendChild(pinText);
       sg.appendChild(pinText);
 
       svgMap.appendChild(sg);
@@ -1181,25 +1163,24 @@ function renderSvgMap(data) {
     const halo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     halo.setAttribute("cx", n.x);
     halo.setAttribute("cy", n.y);
-    halo.setAttribute("r", isInActiveRoute ? 18 : 14);
-    halo.setAttribute("fill", isInActiveRoute ? "#38bdf8" : n.color);
-    halo.setAttribute("opacity", isInActiveRoute ? "0.45" : "0.15");
-    if (isInActiveRoute) halo.setAttribute("filter", "url(#glow-pulse)");
+    halo.setAttribute("r", isInActiveRoute ? 16 : 12);
+    halo.setAttribute("fill", isInActiveRoute ? "#f59e0b" : n.color);
+    halo.setAttribute("opacity", isInActiveRoute ? "0.2" : "0.08");
     svgMap.appendChild(halo);
 
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circle.setAttribute("cx", n.x);
     circle.setAttribute("cy", n.y);
     circle.setAttribute("r", isInActiveRoute ? 12 : 10);
-    circle.setAttribute("fill", "#0b1120");
-    circle.setAttribute("stroke", isInActiveRoute ? "#38bdf8" : n.color);
-    circle.setAttribute("stroke-width", isInActiveRoute ? "2.5" : "1.8");
+    circle.setAttribute("fill", "#16171e");
+    circle.setAttribute("stroke", isInActiveRoute ? "#fbbf24" : n.color);
+    circle.setAttribute("stroke-width", isInActiveRoute ? "2.2" : "1.5");
     svgMap.appendChild(circle);
 
     const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
     label.setAttribute("x", n.x);
     label.setAttribute("y", n.y + 3.5);
-    label.setAttribute("fill", "#f8fafc");
+    label.setAttribute("fill", "#ffffff");
     label.setAttribute("font-size", "10");
     label.setAttribute("font-weight", "bold");
     label.setAttribute("font-family", "Inter, sans-serif");
@@ -1211,9 +1192,9 @@ function renderSvgMap(data) {
     let capY = n.y < 240 ? n.y - 15 : n.y + 21;
     caption.setAttribute("x", n.x);
     caption.setAttribute("y", capY);
-    caption.setAttribute("fill", isInActiveRoute ? "#38bdf8" : n.color);
+    caption.setAttribute("fill", isInActiveRoute ? "#fbbf24" : n.color);
     caption.setAttribute("font-size", "8.5");
-    caption.setAttribute("font-weight", "700");
+    caption.setAttribute("font-weight", "600");
     caption.setAttribute("font-family", "Inter, sans-serif");
     caption.setAttribute("text-anchor", "middle");
     caption.textContent = n.name;
@@ -1251,16 +1232,15 @@ function renderAnimatedVehicle() {
   const strobe = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   strobe.setAttribute("cx", vehX);
   strobe.setAttribute("cy", vehY);
-  strobe.setAttribute("r", 11);
-  strobe.setAttribute("fill", "rgba(56, 189, 248, 0.4)");
-  strobe.setAttribute("filter", "url(#glow-cyan)");
+  strobe.setAttribute("r", 10);
+  strobe.setAttribute("fill", "rgba(239, 68, 68, 0.25)");
   vehG.appendChild(strobe);
 
   const vehBody = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   vehBody.setAttribute("cx", vehX);
   vehBody.setAttribute("cy", vehY);
   vehBody.setAttribute("r", 6.5);
-  vehBody.setAttribute("fill", "#0284c7");
+  vehBody.setAttribute("fill", "#dc2626");
   vehBody.setAttribute("stroke", "#ffffff");
   vehBody.setAttribute("stroke-width", "1.5");
   vehG.appendChild(vehBody);
@@ -1287,8 +1267,8 @@ function drawHydrograph(scenarioId) {
 
   ctx.clearRect(0, 0, width, height);
 
-  // Hyetograph (Rain Bars in Blue)
-  ctx.fillStyle = "rgba(56, 189, 248, 0.22)";
+  // Hyetograph (Neutral Rain Bars)
+  ctx.fillStyle = "rgba(161, 161, 170, 0.22)";
   const steps = 180;
   for (let m = 0; m <= steps; m += 2) {
     const normT = m / 120.0;
@@ -1299,9 +1279,9 @@ function drawHydrograph(scenarioId) {
     ctx.fillRect(x, height - barH, barW, barH);
   }
 
-  // Flood Depth Hydrograph Line (Cyan)
-  ctx.strokeStyle = "#06b6d4";
-  ctx.lineWidth = 1.8;
+  // Flood Depth Hydrograph Line (Warm Amber Water Depth)
+  ctx.strokeStyle = "#f59e0b";
+  ctx.lineWidth = 2.0;
   ctx.beginPath();
 
   for (let m = 0; m <= steps; m += 2) {
