@@ -44,8 +44,11 @@ class SnapshotService:
     def run_scenario(self, scenario_yaml_path: str) -> str:
         snapshots = self.runner.run(scenario_yaml_path)
         sim_id = snapshots[0].simulation_id if snapshots else "custom_storm"
+        stem = Path(scenario_yaml_path).stem
         for snap in snapshots:
             self._store[(snap.simulation_id, snap.timestamp_seconds)] = snap
+            if stem != snap.simulation_id:
+                self._store[(stem, snap.timestamp_seconds)] = snap
         self.active_simulation_id = sim_id
         return sim_id
 
@@ -89,13 +92,17 @@ class SnapshotService:
         fault_blockage: bool = False,
     ) -> Dict[str, Any]:
         if scenario_id:
-            self.ensure_scenario_loaded(scenario_id)
-            sim_id = scenario_id
+            actual_id = self.ensure_scenario_loaded(scenario_id)
+            sim_id = actual_id or scenario_id
         else:
             sim_id = self.active_simulation_id or "storm_01"
 
         target_t = lead_time_minutes * 60
         snap = self.get_snapshot(sim_id, target_t)
+        if not snap and scenario_id:
+            snap = self.get_snapshot(scenario_id, target_t)
+        if not snap:
+            snap = self.get_snapshot(self.active_simulation_id, target_t)
         if not snap:
             return {"status": "NO_ACTIVE_SIMULATION"}
 
