@@ -20,6 +20,7 @@ from backend.api.scenarios import router as scenarios_router
 from backend.api.snapshots import router as snapshots_router
 from backend.api.dashboard import router as dashboard_router
 from backend.api.reports import router as reports_router
+from backend.api.ml import router as ml_router
 from backend.services.simulation_service import SimulationService
 
 # Core simulation service instance for legacy scenario endpoints
@@ -59,6 +60,7 @@ app.include_router(scenarios_router)
 app.include_router(snapshots_router)
 app.include_router(dashboard_router)
 app.include_router(reports_router)
+app.include_router(ml_router)
 
 from fastapi.responses import FileResponse
 

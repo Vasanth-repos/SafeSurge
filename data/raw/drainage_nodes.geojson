@@ -1,0 +1,85 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": "IN01",
+        "node_type": "inlet",
+        "invert_elevation": 14.5,
+        "base_capacity": 25.0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2747,
+          13.0867
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": "IN02",
+        "node_type": "inlet",
+        "invert_elevation": 16.8,
+        "base_capacity": 20.0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2737,
+          13.0847
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": "E001",
+        "node_type": "culvert_inlet",
+        "invert_elevation": 12.2,
+        "base_capacity": 30.0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2777,
+          13.0887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": "JUN1",
+        "node_type": "manhole_junction",
+        "invert_elevation": 12.0,
+        "base_capacity": 45.0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2757,
+          13.0887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": "OUT1",
+        "node_type": "outfall",
+        "invert_elevation": 9.5,
+        "base_capacity": 80.0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2797,
+          13.0917
+        ]
+      }
+    }
+  ]
+}

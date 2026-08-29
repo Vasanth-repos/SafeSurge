@@ -1,0 +1,225 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R001",
+        "road_name": "North Ave (A -> B)",
+        "road_class": "arterial",
+        "speed": 50
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R002",
+        "road_name": "East Expwy (B -> E)",
+        "road_class": "highway",
+        "speed": 60
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R003",
+        "road_name": "West Bypass (A -> W)",
+        "road_class": "arterial",
+        "speed": 45
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R004",
+        "road_name": "South Hwy (C -> D)",
+        "road_class": "highway",
+        "speed": 60
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R005",
+        "road_name": "East Underpass (E -> D)",
+        "road_class": "secondary",
+        "speed": 35
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R006",
+        "road_name": "Central Spine (A -> M)",
+        "road_class": "arterial",
+        "speed": 40
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R007",
+        "road_name": "Midtown Arterial (M -> D)",
+        "road_class": "arterial",
+        "speed": 40
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R008",
+        "road_name": "West Link (W -> M)",
+        "road_class": "collector",
+        "speed": 30
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R009",
+        "road_name": "East Connector (M -> E)",
+        "road_class": "collector",
+        "speed": 30
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R010",
+        "road_name": "West Ridge (W -> C)",
+        "road_class": "arterial",
+        "speed": 45
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2707,
+            13.0827
+          ],
+          [
+            80.2787,
+            13.0907
+          ]
+        ]
+      }
+    }
+  ]
+}

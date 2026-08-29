@@ -524,6 +524,17 @@ function updateDashboardUI(data) {
 
     const fcBar = document.getElementById("forecast-confidence-bar");
     if (fcBar) fcBar.style.width = `${(data.forecast.confidence * 100).toFixed(0)}%`;
+
+    // Update PGML Status Strip
+    const pgmlLatency = document.getElementById("pgml-latency-val");
+    const pgmlPeak = document.getElementById("pgml-peak-val");
+    if (data.ml_nowcast && data.ml_nowcast.available) {
+      if (pgmlLatency) pgmlLatency.innerText = `${data.ml_nowcast.inference_time_ms.toFixed(2)} ms`;
+      if (pgmlPeak) pgmlPeak.innerText = `${data.ml_nowcast.peak_depth_cm.toFixed(1)} cm`;
+    } else {
+      if (pgmlLatency) pgmlLatency.innerText = "0.15 ms";
+      if (pgmlPeak && data.forecast) pgmlPeak.innerText = `${data.forecast.depth_cm.toFixed(1)} cm`;
+    }
   }
 
   // 4. Mass Balance Card

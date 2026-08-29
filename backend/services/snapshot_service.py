@@ -265,6 +265,25 @@ class SnapshotService:
                 "max_exposure_depth_cm": 0.0,
             }
 
+        # Real-time Physics-Guided ML Surrogate Nowcast
+        try:
+            from ml.infer import predict_catchment_depths
+            ml_res = predict_catchment_depths(
+                lead_time_minutes=lead_time_minutes,
+                scenario_id=sim_id,
+                drain_capacity_factor=0.3 if fault_blockage else 1.0,
+            )
+            ml_data = {
+                "available": True,
+                "peak_depth_cm": ml_res["peak_depth_cm"],
+                "mean_depth_cm": ml_res["mean_depth_cm"],
+                "inference_time_ms": ml_res["inference_time_ms"],
+                "model_architecture": ml_res["model_architecture"],
+                "cell_depths": ml_res["cell_depths"],
+            }
+        except Exception:
+            ml_data = {"available": False}
+
         return {
             "simulation_id": snap.simulation_id,
             "timestamp_seconds": snap.timestamp_seconds,
@@ -280,5 +299,7 @@ class SnapshotService:
             "mass_balance": snap.mass_balance.to_dict(),
             "active_faults": active_faults_list,
             "safe_route": best_route,
+            "ml_nowcast": ml_data,
         }
+
 
