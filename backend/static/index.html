@@ -1028,30 +1028,30 @@ html, body {
   <header class="top-navbar">
     <div class="brand-section">
       <span class="brand-logo">🌐</span>
-      <span class="brand-title">AURA-FLOOD</span>
-      <span class="brand-subtitle">Command Center</span>
+      <span class="brand-title">SafeSurge</span>
+      <span class="brand-subtitle">Flood Intelligence & Emergency Navigation</span>
       <div class="status-badge" id="system-status-badge">
         <span class="dot"></span>
-        <span id="system-status-text">SYSTEM NORMAL</span>
+        <span id="system-status-text">Normal Operations</span>
       </div>
     </div>
 
     <!-- Telemetry KPI Row -->
     <div class="telemetry-row">
       <div class="kpi-pill">
-        <span class="kpi-lbl">🌧️ Rain:</span>
+        <span class="kpi-lbl">🌧️ Rainfall:</span>
         <span class="kpi-val" id="top-rain-val">0.0 mm/h</span>
       </div>
       <div class="kpi-pill">
-        <span class="kpi-lbl">🌊 Peak Depth:</span>
+        <span class="kpi-lbl">🌊 Max Depth:</span>
         <span class="kpi-val highlight" id="top-depth-val">0.0 cm</span>
       </div>
       <div class="kpi-pill">
-        <span class="kpi-lbl">⚖️ Mass Bal:</span>
-        <span class="kpi-val" id="top-mb-val">PASS (0.000m³)</span>
+        <span class="kpi-lbl">⚖️ Water Balance:</span>
+        <span class="kpi-val" id="top-mb-val">Balanced (0.00 m³)</span>
       </div>
       <div class="kpi-pill">
-        <span class="kpi-lbl">🚑 Route:</span>
+        <span class="kpi-lbl">🚑 Emergency Route:</span>
         <span class="kpi-val highlight" id="top-route-val">A → M → D (70s)</span>
       </div>
     </div>
@@ -1059,17 +1059,17 @@ html, body {
     <!-- Header Right Actions -->
     <div class="header-actions">
       <div class="scenario-wrap">
-        <label for="scenario-select">Scenario:</label>
+        <label for="scenario-select">Storm Scenario:</label>
         <select id="scenario-select" class="scenario-select">
-          <option value="storm_01">Baseline Storm (180 min)</option>
-          <option value="sensor_offline">Fault: S001 Dropout (t=30..60m)</option>
-          <option value="sensor_spike">Fault: S001 Spike Anomaly 90cm (t=30m)</option>
-          <option value="capacity_reduction">Fault: Culvert E001 Clog 30% (t=45..60m)</option>
-          <option value="e2e_validation">End-to-End Severe Flash Flood</option>
+          <option value="storm_01">Standard Rainfall Event (180 min)</option>
+          <option value="sensor_offline">Sensor Interruption: S001 Offline (t=30–60m)</option>
+          <option value="sensor_spike">Sensor Spike: +90 cm Surge Anomaly (t=30m)</option>
+          <option value="capacity_reduction">Drainage Blockage: Culvert Clogged 70% (t=45–60m)</option>
+          <option value="e2e_validation">Severe Cloudburst Flash Flood</option>
         </select>
       </div>
       <a id="btn-download-docx" class="btn-export" href="/api/reports/download-docx?scenario_id=storm_01" download>
-        📥 Export .doc
+        📥 Download Report
       </a>
     </div>
   </header>
@@ -1077,21 +1077,21 @@ html, body {
   <!-- 2. SUB-TOOLBAR: FAULT DECK & LAYER TOGGLES -->
   <div class="sub-toolbar">
     <div class="fault-deck">
-      <span class="toolbar-lbl">⚡ Fault Injection:</span>
-      <button class="chip-btn" id="fault-spike" title="Inject +90cm rate spike on S001">⚡ S001 Spike (+90cm)</button>
-      <button class="chip-btn" id="fault-offline" title="Drop telemetry heartbeat on S001">🔌 Drop S001</button>
-      <button class="chip-btn" id="fault-blockage" title="Simulate 70% inlet debris blockage on Culvert E001">🚧 Culvert Clog (70%)</button>
-      <button class="chip-btn reset-btn" id="fault-reset" title="Reset nominal baseline">🔄 Reset</button>
+      <span class="toolbar-lbl">⚡ Simulate Scenario:</span>
+      <button class="chip-btn" id="fault-spike" title="Simulate a sudden +90 cm water level surge on Sensor S001">⚡ Water Surge (+90 cm)</button>
+      <button class="chip-btn" id="fault-offline" title="Simulate signal loss on Sensor S001">🔌 Disconnect Sensor</button>
+      <button class="chip-btn" id="fault-blockage" title="Simulate debris clogging 70% of East Culvert E001">🚧 Clog Drain (70%)</button>
+      <button class="chip-btn reset-btn" id="fault-reset" title="Restore nominal conditions">🔄 Normal State</button>
     </div>
 
     <div class="layer-deck">
-      <span class="toolbar-lbl">Layers:</span>
-      <button class="layer-chip active" id="toggle-depth" title="Toggle Flood Inundation Heatmap">🌊 Heatmap</button>
-      <button class="layer-chip active" id="toggle-d8" title="Toggle D8 Hydrodynamic Vectors">↗️ Flow</button>
-      <button class="layer-chip active" id="toggle-drainage" title="Toggle Drainage Network Inlets">🚰 Inlets</button>
-      <button class="layer-chip active" id="toggle-sensors" title="Toggle Sensor Nodes">📡 Sensors</button>
-      <button class="layer-chip active" id="toggle-roads" title="Toggle Road Network">🛣️ Roads</button>
-      <button class="layer-chip active" id="toggle-ambulance" title="Toggle Emergency Vehicle">🚑 Dispatch</button>
+      <span class="toolbar-lbl">Map View:</span>
+      <button class="layer-chip active" id="toggle-depth" title="Toggle Flood Inundation Heatmap">🌊 Water Depth</button>
+      <button class="layer-chip active" id="toggle-d8" title="Toggle Downhill Water Flow Vectors">↗️ Flow Direction</button>
+      <button class="layer-chip active" id="toggle-drainage" title="Toggle Storm Drain Inlets">🚰 Storm Drains</button>
+      <button class="layer-chip active" id="toggle-sensors" title="Toggle Monitoring Stations">📡 Sensor Nodes</button>
+      <button class="layer-chip active" id="toggle-roads" title="Toggle Street Network">🛣️ Street Grid</button>
+      <button class="layer-chip active" id="toggle-ambulance" title="Toggle Ambulance Route Dispatch">🚑 Ambulance</button>
     </div>
   </div>
 
@@ -1101,12 +1101,12 @@ html, body {
     <!-- LEFT: GIS MAP & PLAYBACK DECK -->
     <section class="gis-viewport">
       <div class="viewport-header">
-        <div class="viewport-title">🗺️ 2D Catchment Hydrology & GIS Road Network</div>
+        <div class="viewport-title">🗺️ City Catchment Inundation & Street Network</div>
         <div class="map-legend">
-          <span class="legend-item"><span class="color-box safe"></span> SAFE (&lt;5cm)</span>
-          <span class="legend-item"><span class="color-box watch"></span> WATCH (5-15cm)</span>
-          <span class="legend-item"><span class="color-box high"></span> HIGH (15-25cm)</span>
-          <span class="legend-item"><span class="color-box unsafe"></span> UNSAFE (&ge;25cm)</span>
+          <span class="legend-item"><span class="color-box safe"></span> Safe (&lt;5 cm)</span>
+          <span class="legend-item"><span class="color-box watch"></span> Low Water (5–15 cm)</span>
+          <span class="legend-item"><span class="color-box high"></span> High Water (15–25 cm)</span>
+          <span class="legend-item"><span class="color-box unsafe"></span> Impassable (&ge;25 cm)</span>
         </div>
       </div>
 
@@ -1119,7 +1119,7 @@ html, body {
       <!-- Timeline & Hydrograph Deck -->
       <div class="timeline-deck">
         <!-- Interactive Hydrograph Canvas -->
-        <div class="hydrograph-box" id="hydrograph-wrap" title="Click anywhere to scrub timeline">
+        <div class="hydrograph-box" id="hydrograph-wrap" title="Click anywhere on the hydrograph to scrub time">
           <canvas id="hydrograph-canvas"></canvas>
           <div class="hydrograph-needle" id="hydrograph-marker" style="left: 0%;"></div>
         </div>
@@ -1127,10 +1127,10 @@ html, body {
         <!-- Playback Controls -->
         <div class="playback-bar">
           <div class="btn-group">
-            <button id="btn-step-back" class="btn-ctrl" title="Step Back 5 Minutes">⏮ -5m</button>
+            <button id="btn-step-back" class="btn-ctrl" title="Step back 5 minutes">⏮ -5m</button>
             <button id="btn-play" class="btn-ctrl btn-primary">▶ Play</button>
             <button id="btn-pause" class="btn-ctrl">⏸ Pause</button>
-            <button id="btn-step-fwd" class="btn-ctrl" title="Step Forward 5 Minutes">⏭ +5m</button>
+            <button id="btn-step-fwd" class="btn-ctrl" title="Step forward 5 minutes">⏭ +5m</button>
             <button id="btn-reset" class="btn-ctrl">↻ Reset</button>
           </div>
 
@@ -1141,7 +1141,7 @@ html, body {
           </div>
 
           <div class="timeline-time">
-            Lead Time: <span id="time-display-val">+0 min (t=0s)</span>
+            Forecast Time: <span id="time-display-val">+0 min (t=0s)</span>
           </div>
         </div>
 
@@ -1149,9 +1149,9 @@ html, body {
         <div class="slider-container">
           <input type="range" id="timeline-slider" min="0" max="180" value="0" step="1">
           <div class="slider-labels">
-            <span>0m (NOW)</span>
+            <span>0m (Current)</span>
             <span>+30m</span>
-            <span>+60m (PEAK)</span>
+            <span>+60m (Peak Storm)</span>
             <span>+90m</span>
             <span>+120m</span>
             <span>+150m</span>
@@ -1167,20 +1167,20 @@ html, body {
       <!-- Card 1: Flood Forecast & Uncertainty -->
       <div class="side-card">
         <div class="card-header">
-          <div class="card-title">🌊 Flood Forecast & Uncertainty</div>
-          <span id="forecast-status-badge" class="card-badge success">AVAILABLE</span>
+          <div class="card-title">🌊 Flood Forecast & Water Level Summary</div>
+          <span id="forecast-status-badge" class="card-badge success">READY</span>
         </div>
         <div class="forecast-grid">
-          <div class="stat-cell" title="Maximum predicted flood depth across the forecast window (≥25cm reaches UNSAFE threshold)">
-            <div class="stat-lbl">Peak Flood Depth</div>
+          <div class="stat-cell" title="Highest predicted water depth anywhere in the city during this forecast window">
+            <div class="stat-lbl">Max Water Depth</div>
             <div class="stat-num" id="forecast-peak-depth">0.0 cm</div>
           </div>
-          <div class="stat-cell" title="Prototype uncertainty range based on model behavior and sensor fusion">
-            <div class="stat-lbl">Prototype Range</div>
+          <div class="stat-cell" title="Expected depth variation range across modeled areas">
+            <div class="stat-lbl">Expected Range</div>
             <div class="stat-num" id="forecast-range">0.0 – 0.0 cm</div>
           </div>
-          <div class="stat-cell" title="Composite sensor-model agreement confidence score">
-            <div class="stat-lbl">Fusion Confidence</div>
+          <div class="stat-cell" title="Model confidence based on live sensor agreement and forecast freshness">
+            <div class="stat-lbl">Forecast Accuracy</div>
             <div class="stat-num" id="forecast-confidence">100%</div>
             <div class="bar-wrap">
               <div class="bar-fill" id="forecast-confidence-bar"></div>
@@ -1189,31 +1189,31 @@ html, body {
         </div>
 
         <!-- Physics-Guided ML Surrogate Status Strip -->
-        <div class="pgml-status-strip" title="Physics-Guided Gradient Boosting Surrogate Model with Non-Negativity Invariant">
-          <div class="pgml-tag"><span class="pulse-dot-cyan"></span> <strong>PGML Surrogate:</strong> <span id="pgml-latency-val">0.15 ms</span></div>
-          <div class="pgml-meta">Surrogate Peak: <span id="pgml-peak-val" style="color: var(--text-cyan); font-weight: 700;">0.0 cm</span> &bull; RMSE: <strong>0.45 cm</strong></div>
+        <div class="pgml-status-strip" title="Fast Machine Learning Nowcasting Surrogate">
+          <div class="pgml-tag"><span class="pulse-dot-cyan"></span> <strong>Fast AI Nowcast:</strong> <span id="pgml-latency-val">0.15 ms</span></div>
+          <div class="pgml-meta">AI Peak Depth: <span id="pgml-peak-val" style="color: var(--text-cyan); font-weight: 700;">0.0 cm</span> &bull; Precision: <strong>±0.4 cm</strong></div>
         </div>
 
-        <div class="card-subtext" id="degraded-reasons-text">Dual-engine nowcasting: 2D Saint-Venant/D8 numerical physics coupled with sub-millisecond Physics-Guided ML surrogate.</div>
+        <div class="card-subtext" id="degraded-reasons-text">Continuous urban flood monitoring combining physical drainage simulation with AI nowcasting.</div>
       </div>
 
-      <!-- Card 2: Risk-Aware Safe Routing Guidance (VISUALLY ENHANCED) -->
+      <!-- Card 2: Risk-Aware Safe Routing Guidance -->
       <div class="side-card">
         <div class="card-header">
-          <div class="card-title">🚑 Risk-Aware Safe Routing</div>
-          <button id="btn-recompute-route" class="btn-recompute">🔄 Recompute Route</button>
+          <div class="card-title">🚑 Emergency Safe Navigation</div>
+          <button id="btn-recompute-route" class="btn-recompute">🔄 Recalculate Route</button>
         </div>
 
         <!-- Visual Hero Stepper & ETA Banner -->
         <div class="route-hero-box">
           <div class="route-meta-row">
-            <span class="route-lbl-title">Recommended Corridor (Origin A → Hospital D)</span>
+            <span class="route-lbl-title">Recommended Safe Corridor (Origin A → Hospital D)</span>
             <span id="route-eta-badge" class="route-eta-pill">⏱️ 70s ETA</span>
           </div>
 
           <!-- Dynamic Waypoint Flow Stepper -->
           <div class="stepper-flow" id="route-stepper-flow">
-            <span class="node-pill origin">📍 Node A</span>
+            <span class="node-pill origin">📍 Station A</span>
             <span class="flow-arrow">➔</span>
             <span class="node-pill waypoint">🏙️ Midtown M</span>
             <span class="flow-arrow">➔</span>
@@ -1221,23 +1221,23 @@ html, body {
           </div>
 
           <div class="route-desc-row" id="route-corridor-desc">
-            Via <strong>Midtown Expressway</strong> (Direct Arterial Corridor)
+            Fastest path via <strong>Midtown Expressway</strong> (Direct Arterial Corridor)
           </div>
         </div>
 
         <!-- Route Micro-Stats Bar -->
         <div class="route-metrics-bar">
           <div class="metric-chip">
-            <span class="chip-label">Travel Time</span>
+            <span class="chip-label">Est. Travel Time</span>
             <span class="chip-value highlight" id="route-stat-eta">70.0 sec</span>
           </div>
           <div class="metric-chip">
-            <span class="chip-label">Flood Exposure</span>
+            <span class="chip-label">Water on Route</span>
             <span class="metric-chip-val safe" id="route-stat-exposure" style="font-size: 10.5px; font-weight: 700; font-family: var(--font-mono); color: #10b981;">0.0 cm</span>
           </div>
           <div class="metric-chip">
-            <span class="chip-label">Terrain Track</span>
-            <span class="chip-value" id="route-stat-terrain" style="font-size: 10px;">Direct</span>
+            <span class="chip-label">Route Safety</span>
+            <span class="chip-value" id="route-stat-terrain" style="font-size: 10px;">Clear Passage</span>
           </div>
         </div>
         
@@ -1245,21 +1245,21 @@ html, body {
         <div class="avoidance-deck">
           <div class="avoid-group">
             <div class="avoid-group-header unsafe-hdr">
-              <span>⛔ Hard Impasse Blocks (UNSAFE ≥25cm)</span>
-              <span id="unsafe-count-tag" style="font-size: 8.5px; color: #fca5a5;">0 Roads</span>
+              <span>⛔ Closed Roads (Inundated ≥ 25 cm)</span>
+              <span id="unsafe-count-tag" style="font-size: 8.5px; color: #fca5a5;">All roads open</span>
             </div>
             <div class="avoid-pills-container" id="unsafe-pills-wrap">
-              <span class="avoid-pill clear">✅ No hard physical barriers</span>
+              <span class="avoid-pill clear">✅ All roads are currently passable</span>
             </div>
           </div>
 
           <div class="avoid-group">
             <div class="avoid-group-header high-hdr">
-              <span>⚠️ Cost-Penalized Avoided (HIGH 15–25cm)</span>
-              <span id="high-count-tag" style="font-size: 8.5px; color: #fdba74;">0 Roads</span>
+              <span>⚠️ Caution: Deep Water (15–25 cm)</span>
+              <span id="high-count-tag" style="font-size: 8.5px; color: #fdba74;">No warnings</span>
             </div>
             <div class="avoid-pills-container" id="high-pills-wrap">
-              <span class="avoid-pill clear">✅ No high-penalty diversions</span>
+              <span class="avoid-pill clear">✅ No flood detours required</span>
             </div>
           </div>
         </div>
@@ -1268,45 +1268,45 @@ html, body {
       <!-- Card 3: Hydrological Mass Balance Invariant -->
       <div class="side-card">
         <div class="card-header">
-          <div class="card-title">⚖️ Hydrological Mass Balance</div>
-          <span id="mb-status-badge" class="card-badge success">PASS</span>
+          <div class="card-title">⚖️ Water Balance Tracker</div>
+          <span id="mb-status-badge" class="card-badge success">BALANCED</span>
         </div>
         <div class="mb-ledger">
-          <div class="mb-row"><span>Inflow Runoff (I):</span><strong id="mb-runoff">0.00 m³</strong></div>
-          <div class="mb-row"><span>Storage Delta (ΔS):</span><strong id="mb-storage-change">0.00 m³</strong></div>
-          <div class="mb-row"><span>Drainage Capture (D):</span><strong id="mb-drainage">0.00 m³</strong></div>
-          <div class="mb-row"><span>Boundary Outflow (B):</span><strong id="mb-boundary">0.00 m³</strong></div>
-          <div class="mb-row total"><span>Residual Error (E):</span><strong id="mb-error">0.000000 m³</strong></div>
+          <div class="mb-row"><span>Rainwater Inflow:</span><strong id="mb-runoff">0.00 m³</strong></div>
+          <div class="mb-row"><span>Surface Water Change:</span><strong id="mb-storage-change">0.00 m³</strong></div>
+          <div class="mb-row"><span>Drain System Drainage:</span><strong id="mb-drainage">0.00 m³</strong></div>
+          <div class="mb-row"><span>Canal Discharge:</span><strong id="mb-boundary">0.00 m³</strong></div>
+          <div class="mb-row total"><span>Water Balance Residual:</span><strong id="mb-error">Balanced (0.00 m³)</strong></div>
         </div>
       </div>
 
       <!-- Card 4: Sensor Fleet Telemetry Health -->
       <div class="side-card">
         <div class="card-header">
-          <div class="card-title">📡 Sensor Fleet Telemetry</div>
+          <div class="card-title">📡 Field Sensor Stations</div>
         </div>
         <div class="sensor-table-wrap">
           <table class="sensor-table">
             <thead>
               <tr>
-                <th>Sensor</th>
-                <th>Grid</th>
-                <th>Reading</th>
-                <th>Status</th>
-                <th>Bias</th>
+                <th>Station</th>
+                <th>Location</th>
+                <th>Water Level</th>
+                <th>Health</th>
+                <th>Drift</th>
               </tr>
             </thead>
             <tbody id="sensor-table-body">
               <tr>
                 <td><strong>S001</strong></td>
-                <td>C012</td>
+                <td>North Ridge</td>
                 <td>0.0 cm</td>
                 <td><span class="badge-tag online">ONLINE</span></td>
                 <td>+0.0 cm</td>
               </tr>
               <tr>
                 <td><strong>S002</strong></td>
-                <td>C025</td>
+                <td>Highway Hub</td>
                 <td>0.0 cm</td>
                 <td><span class="badge-tag online">ONLINE</span></td>
                 <td>+0.0 cm</td>
@@ -1319,6 +1319,6 @@ html, body {
     </aside>
   </main>
 
-  <script src="/static/app.js?v=2.7"></script>
+  <script src="/static/app.js?v=2.8"></script>
 </body>
 </html>
