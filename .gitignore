@@ -4,3 +4,4 @@ __pycache__/
 .coverage
 *.log
 .env
+outputs/reports/*.docx

@@ -436,7 +436,15 @@ async function loadSnapshot(leadTimeMinutes) {
 
   const btnDocx = document.getElementById("btn-download-docx");
   if (btnDocx) {
-    btnDocx.href = `/api/reports/download-docx?scenario_id=${scenarioId}`;
+    const reportParams = new URLSearchParams({
+      scenario_id: scenarioId,
+      lead_time_minutes: leadTimeMinutes,
+      fault_spike: activeFaults.spike ? "true" : "false",
+      fault_offline: activeFaults.offline ? "true" : "false",
+      fault_blockage: activeFaults.blockage ? "true" : "false"
+    });
+    btnDocx.href = `/api/reports/download-docx?${reportParams.toString()}`;
+    btnDocx.title = `Download dynamic report for ${scenarioId} at +${leadTimeMinutes}m`;
   }
 
   let data = null;
@@ -1381,6 +1389,17 @@ if (btnRecomputeRoute) {
       loadSnapshot(parseInt(slider.value, 10));
       btnRecomputeRoute.innerText = "🔄 Recompute Route";
     }, 200);
+  });
+}
+
+const btnDownloadReport = document.getElementById("btn-download-docx");
+if (btnDownloadReport) {
+  btnDownloadReport.addEventListener("click", () => {
+    const originalText = btnDownloadReport.innerHTML;
+    btnDownloadReport.innerHTML = "⏳ Generating...";
+    setTimeout(() => {
+      btnDownloadReport.innerHTML = originalText;
+    }, 1500);
   });
 }
 

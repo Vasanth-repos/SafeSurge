@@ -1,6 +1,7 @@
 """
 API Endpoints — Prediction Reports & Export:
-Generates and serves downloadable 3-Hour Flood Prediction Reports in .docx format.
+Generates and serves downloadable dynamic Flood Prediction & Advisory Reports in .docx format.
+Adapts dynamically to the exact live simulation state, current lead time, injected faults, and routing.
 """
 
 import os
@@ -18,11 +19,18 @@ router = APIRouter(prefix="/api/reports", tags=["Reports"])
 @router.get("/download-docx")
 def download_3hour_docx_report(
     scenario_id: str = Query("storm_01", description="Scenario ID to generate report for"),
+    lead_time_minutes: int = Query(0, ge=0, description="Current forecast lead time in minutes"),
+    fault_spike: bool = Query(False, description="Simulate sensor surge anomaly"),
+    fault_offline: bool = Query(False, description="Simulate sensor dropout"),
+    fault_blockage: bool = Query(False, description="Simulate culvert drainage blockage"),
 ):
-    """Generates and downloads a comprehensive 3-hour flood prediction report in DOCX format."""
+    """
+    Generates and downloads a comprehensive, dynamic flood prediction report in DOCX format,
+    tailored to the exact live scenario, forecast lead time, and active fault injection state.
+    """
     try:
         service = get_snapshot_service()
-        # Retrieve all snapshots for the scenario
+        # Retrieve all snapshots for the scenario timeline
         service.ensure_scenario_loaded(scenario_id)
         timestamps = service.get_all_timestamps(scenario_id)
         snapshots = [service.get_snapshot(scenario_id, t) for t in timestamps if service.get_snapshot(scenario_id, t) is not None]
@@ -33,18 +41,47 @@ def download_3hour_docx_report(
             yaml_path = f"config/scenarios/{scenario_id}.yaml" if os.path.exists(f"config/scenarios/{scenario_id}.yaml") else "config/scenarios/storm_01.yaml"
             snapshots = runner.run(yaml_path)
 
-        output_path = os.path.join("outputs", "reports", f"flood_nowcasting_3hr_report_{scenario_id}.docx")
+        # Retrieve dynamic live state matching the dashboard view
+        live_state = service.get_dashboard_state(
+            lead_time_minutes=lead_time_minutes,
+            scenario_id=scenario_id,
+            fault_spike=fault_spike,
+            fault_offline=fault_offline,
+            fault_blockage=fault_blockage,
+        )
+
+        active_faults_dict = {
+            "spike": fault_spike,
+            "offline": fault_offline,
+            "blockage": fault_blockage,
+        }
+
+        # Construct specific output filename reflecting current state
+        fault_tag = ""
+        if fault_spike:
+            fault_tag += "_surge"
+        if fault_offline:
+            fault_tag += "_drop"
+        if fault_blockage:
+            fault_tag += "_clog"
+
+        doc_filename = f"SafeSurge_Advisory_{scenario_id}_t{lead_time_minutes}m{fault_tag}.docx"
+        output_path = os.path.join("outputs", "reports", doc_filename)
+
         create_3hour_prediction_docx(
             snapshots=snapshots,
             scenario_id=scenario_id,
             output_path=output_path,
+            lead_time_minutes=lead_time_minutes,
+            live_state=live_state,
+            active_faults=active_faults_dict,
         )
 
         return FileResponse(
             path=output_path,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            filename=f"flood_nowcasting_3hr_report_{scenario_id}.docx",
-            headers={"Content-Disposition": f'attachment; filename="flood_nowcasting_3hr_report_{scenario_id}.docx"'},
+            filename=doc_filename,
+            headers={"Content-Disposition": f'attachment; filename="{doc_filename}"'},
         )
     except Exception as e:
         raise HTTPException(
