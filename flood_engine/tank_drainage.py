@@ -47,6 +47,7 @@ class DrainageTankNode:
     drainage_degradation_factor: float = 1.0  # 1.0 = 100%, 0.5 = 50%, 0.3 = 30%
     downstream_node_id: str | None = None
     node_depth_cm: float = 150.0  # Physical manhole / tank depth for sensor stage mapping
+    head_dependent_outflow: bool = False  # Hydraulic orifice discharge: Q proportional to fill ratio
     thresholds: TankThresholds = field(default_factory=TankThresholds)
 
     # Step telemetry metrics
@@ -105,13 +106,20 @@ class DrainageTankNode:
         # Available water before discharge
         water_available = self.current_storage_liters + ext_inflow
 
-        # Outflow capacity over dt
-        max_possible_outflow = self.effective_capacity_lps * dt
+        # Outflow capacity over dt (with optional orifice discharge retention)
+        if self.head_dependent_outflow and water_available > 0:
+            fill_ratio = min(1.0, max(0.05, water_available / self.capacity_liters))
+            discharge_rate = self.effective_capacity_lps * math.sqrt(fill_ratio)
+            max_possible_outflow = discharge_rate * dt
+        else:
+            max_possible_outflow = self.effective_capacity_lps * dt
+
         actual_outflow = min(water_available, max_possible_outflow)
         self.outflow_lps = round(actual_outflow / dt, 2)
 
         # Tentative storage
         tentative_storage = water_available - actual_outflow
+
 
         # Capacity limitation and overflow calculation
         if tentative_storage > self.capacity_liters:

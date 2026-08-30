@@ -4,8 +4,9 @@ from pathlib import Path
 from typing import Any
 
 from flood_engine.snapshot import SimulationSnapshot
-from flood_engine.tank_drainage import VirtualTankDrainageNetwork
+from flood_engine.tank_drainage import DrainageTankNode, VirtualTankDrainageNetwork
 from replay.scenarios import ScenarioRunner
+
 
 
 
@@ -329,8 +330,64 @@ class SnapshotService:
         fault_blockage: bool,
         sensor_list: list[dict[str, Any]] | None = None,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
-        """Simulates the 5-node virtual tank drainage network up to the current lead time."""
-        net = VirtualTankDrainageNetwork()
+        """Simulates the 5-node virtual tank drainage network with realistic hydraulic retention."""
+        net = VirtualTankDrainageNetwork([
+            DrainageTankNode(
+                node_id="D01",
+                latitude=13.0867,
+                longitude=80.2747,
+                connected_cell_id="C022",
+                capacity_liters=1000.0,
+                base_capacity_lps=5.5,
+                downstream_node_id="D02",
+                node_depth_cm=120.0,
+                head_dependent_outflow=True,
+            ),
+            DrainageTankNode(
+                node_id="D02",
+                latitude=13.0847,
+                longitude=80.2737,
+                connected_cell_id="C045",
+                capacity_liters=1500.0,
+                base_capacity_lps=7.5,
+                downstream_node_id="D03",
+                node_depth_cm=140.0,
+                head_dependent_outflow=True,
+            ),
+            DrainageTankNode(
+                node_id="D03",
+                latitude=13.0887,
+                longitude=80.2777,
+                connected_cell_id="C058",  # East Underpass depression hotspot
+                capacity_liters=2000.0,
+                base_capacity_lps=9.0,
+                downstream_node_id="D04",
+                node_depth_cm=160.0,
+                head_dependent_outflow=True,
+            ),
+            DrainageTankNode(
+                node_id="D04",
+                latitude=13.0887,
+                longitude=80.2757,
+                connected_cell_id="C065",
+                capacity_liters=2500.0,
+                base_capacity_lps=12.0,
+                downstream_node_id="D05",
+                node_depth_cm=180.0,
+                head_dependent_outflow=True,
+            ),
+            DrainageTankNode(
+                node_id="D05",
+                latitude=13.0917,
+                longitude=80.2797,
+                connected_cell_id="C089",  # Outlet to canal
+                capacity_liters=3000.0,
+                base_capacity_lps=13.5,
+                downstream_node_id=None,
+                node_depth_cm=200.0,
+                head_dependent_outflow=True,
+            ),
+        ])
         dt = 60.0
         d3_factor = 0.30 if fault_blockage else 1.0
 
@@ -338,13 +395,13 @@ class SnapshotService:
         for m in range(0, lead_time_minutes + 1):
             norm_t = min(1.0, m / 180.0)
             # Storm profile with peak around t=60m
-            rain_rate = 55.0 * math.sin(norm_t * math.pi) if norm_t > 0 else 0.0
+            rain_rate = 50.0 * math.sin(norm_t * math.pi) if norm_t > 0 else 0.0
 
             # Inflow in Liters/step from surface runoff:
-            c22_inflow = (rain_rate / 60.0) * 18.0 * 10.0
-            c45_inflow = (rain_rate / 60.0) * 22.0 * 10.0
-            c58_inflow = (rain_rate / 60.0) * (38.0 if not fault_blockage else 52.0) * 10.0
-            c65_inflow = (rain_rate / 60.0) * 25.0 * 10.0
+            c22_inflow = (rain_rate * 0.16) * 60.0
+            c45_inflow = (rain_rate * 0.20) * 60.0
+            c58_inflow = (rain_rate * (0.28 if not fault_blockage else 0.40)) * 60.0
+            c65_inflow = (rain_rate * 0.18) * 60.0
 
             inflows = {
                 "C022": c22_inflow,
@@ -354,6 +411,7 @@ class SnapshotService:
             }
             degs = {"D03": d3_factor} if fault_blockage else None
             net.step(dt_seconds=dt, surface_inflows_liters_by_cell=inflows, degradation_factors=degs)
+
 
         # Map sensor comparisons
         sensor_map = {s.get("sensor_id"): s for s in (sensor_list or [])}
