@@ -20,7 +20,8 @@ def test_e2e_static_and_root():
     res_root = client.get("/")
     assert res_root.status_code == 200
     assert "<!DOCTYPE html>" in res_root.text
-    assert "SafeSurge" in res_root.text
+    assert "Drain Out" in res_root.text
+
 
     # Test CSS
     res_css = client.get("/static/app.css")
