@@ -455,7 +455,8 @@ html, body {
 /* SVG Map Canvas */
 .svg-wrapper {
   flex-shrink: 0;
-  height: 375px;
+  height: 560px;
+  min-height: 500px;
   position: relative;
   background: #080a0f;
   margin: 6px 10px;
@@ -470,10 +471,12 @@ html, body {
 #flood-map {
   width: 100%;
   height: 100%;
-  max-width: 460px;
-  max-height: 460px;
+  max-width: 550px;
+  max-height: 550px;
+  aspect-ratio: 1 / 1;
   display: block;
 }
+
 
 
 
