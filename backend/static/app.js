@@ -416,6 +416,31 @@ function simulateCatchmentState(leadTimeMinutes, scenarioId) {
       { sensor_id: "S005", location_id: "C061", status: "ONLINE", last_valid_reading_cm: cellDepthMap["C061"] || 0.0, bias_cm: 0.0 },
       { sensor_id: "S006", location_id: "C088", status: "ONLINE", last_valid_reading_cm: cellDepthMap["C088"] || 0.0, bias_cm: 0.2 }
     ],
+    drainage_tanks: {
+      "D01": { node_id: "D01", connected_cell_id: "C022", capacity_liters: 1000, current_storage_liters: Math.round(Math.min(1000, rainIntensity * 12)), inflow_lps: +(rainIntensity * 0.35).toFixed(1), outflow_lps: +(rainIntensity * 0.35).toFixed(1), overflow_lps: 0.0, fill_percentage: Math.round((Math.min(1000, rainIntensity * 12) / 1000) * 100), status: "NORMAL", simulated_water_level_cm: Math.round(rainIntensity * 1.5), drainage_degradation_factor: 1.0 },
+      "D02": { node_id: "D02", connected_cell_id: "C045", capacity_liters: 1500, current_storage_liters: Math.round(Math.min(1500, rainIntensity * 18)), inflow_lps: +(rainIntensity * 0.42).toFixed(1), outflow_lps: +(rainIntensity * 0.42).toFixed(1), overflow_lps: 0.0, fill_percentage: Math.round((Math.min(1500, rainIntensity * 18) / 1500) * 100), status: "NORMAL", simulated_water_level_cm: Math.round(rainIntensity * 2.0), drainage_degradation_factor: 1.0 },
+      "D03": {
+        node_id: "D03", connected_cell_id: "C058", capacity_liters: 2000,
+        current_storage_liters: isBlockage ? 2000 : Math.round(Math.min(2000, rainIntensity * 35)),
+        inflow_lps: +(rainIntensity * (isBlockage ? 0.9 : 0.65)).toFixed(1),
+        outflow_lps: isBlockage ? 9.0 : +(rainIntensity * 0.65).toFixed(1),
+        overflow_lps: isBlockage && stepIdx >= 45 && stepIdx <= 120 ? +(rainIntensity * 0.9 - 9.0).toFixed(1) : 0.0,
+        fill_percentage: isBlockage ? 100.0 : Math.round((Math.min(2000, rainIntensity * 35) / 2000) * 100),
+        status: isBlockage && stepIdx >= 45 && stepIdx <= 120 ? "SURCHARGING" : (rainIntensity > 10 ? "WATCH" : "NORMAL"),
+        simulated_water_level_cm: isBlockage ? 160.0 : Math.round(rainIntensity * 3.2),
+        drainage_degradation_factor: isBlockage ? 0.3 : 1.0,
+        sensor_comparison: { simulated_level_cm: isBlockage ? 160.0 : Math.round(rainIntensity * 3.2), sensor_reading_cm: isBlockage ? 152.0 : Math.round(rainIntensity * 3.0), agreement: "EXCELLENT" }
+      },
+      "D04": { node_id: "D04", connected_cell_id: "C065", capacity_liters: 2500, current_storage_liters: Math.round(Math.min(2500, rainIntensity * 25)), inflow_lps: +(rainIntensity * 0.5).toFixed(1), outflow_lps: +(rainIntensity * 0.5).toFixed(1), overflow_lps: 0.0, fill_percentage: Math.round((Math.min(2500, rainIntensity * 25) / 2500) * 100), status: "NORMAL", simulated_water_level_cm: Math.round(rainIntensity * 2.2), drainage_degradation_factor: 1.0 },
+      "D05": { node_id: "D05", connected_cell_id: "C089", capacity_liters: 3000, current_storage_liters: Math.round(Math.min(3000, rainIntensity * 30)), inflow_lps: +(rainIntensity * 0.58).toFixed(1), outflow_lps: +(rainIntensity * 0.58).toFixed(1), overflow_lps: 0.0, fill_percentage: Math.round((Math.min(3000, rainIntensity * 30) / 3000) * 100), status: "NORMAL", simulated_water_level_cm: Math.round(rainIntensity * 2.5), drainage_degradation_factor: 1.0 }
+    },
+    drainage_network_summary: {
+      network_status: isBlockage && stepIdx >= 45 && stepIdx <= 120 ? "SURCHARGING" : (rainIntensity > 10 ? "WATCH" : "NORMAL"),
+      total_nodes: 5,
+      total_capacity_liters: 10000.0,
+      total_storage_liters: isBlockage ? 4500.0 : 1200.0,
+      network_fill_percentage: isBlockage ? 45.0 : 12.0
+    },
     cells: cells,
     roads: roads,
     safe_route: safeRoute
@@ -600,7 +625,84 @@ function updateDashboardUI(data) {
 
   // 7. Render SVG Map with Layers + Active Route Glow Corridor
   renderSvgMap(data);
+
+  // 8. Render Underground Drainage Virtual Tanks
+  renderDrainageTanks(data.drainage_tanks, data.drainage_network_summary);
 }
+
+// Render Underground Drainage Virtual Storage Tanks Deck
+function renderDrainageTanks(tanks, summary) {
+  if (!tanks) return;
+
+  // 1. Overall Network Status Badge
+  const netPill = document.getElementById("drainage-net-status-pill");
+  const netText = document.getElementById("drainage-net-status-text");
+  const netStat = summary?.network_status || "NORMAL";
+
+  if (netPill && netText) {
+    netPill.className = `network-status-pill ${netStat.toLowerCase()}`;
+    netText.innerText = `NETWORK: ${netStat}`;
+  }
+
+  // 2. Network Stream Node Badges
+  const tankList = Array.isArray(tanks) ? tanks : Object.values(tanks);
+  tankList.forEach(t => {
+    const badge = document.getElementById(`flow-node-${t.node_id}`);
+    if (badge) {
+      badge.className = `tank-node-badge ${t.status.toLowerCase()}`;
+      const statTag = badge.querySelector(".node-stat-tag");
+      if (statTag) {
+        statTag.innerText = `${t.status} (${t.fill_percentage}%)`;
+      }
+    }
+  });
+
+  // 3. Render 5 Tank Cards
+  const container = document.getElementById("tanks-grid-container");
+  if (!container) return;
+
+  container.innerHTML = tankList.map(t => {
+    const statusLower = t.status.toLowerCase();
+    const fillPct = Math.min(100, Math.max(0, t.fill_percentage));
+    const isSurcharging = t.status === "SURCHARGING" || t.overflow_lps > 0;
+    const sens = t.sensor_comparison;
+    let sensStr = `Sim Stage: ${t.simulated_water_level_cm || 0}cm`;
+    if (sens && sens.sensor_reading_cm !== null && sens.sensor_reading_cm !== undefined) {
+      sensStr = `Live: ${sens.sensor_reading_cm}cm • Sim: ${sens.simulated_level_cm}cm (${sens.agreement})`;
+    }
+
+    return `
+      <div class="tank-card ${statusLower}">
+        <div class="tank-header">
+          <div class="tank-name">${t.node_id} <span class="tank-cell-tag">${t.connected_cell_id}</span></div>
+          <span class="tank-status-pill ${statusLower}">${t.status}</span>
+        </div>
+        
+        <div class="tank-visual-wrap">
+          <div class="tank-column">
+            <div class="tank-cylinder">
+              <div class="tank-water" style="height: ${fillPct}%;">
+                <div class="water-wave"></div>
+              </div>
+              ${isSurcharging ? `<div class="tank-overflow-banner">⚠️ SPILL ${t.overflow_lps || 0}L/s</div>` : ''}
+            </div>
+            <div class="tank-pct-label">${fillPct}%</div>
+          </div>
+
+          <div class="tank-metrics">
+            <div class="metric-row"><span class="m-lbl">Capacity:</span><span class="m-val">${t.capacity_liters.toLocaleString()} L</span></div>
+            <div class="metric-row"><span class="m-lbl">Current:</span><span class="m-val highlight">${t.current_storage_liters.toLocaleString()} L</span></div>
+            <div class="metric-row"><span class="m-lbl">Inflow:</span><span class="m-val">${t.inflow_lps} L/s</span></div>
+            <div class="metric-row"><span class="m-lbl">Outflow:</span><span class="m-val">${t.outflow_lps} L/s</span></div>
+            <div class="metric-row"><span class="m-lbl">Degrade:</span><span class="m-val">${t.drainage_degradation_factor} (${Math.round(t.drainage_degradation_factor * 100)}%)</span></div>
+            <div class="metric-row sensor"><span class="m-lbl">Sensor:</span><span class="m-val sensor">${sensStr}</span></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
 
 // Update Visually Enhanced Safe Routing Guidance
 function updateRouteDispatch(data) {

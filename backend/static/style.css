@@ -1078,3 +1078,383 @@ html, body {
     display: none;
   }
 }
+
+/* =========================================================================
+   UNDERGROUND DRAINAGE NETWORK: VIRTUAL TANKS & STREAM VIEW
+   ========================================================================= */
+.drainage-network-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  margin-top: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-icon {
+  font-size: 14px;
+}
+
+.panel-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.2px;
+}
+
+.network-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: #34d399;
+}
+
+.network-status-pill.surcharging {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  animation: pulse-red 1.2s infinite ease-in-out;
+}
+
+.network-status-pill.near_capacity {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.5);
+  color: #fb923c;
+}
+
+.network-status-pill.watch {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+}
+
+.net-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.network-status-pill.surcharging .net-dot {
+  background: #ef4444;
+}
+
+/* Network Graph Topology Strip */
+.network-graph-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  overflow-x: auto;
+}
+
+.graph-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.graph-nodes-flow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.flow-pill {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+.flow-pill.surface {
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+}
+
+.flow-pill.outfall {
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34d399;
+}
+
+.pipe-arrow {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.tank-node-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #34d399;
+  transition: all 0.2s ease;
+}
+
+.tank-node-badge.watch {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+.tank-node-badge.near_capacity {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: #fb923c;
+}
+
+.tank-node-badge.surcharging {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Tanks Grid Deck */
+.tanks-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .tanks-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.tank-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tank-card.surcharging {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.tank-card.near_capacity {
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.tank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tank-name {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.tank-cell-tag {
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-left: 2px;
+}
+
+.tank-status-pill {
+  font-size: 7.5px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.tank-status-pill.normal {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.tank-status-pill.watch {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.tank-status-pill.near_capacity {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fb923c;
+}
+
+.tank-status-pill.surcharging {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  font-weight: 800;
+}
+
+/* Vertical Tank Visual Column */
+.tank-visual-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tank-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 42px;
+  flex-shrink: 0;
+}
+
+.tank-cylinder {
+  position: relative;
+  width: 32px;
+  height: 90px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #475569;
+  border-radius: 4px 4px 6px 6px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.tank-card.surcharging .tank-cylinder {
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.tank-water {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+  min-height: 0%;
+}
+
+.tank-card.watch .tank-water {
+  background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+}
+
+.tank-card.near_capacity .tank-water {
+  background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+}
+
+.tank-card.surcharging .tank-water {
+  background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+}
+
+.water-wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.tank-overflow-banner {
+  position: absolute;
+  top: 2px;
+  left: 1px;
+  right: 1px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 6.5px;
+  font-weight: 800;
+  text-align: center;
+  padding: 1px 0;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  animation: pulse-red 0.8s infinite;
+}
+
+.tank-pct-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  margin-top: 3px;
+}
+
+/* Tank Metrics Details */
+.tank-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  font-size: 8.5px;
+  font-family: var(--font-mono);
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.m-lbl {
+  color: var(--text-tertiary);
+  font-family: var(--font-sans);
+}
+
+.m-val {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.m-val.highlight {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.metric-row.sensor {
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-top: 2px;
+  margin-top: 2px;
+}
+
+.m-val.sensor {
+  font-size: 8px;
+  color: #34d399;
+}

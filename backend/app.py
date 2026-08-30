@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.api.dashboard import router as dashboard_router
 from backend.api.diagnostics import router as diagnostics_router
+from backend.api.drainage import router as drainage_router
 from backend.api.flood import router as flood_router
 from backend.api.ml import router as ml_router
 from backend.api.rainfall import router as rainfall_router
@@ -57,11 +58,14 @@ app.include_router(flood_router)
 app.include_router(roads_router)
 app.include_router(routes_router)
 app.include_router(diagnostics_router)
+app.include_router(drainage_router)
 app.include_router(scenarios_router)
 app.include_router(snapshots_router)
 app.include_router(dashboard_router)
 app.include_router(reports_router)
 app.include_router(ml_router)
+
+
 
 from fastapi.responses import FileResponse
 

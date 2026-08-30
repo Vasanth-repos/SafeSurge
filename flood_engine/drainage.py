@@ -49,6 +49,17 @@ class DrainageNode:
         """Sets the capacity degradation factor (0 <= factor <= 1)."""
         self.capacity_factor = float(factor)
 
+    @property
+    def effective_capacity_m3_s(self) -> float:
+        """Returns base capacity scaled by capacity factor."""
+        return self.base_capacity_m3_s * getattr(self, "capacity_factor", 1.0)
+
+    @property
+    def captured_this_step_m3(self) -> float:
+        """Volume captured during the most recent simulation step."""
+        return getattr(self, "_captured_this_step_m3", 0.0)
+
+
 
 class DrainageEdge:
     def __init__(

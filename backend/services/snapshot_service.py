@@ -1,9 +1,12 @@
+import math
 import os
 from pathlib import Path
 from typing import Any
 
 from flood_engine.snapshot import SimulationSnapshot
+from flood_engine.tank_drainage import VirtualTankDrainageNetwork
 from replay.scenarios import ScenarioRunner
+
 
 
 class SnapshotService:
@@ -291,6 +294,14 @@ class SnapshotService:
         except Exception:
             ml_data = {"available": False}
 
+        # Virtual Tank Underground Drainage Network Simulation
+        tanks_dict, net_summary = self._compute_drainage_tanks_state(
+            lead_time_minutes=lead_time_minutes,
+            scenario_id=sim_id,
+            fault_blockage=fault_blockage,
+            sensor_list=sensor_list,
+        )
+
         return {
             "simulation_id": snap.simulation_id,
             "timestamp_seconds": snap.timestamp_seconds,
@@ -301,6 +312,8 @@ class SnapshotService:
             "cells": cell_list,
             "roads": road_list,
             "drainage": drainage_list,
+            "drainage_tanks": tanks_dict,
+            "drainage_network_summary": net_summary,
             "sensors": sensor_list,
             "anomalies": anomalies_list,
             "mass_balance": snap.mass_balance.to_dict(),
@@ -308,5 +321,69 @@ class SnapshotService:
             "safe_route": best_route,
             "ml_nowcast": ml_data,
         }
+
+    def _compute_drainage_tanks_state(
+        self,
+        lead_time_minutes: int,
+        scenario_id: str,
+        fault_blockage: bool,
+        sensor_list: list[dict[str, Any]] | None = None,
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Simulates the 5-node virtual tank drainage network up to the current lead time."""
+        net = VirtualTankDrainageNetwork()
+        dt = 60.0
+        d3_factor = 0.30 if fault_blockage else 1.0
+
+        # Step network sequentially from minute 0 to lead_time_minutes
+        for m in range(0, lead_time_minutes + 1):
+            norm_t = min(1.0, m / 180.0)
+            # Storm profile with peak around t=60m
+            rain_rate = 55.0 * math.sin(norm_t * math.pi) if norm_t > 0 else 0.0
+
+            # Inflow in Liters/step from surface runoff:
+            c22_inflow = (rain_rate / 60.0) * 18.0 * 10.0
+            c45_inflow = (rain_rate / 60.0) * 22.0 * 10.0
+            c58_inflow = (rain_rate / 60.0) * (38.0 if not fault_blockage else 52.0) * 10.0
+            c65_inflow = (rain_rate / 60.0) * 25.0 * 10.0
+
+            inflows = {
+                "C022": c22_inflow,
+                "C045": c45_inflow,
+                "C058": c58_inflow,
+                "C065": c65_inflow,
+            }
+            degs = {"D03": d3_factor} if fault_blockage else None
+            net.step(dt_seconds=dt, surface_inflows_liters_by_cell=inflows, degradation_factors=degs)
+
+        # Map sensor comparisons
+        sensor_map = {s.get("sensor_id"): s for s in (sensor_list or [])}
+        s1 = sensor_map.get("S001")
+        s5 = sensor_map.get("S005") or sensor_map.get("S002")
+
+        tanks_dict = {}
+        for nid, node in net.nodes.items():
+            t_data = node.to_dict()
+            if nid == "D03" and s5:
+                t_data["sensor_comparison"] = net.compare_with_sensor(
+                    "D03", s5.get("last_valid_reading_cm"), s5.get("status", "ONLINE")
+                )
+            elif nid == "D01" and s1:
+                t_data["sensor_comparison"] = net.compare_with_sensor(
+                    "D01", s1.get("last_valid_reading_cm"), s1.get("status", "ONLINE")
+                )
+            else:
+                t_data["sensor_comparison"] = {
+                    "node_id": nid,
+                    "simulated_level_cm": node.simulated_water_level_cm,
+                    "sensor_reading_cm": None,
+                    "sensor_status": "NONE",
+                    "residual_cm": None,
+                    "agreement": "SIMULATED_ONLY",
+                }
+            tanks_dict[nid] = t_data
+
+        summary = net.get_network_summary()
+        return tanks_dict, summary
+
 
 

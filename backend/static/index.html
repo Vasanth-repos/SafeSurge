@@ -146,7 +146,48 @@
           </div>
         </div>
       </div>
+
+      <!-- UNDERGROUND DRAINAGE NETWORK: VIRTUAL STORAGE TANKS -->
+      <div class="drainage-network-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">🚰</span>
+            <span class="panel-title">Underground Storm Drainage Network — Virtual Storage Tanks</span>
+          </div>
+          <div class="network-status-pill" id="drainage-net-status-pill">
+            <span class="net-dot green"></span>
+            <span id="drainage-net-status-text">NETWORK: NORMAL</span>
+          </div>
+        </div>
+
+        <!-- Network Flow Graph Strip -->
+        <div class="network-graph-strip">
+          <div class="graph-label">Connected Stream:</div>
+          <div class="graph-nodes-flow">
+            <span class="flow-pill surface">🌧️ Surface Inlets</span>
+            <span class="pipe-arrow">➔</span>
+            <span class="tank-node-badge" id="flow-node-D01"><span class="node-code">D01</span> <span class="node-stat-tag">NORMAL</span></span>
+            <span class="pipe-arrow">➔</span>
+            <span class="tank-node-badge" id="flow-node-D02"><span class="node-code">D02</span> <span class="node-stat-tag">NORMAL</span></span>
+            <span class="pipe-arrow">➔</span>
+            <span class="tank-node-badge" id="flow-node-D03"><span class="node-code">D03</span> <span class="node-stat-tag">NORMAL</span></span>
+            <span class="pipe-arrow">➔</span>
+            <span class="tank-node-badge" id="flow-node-D04"><span class="node-code">D04</span> <span class="node-stat-tag">NORMAL</span></span>
+            <span class="pipe-arrow">➔</span>
+            <span class="tank-node-badge" id="flow-node-D05"><span class="node-code">D05</span> <span class="node-stat-tag">NORMAL</span></span>
+            <span class="pipe-arrow">➔</span>
+            <span class="flow-pill outfall">🌊 Canal Outfall</span>
+          </div>
+        </div>
+
+        <!-- Virtual Tanks Container -->
+        <div class="tanks-grid" id="tanks-grid-container">
+          <!-- Dynamic Tank Cards rendered by app.js -->
+        </div>
+      </div>
+
     </section>
+
 
     <!-- RIGHT: OBSERVABILITY & DECISION INTELLIGENCE SIDEBAR -->
     <aside class="sidebar-panel">
