@@ -699,13 +699,11 @@ function renderDrainageTanks(tanks, summary) {
 
   container.innerHTML = tankList.map(t => {
     const statusLower = t.status.toLowerCase();
-    const fillPct = Math.min(100, Math.max(0, t.fill_percentage));
+    const fillPct = Math.round(Math.min(100, Math.max(0, t.fill_percentage)));
     const isSurcharging = t.status === "SURCHARGING" || t.overflow_lps > 0;
+    const isDegraded = t.drainage_degradation_factor < 0.99;
     const sens = t.sensor_comparison;
-    let sensStr = `Sim Stage: ${t.simulated_water_level_cm || 0}cm`;
-    if (sens && sens.sensor_reading_cm !== null && sens.sensor_reading_cm !== undefined) {
-      sensStr = `Live: ${sens.sensor_reading_cm}cm • Sim: ${sens.simulated_level_cm}cm (${sens.agreement})`;
-    }
+    const hasLiveSensor = sens && sens.sensor_reading_cm !== null && sens.sensor_reading_cm !== undefined;
 
     return `
       <div class="tank-card ${statusLower}">
@@ -713,6 +711,8 @@ function renderDrainageTanks(tanks, summary) {
           <div class="tank-name">${t.node_id} <span class="tank-cell-tag">${t.connected_cell_id}</span></div>
           <span class="tank-status-pill ${statusLower}">${t.status}</span>
         </div>
+
+        ${isSurcharging ? `<div class="tank-spill-tag">⚠️ SPILL ${Number(t.overflow_lps || 0).toFixed(1)} L/s</div>` : (isDegraded ? `<div class="tank-degraded-tag">🚧 Blocked ${Math.round((1 - t.drainage_degradation_factor) * 100)}%</div>` : `<div class="tank-nominal-tag">✅ Conduit Clear</div>`)}
         
         <div class="tank-visual-wrap">
           <div class="tank-column">
@@ -720,25 +720,23 @@ function renderDrainageTanks(tanks, summary) {
               <div class="tank-water" style="height: ${fillPct}%;">
                 <div class="water-wave"></div>
               </div>
-              ${isSurcharging ? `<div class="tank-overflow-banner">⚠️ SPILL ${t.overflow_lps || 0}L/s</div>` : ''}
             </div>
             <div class="tank-pct-label">${fillPct}%</div>
           </div>
 
           <div class="tank-metrics">
-            <div class="metric-row"><span class="m-lbl">Capacity:</span><span class="m-val">${t.capacity_liters.toLocaleString()} L</span></div>
-            <div class="metric-row"><span class="m-lbl">Current:</span><span class="m-val highlight">${t.current_storage_liters.toLocaleString()} L</span></div>
-            <div class="metric-row"><span class="m-lbl">Inflow:</span><span class="m-val">${t.inflow_lps} L/s</span></div>
-            <div class="metric-row"><span class="m-lbl">Outflow:</span><span class="m-val">${t.outflow_lps} L/s</span></div>
-            <div class="metric-row"><span class="m-lbl">Degrade:</span><span class="m-val">${t.drainage_degradation_factor} (${Math.round(t.drainage_degradation_factor * 100)}%)</span></div>
-            <div class="metric-row sensor"><span class="m-lbl">Stage:</span><span class="m-val sensor">${t.simulated_water_level_cm || 0} cm</span></div>
-            ${sens && sens.sensor_reading_cm !== null && sens.sensor_reading_cm !== undefined ? `
-            <div class="metric-row sensor"><span class="m-lbl">Live (${sens.agreement}):</span><span class="m-val sensor">${sens.sensor_reading_cm} cm</span></div>` : ''}
+            <div class="metric-row"><span class="m-lbl">Capacity</span><span class="m-val">${Math.round(t.capacity_liters).toLocaleString()} L</span></div>
+            <div class="metric-row"><span class="m-lbl">Stored</span><span class="m-val highlight">${Math.round(t.current_storage_liters).toLocaleString()} L</span></div>
+            <div class="metric-row"><span class="m-lbl">Inflow</span><span class="m-val">${Number(t.inflow_lps || 0).toFixed(1)} L/s</span></div>
+            <div class="metric-row"><span class="m-lbl">Outflow</span><span class="m-val">${Number(t.outflow_lps || 0).toFixed(1)} L/s</span></div>
+            <div class="metric-row"><span class="m-lbl">Stage</span><span class="m-val">${Number(t.simulated_water_level_cm || 0).toFixed(0)} cm</span></div>
+            <div class="metric-row sensor"><span class="m-lbl">Sensor</span><span class="m-val sensor">${hasLiveSensor ? `${sens.sensor_reading_cm}cm (${sens.agreement})` : '—'}</span></div>
           </div>
         </div>
       </div>
     `;
   }).join("");
+
 
 
   // 4. Render Right Sidebar Mini Tanks Card
@@ -1051,19 +1049,8 @@ function renderSvgMap(data) {
 
       cellG.appendChild(rect);
 
-      // Subtle cell ID corner tag for clear spatial grid visibility
-      const cellLbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      cellLbl.setAttribute("x", c * 48 + 14);
-      cellLbl.setAttribute("y", r * 48 + 20);
-      cellLbl.setAttribute("fill", "rgba(255, 255, 255, 0.25)");
-      cellLbl.setAttribute("font-size", "7.5");
-      cellLbl.setAttribute("font-family", "monospace");
-      cellLbl.setAttribute("pointer-events", "none");
-      cellLbl.textContent = cell.cell_id;
-      cellG.appendChild(cellLbl);
-
-      // High-Contrast D8 Hydrodynamic Flow Vectors Layer
-      if (layers.d8 && (cell.depth_cm > 0.2 || (currentMinute > 0 && layers.depth))) {
+      // Hydrodynamic Flow Vectors Layer (only on inundated cells to keep map clean)
+      if (layers.d8 && cell.depth_cm >= 3.0) {
         const cx = c * 48 + 33;
         const cy = r * 48 + 33;
 
@@ -1082,6 +1069,7 @@ function renderSvgMap(data) {
 
         const flowG = document.createElementNS("http://www.w3.org/2000/svg", "g");
         flowG.setAttribute("transform", `translate(${cx}, ${cy}) rotate(${angleDeg})`);
+        flowG.setAttribute("pointer-events", "none");
 
         let markerId = "arrow-safe";
         let strokeCol = "#10b981";
@@ -1097,9 +1085,9 @@ function renderSvgMap(data) {
         }
 
         const arrowCore = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        arrowCore.setAttribute("x1", "-7");
+        arrowCore.setAttribute("x1", "-6");
         arrowCore.setAttribute("y1", "0");
-        arrowCore.setAttribute("x2", "7");
+        arrowCore.setAttribute("x2", "6");
         arrowCore.setAttribute("y2", "0");
         arrowCore.setAttribute("stroke", strokeCol);
         arrowCore.setAttribute("stroke-width", "1.2");
@@ -1126,64 +1114,42 @@ function renderSvgMap(data) {
       { id: "D05", cell: "C089", x: 465, y: 417, name: "D05 Outfall" }
     ];
 
-    // Pipeline connecting D01 -> D02 -> D03 -> D04 -> D05
+    // Blueprint-style dashed pipeline connecting D01 -> D02 -> D03 -> D04 -> D05
     const pipePoints = tankNodes.map(t => `${t.x},${t.y}`).join(" ");
-    const pipeBack = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    pipeBack.setAttribute("points", pipePoints);
-    pipeBack.setAttribute("fill", "none");
-    pipeBack.setAttribute("stroke", "rgba(56, 189, 248, 0.25)");
-    pipeBack.setAttribute("stroke-width", "5");
-    pipeBack.setAttribute("stroke-linecap", "round");
-    pipeBack.setAttribute("stroke-linejoin", "round");
-    svgMap.appendChild(pipeBack);
-
     const pipeFlow = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
     pipeFlow.setAttribute("points", pipePoints);
     pipeFlow.setAttribute("fill", "none");
-    pipeFlow.setAttribute("stroke", "#38bdf8");
-    pipeFlow.setAttribute("stroke-width", "2");
-    pipeFlow.setAttribute("stroke-dasharray", "6,4");
+    pipeFlow.setAttribute("stroke", "rgba(56, 189, 248, 0.65)");
+    pipeFlow.setAttribute("stroke-width", "1.8");
+    pipeFlow.setAttribute("stroke-dasharray", "4,3");
     pipeFlow.setAttribute("stroke-linecap", "round");
     pipeFlow.setAttribute("stroke-linejoin", "round");
     svgMap.appendChild(pipeFlow);
 
-    // Render each tank node station
+    // Render each tank node station with clean, non-obtrusive icons
     tankNodes.forEach(tn => {
       const tg = document.createElementNS("http://www.w3.org/2000/svg", "g");
       const tankData = (data.drainage_tanks && data.drainage_tanks[tn.id]) || {};
-      const fillPct = tankData.fill_percentage || 0;
+      const fillPct = Math.round(tankData.fill_percentage || 0);
       const isSurcharging = tankData.status === "SURCHARGING" || (tn.id === "D03" && isBlockageActive);
-
-      if (isSurcharging) {
-        const clogHalo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        clogHalo.setAttribute("cx", tn.x);
-        clogHalo.setAttribute("cy", tn.y);
-        clogHalo.setAttribute("r", 15);
-        clogHalo.setAttribute("fill", "rgba(239, 68, 68, 0.35)");
-        clogHalo.setAttribute("stroke", "#ef4444");
-        clogHalo.setAttribute("stroke-width", "1.5");
-        clogHalo.setAttribute("stroke-dasharray", "3,2");
-        clogHalo.setAttribute("filter", "url(#glow-pulse)");
-        tg.appendChild(clogHalo);
-      }
 
       // Tank node circle
       const nodeCol = isSurcharging ? "#ef4444" : (fillPct >= 80 ? "#f97316" : (fillPct >= 50 ? "#fbbf24" : "#0284c7"));
       const tIcon = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       tIcon.setAttribute("cx", tn.x);
       tIcon.setAttribute("cy", tn.y);
-      tIcon.setAttribute("r", 9.0);
+      tIcon.setAttribute("r", "7.0");
       tIcon.setAttribute("fill", nodeCol);
       tIcon.setAttribute("stroke", "#ffffff");
-      tIcon.setAttribute("stroke-width", "1.5");
+      tIcon.setAttribute("stroke-width", "1.2");
       tIcon.setAttribute("cursor", "pointer");
       tg.appendChild(tIcon);
 
       const tText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       tText.setAttribute("x", tn.x);
-      tText.setAttribute("y", tn.y + 3);
+      tText.setAttribute("y", tn.y + 2.5);
       tText.setAttribute("fill", "#ffffff");
-      tText.setAttribute("font-size", "7.5");
+      tText.setAttribute("font-size", "6.5");
       tText.setAttribute("font-weight", "bold");
       tText.setAttribute("font-family", "monospace");
       tText.setAttribute("text-anchor", "middle");
@@ -1200,8 +1166,8 @@ function renderSvgMap(data) {
           </div>
           <div style="font-size: 10px; line-height: 1.4;">
             <div>Status: <strong style="color: ${nodeCol};">${tankData.status || 'NORMAL'}</strong></div>
-            <div>Stored: <strong>${tankData.current_storage_liters || 0} L</strong> / ${tankData.capacity_liters || 1000} L (${fillPct}%)</div>
-            <div>Inflow: <strong>${tankData.inflow_lps || 0} L/s</strong> | Outflow: <strong>${tankData.outflow_lps || 0} L/s</strong></div>
+            <div>Stored: <strong>${Math.round(tankData.current_storage_liters || 0).toLocaleString()} L</strong> / ${Math.round(tankData.capacity_liters || 1000).toLocaleString()} L (${fillPct}%)</div>
+            <div>Inflow: <strong>${Number(tankData.inflow_lps || 0).toFixed(1)} L/s</strong> | Outflow: <strong>${Number(tankData.outflow_lps || 0).toFixed(1)} L/s</strong></div>
           </div>
         `;
       });
@@ -1212,6 +1178,7 @@ function renderSvgMap(data) {
       svgMap.appendChild(tg);
     });
   }
+
 
   // C. Road Segments Layer (Physical asphalt background)
   const streetMeta = {

@@ -1275,13 +1275,16 @@ html, body {
   background: #14161f;
   border: 1px solid var(--border-strong);
   border-radius: 6px;
-  padding: 8px;
+  padding: 8px 9px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 5px;
+  min-height: 155px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 
 
 .tank-card.surcharging {
@@ -1343,35 +1346,77 @@ html, body {
   font-weight: 800;
 }
 
+/* Tank Status Sub-Tags (Identical height for all cards) */
+.tank-spill-tag {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 3px;
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  animation: pulse-red 0.9s infinite;
+}
+
+.tank-degraded-tag {
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: #fb923c;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 3px;
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+.tank-nominal-tag {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 3px;
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
 /* Vertical Tank Visual Column */
 .tank-visual-wrap {
   display: flex;
   gap: 8px;
   align-items: center;
+  margin-top: 2px;
 }
 
 .tank-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 42px;
+  width: 38px;
   flex-shrink: 0;
 }
 
 .tank-cylinder {
   position: relative;
   width: 32px;
-  height: 90px;
-  background: rgba(15, 23, 42, 0.8);
-  border: 2px solid #475569;
-  border-radius: 4px 4px 6px 6px;
+  height: 76px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid #475569;
+  border-radius: 4px;
   overflow: hidden;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .tank-card.surcharging .tank-cylinder {
   border-color: #ef4444;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .tank-water {
@@ -1401,28 +1446,12 @@ html, body {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.4);
 }
 
-.tank-overflow-banner {
-  position: absolute;
-  top: 2px;
-  left: 1px;
-  right: 1px;
-  background: #dc2626;
-  color: #ffffff;
-  font-size: 6.5px;
-  font-weight: 800;
-  text-align: center;
-  padding: 1px 0;
-  border-radius: 2px;
-  font-family: var(--font-mono);
-  animation: pulse-red 0.8s infinite;
-}
-
 .tank-pct-label {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 800;
   font-family: var(--font-mono);
   color: var(--text-primary);
@@ -1437,22 +1466,30 @@ html, body {
   flex: 1;
   font-size: 8.5px;
   font-family: var(--font-mono);
+  overflow: hidden;
 }
 
 .metric-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  white-space: nowrap;
+  gap: 4px;
 }
 
 .m-lbl {
   color: var(--text-tertiary);
   font-family: var(--font-sans);
+  font-size: 8px;
+  flex-shrink: 0;
 }
 
 .m-val {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 600;
+  font-size: 8.5px;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .m-val.highlight {
@@ -1463,13 +1500,15 @@ html, body {
 .metric-row.sensor {
   border-top: 1px dashed rgba(255, 255, 255, 0.08);
   padding-top: 2px;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .m-val.sensor {
   font-size: 8px;
   color: #34d399;
+  white-space: nowrap;
 }
+
 
 /* Sidebar Tank Summary Widget */
 .side-tanks-summary-bar {
