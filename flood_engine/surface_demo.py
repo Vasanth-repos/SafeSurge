@@ -21,7 +21,7 @@ def main():
     # Ingest runoff burst on upper ridge cell (C00001) across 4 timesteps
     for i in range(1, 5):
         t = i * 60
-        runoff_input = {cid: (2.5 if cid == "C00001" and i == 1 else 0.0) for cid in terrain.cells.keys()}
+        runoff_input = {cid: (2.5 if cid == "C00001" and i == 1 else 0.0) for cid in terrain.cells}
         step = engine.step(t, runoff_input)
 
         c1 = step.cells["C00001"]

@@ -27,7 +27,7 @@ def test_surface_to_drainage_coupling_conservation():
     # 3. Simulate storm: surface receives runoff, captures a fraction into drainage
     for i in range(1, 6):
         t = i * 60
-        r_step = surface_engine.step(t, {"C00001": 2.0, **{cid: 0.0 for cid in terrain.cells.keys() if cid != "C00001"}})
+        r_step = surface_engine.step(t, {"C00001": 2.0, **{cid: 0.0 for cid in terrain.cells if cid != "C00001"}})
 
         # Inlet captures 0.8 m³ from surface ponding if available
         captured_m3 = min(0.8, r_step.cells["C00001"].new_storage_m3)

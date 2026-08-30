@@ -8,11 +8,12 @@ Generates:
 5. fault_injection_scenarios.csv
 """
 
-import os
 import csv
 import json
 import math
+import os
 import random
+
 import numpy as np
 
 try:

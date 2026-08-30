@@ -24,7 +24,7 @@ def test_end_to_end_layer3_to_layer4_to_layer5():
     terrain = D8Terrain.compute_from_grid(grid)
 
     # 2. Setup Layer 4 Runoff Engine
-    cell_areas = {cid: grid.cell_area_m2 for cid in terrain.cells.keys()}
+    cell_areas = {cid: grid.cell_area_m2 for cid in terrain.cells}
     runoff_engine = RunoffEngine(
         cell_areas_m2=cell_areas,
         default_cn=90.0,

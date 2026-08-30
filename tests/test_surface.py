@@ -24,7 +24,7 @@ def test_mass_conservation_invariant():
     # Ingest runoff over 10 timesteps
     for i in range(1, 11):
         t = i * 60
-        r_input = {cid: (1.5 if cid in ("C00001", "C00002") else 0.2) for cid in terrain.cells.keys()}
+        r_input = {cid: (1.5 if cid in ("C00001", "C00002") else 0.2) for cid in terrain.cells}
         step = engine.step(t, r_input)
         assert abs(step.mass_balance_error_m3) <= 1e-5
 
@@ -47,7 +47,7 @@ def test_d8_downslope_flow_direction():
     assert target_id is not None
 
     # Step 1: Add water only to C00001
-    r_input = {cid: (5.0 if cid == source_id else 0.0) for cid in terrain.cells.keys()}
+    r_input = {cid: (5.0 if cid == source_id else 0.0) for cid in terrain.cells}
     step_1 = engine.step(60, r_input)
 
     outflow_c1 = step_1.cells[source_id].surface_outflow_m3
@@ -74,7 +74,7 @@ def test_progressive_valley_accumulation():
     storages_valley = []
     for i in range(1, 6):
         t = i * 60
-        r_input = {cid: (3.0 if cid == "C00001" else 0.0) for cid in terrain.cells.keys()}
+        r_input = {cid: (3.0 if cid == "C00001" else 0.0) for cid in terrain.cells}
         step = engine.step(t, r_input)
         storages_valley.append(step.cells[valley_cell].new_storage_m3)
 
@@ -92,7 +92,7 @@ def test_boundary_outflow_accounting():
     outlet_id = "C00036"
     assert terrain.get_cell(outlet_id).is_outlet
 
-    r_input = {cid: (4.0 if cid == outlet_id else 0.0) for cid in terrain.cells.keys()}
+    r_input = {cid: (4.0 if cid == outlet_id else 0.0) for cid in terrain.cells}
     step = engine.step(60, r_input)
 
     assert step.total_boundary_outflow_m3 > 0.0
@@ -144,10 +144,10 @@ def test_effective_area_and_depth_diagnostics():
     terrain = D8Terrain.compute_from_grid(grid)
 
     # Cell C00001 has effective road ponding area = 25 m² instead of 100 m²
-    eff_areas = {cid: (25.0 if cid == "C00001" else 100.0) for cid in terrain.cells.keys()}
+    eff_areas = {cid: (25.0 if cid == "C00001" else 100.0) for cid in terrain.cells}
     engine = SurfaceStorageEngine(grid=grid, terrain=terrain, effective_areas_m2=eff_areas, expected_timestep_seconds=60)
 
-    step = engine.step(60, {"C00001": 2.5, **{cid: 0.0 for cid in terrain.cells.keys() if cid != "C00001"}})
+    step = engine.step(60, {"C00001": 2.5, **{cid: 0.0 for cid in terrain.cells if cid != "C00001"}})
     c1 = step.cells["C00001"]
     # depth = storage / 25.0
     expected_depth = c1.new_storage_m3 / 25.0

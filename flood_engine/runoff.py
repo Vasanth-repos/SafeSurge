@@ -125,7 +125,7 @@ class RunoffEngine:
         cn_map = curve_numbers or {}
         lu_map = land_uses or {}
 
-        for cid in self.cell_areas_m2.keys():
+        for cid in self.cell_areas_m2:
             cn = float(cn_map.get(cid, self.default_cn))
             if not (0 < cn <= 100):
                 raise ValueError(f"Curve Number for cell {cid} must be in (0, 100], got {cn}")
@@ -136,8 +136,8 @@ class RunoffEngine:
             self.abstraction_Ia[cid] = 0.2 * s
 
         # State tracking per cell
-        self.cumulative_rainfall_mm: dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2.keys()}
-        self.cumulative_runoff_mm: dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2.keys()}
+        self.cumulative_rainfall_mm: dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2}
+        self.cumulative_runoff_mm: dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2}
         self.cumulative_direct_runoff_volume_m3: float = 0.0
         self.cumulative_gross_rainfall_volume_m3: float = 0.0
 
@@ -147,7 +147,7 @@ class RunoffEngine:
 
     def reset(self) -> None:
         """Resets all cumulative hydrological state and timestamp history."""
-        for cid in self.cell_areas_m2.keys():
+        for cid in self.cell_areas_m2:
             self.cumulative_rainfall_mm[cid] = 0.0
             self.cumulative_runoff_mm[cid] = 0.0
         self.cumulative_direct_runoff_volume_m3 = 0.0
@@ -195,11 +195,11 @@ class RunoffEngine:
             val = float(rainfall_input)
             if math.isnan(val) or math.isinf(val) or val < 0.0:
                 raise ValueError(f"Invalid rainfall value: {val}")
-            for cid in self.cell_areas_m2.keys():
+            for cid in self.cell_areas_m2:
                 rainfall_by_cell[cid] = val
         elif isinstance(rainfall_input, dict):
             # Strict cell check
-            for cid in rainfall_input.keys():
+            for cid in rainfall_input:
                 if cid not in self.cell_areas_m2:
                     raise ValueError(f"Unknown cell ID '{cid}' in rainfall input not found in model domain.")
             missing = set(self.cell_areas_m2.keys()) - set(rainfall_input.keys())

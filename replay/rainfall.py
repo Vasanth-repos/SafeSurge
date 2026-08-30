@@ -95,8 +95,7 @@ class ScalarRainfallReplay:
 
     def replay(self) -> Iterator[RainfallStep]:
         """Pure deterministic generator yielding RainfallStep per timestep."""
-        for step in self.steps:
-            yield step
+        yield from self.steps
 
     @classmethod
     def load_from_dict(
@@ -189,8 +188,7 @@ class SpatialRainfallReplay:
         return len(self.steps)
 
     def replay(self) -> Iterator[SpatialRainfallStep]:
-        for step in self.steps:
-            yield step
+        yield from self.steps
 
     @classmethod
     def load_from_dict(
@@ -228,7 +226,7 @@ class SpatialRainfallReplay:
 
             # Validate unknown cells
             if valid_cell_ids is not None:
-                for cid in cells_map.keys():
+                for cid in cells_map:
                     if cid not in valid_cell_ids:
                         raise ValueError(f"Unknown cell ID '{cid}' in spatial rainfall not found in computational grid.")
 

@@ -107,7 +107,7 @@ class FusionPipeline:
             sensor_last_updated_map[sid] = obs.timestamp_seconds
             sensor_cell_id_map[sid] = obs.cell_id
 
-            matched, model_depth, residual = match_sensor_to_model(
+            matched, model_depth, _residual = match_sensor_to_model(
                 observation=obs,
                 model_depth_cm_by_cell=model_depth_cm_by_cell,
                 model_timestamp_seconds=t,
@@ -124,7 +124,7 @@ class FusionPipeline:
         # 2. Extract current sensor bias states
         sensor_states = {
             sid: self.bias_estimator.get_state(sid)
-            for sid in sensor_coords_m_by_id.keys()
+            for sid in sensor_coords_m_by_id
         }
         sensor_biases = {
             sid: state.bias_cm for sid, state in sensor_states.items()

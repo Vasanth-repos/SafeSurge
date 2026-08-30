@@ -6,6 +6,7 @@ with automated avoided-road diagnostics and graceful fallback when no safe route
 
 from __future__ import annotations
 
+import itertools
 from collections.abc import Mapping
 
 import networkx as nx
@@ -133,7 +134,7 @@ class EmergencyRouter:
         total_cost = 0.0
         min_conf = 1.0
 
-        for u, v in zip(node_path[:-1], node_path[1:]):
+        for u, v in itertools.pairwise(node_path):
             edge_data = g.get_edge_data(u, v)
             road_path.append(edge_data["road_id"])
             total_travel_time += edge_data["travel_time"]

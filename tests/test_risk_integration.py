@@ -35,7 +35,7 @@ def test_full_chain_layer5_layer9_layer10_integration():
     road = RoadFeature(road_id="R001_MAIN", geometry=road_geom, source_crs="EPSG:32644")
 
     # Step 1: Run surface storage
-    storage_input = {"C00001": 18.4, **{cid: 0.0 for cid in terrain.cells.keys() if cid != "C00001"}}
+    storage_input = {"C00001": 18.4, **{cid: 0.0 for cid in terrain.cells if cid != "C00001"}}
     s_step = surface_engine.step(60, storage_input)
 
     # Step 2: Layer 9 Depth calculation

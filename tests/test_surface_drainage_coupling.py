@@ -114,7 +114,7 @@ def test_capture_removed_exactly_once():
         dt_seconds=60.0,
     )
 
-    runoff = {cid: (10.0 if cid == "C00001" else 0.0) for cid in terrain.cells.keys()}
+    runoff = {cid: (10.0 if cid == "C00001" else 0.0) for cid in terrain.cells}
     step = coupling.step(60, runoff)
 
     assert step.total_drainage_capture_m3 == pytest.approx(3.0)
@@ -150,7 +150,7 @@ def test_surcharge_is_delayed_and_no_instantaneous_loop():
     )
 
     # Step 1: t=60s. Ingest 10 m³ on C00001
-    runoff_1 = {cid: (10.0 if cid == "C00001" else 0.0) for cid in terrain.cells.keys()}
+    runoff_1 = {cid: (10.0 if cid == "C00001" else 0.0) for cid in terrain.cells}
     step_1 = coupling.step(60, runoff_1)
 
     # 3.0 m³ captured -> Node N001 stores 1.0 m³ max, remaining 2.0 m³ is surcharge
@@ -160,7 +160,7 @@ def test_surcharge_is_delayed_and_no_instantaneous_loop():
     assert abs(step_1.mass_balance_error_m3) <= 1e-5
 
     # Step 2: t=120s with 0 runoff. The 2.0 m³ pending surcharge is now injected onto C00001
-    runoff_2 = {cid: 0.0 for cid in terrain.cells.keys()}
+    runoff_2 = {cid: 0.0 for cid in terrain.cells}
     step_2 = coupling.step(120, runoff_2)
 
     # Pending surcharge has been consumed
@@ -194,7 +194,7 @@ def test_full_system_mass_conservation():
     # Simulate 5 storm timesteps
     for i in range(1, 6):
         t = i * 60
-        r_input = {cid: (4.0 if cid in ("C00001", "C00022") else 0.5) for cid in terrain.cells.keys()}
+        r_input = {cid: (4.0 if cid in ("C00001", "C00022") else 0.5) for cid in terrain.cells}
         res = coupling.step(t, r_input)
         assert abs(res.mass_balance_error_m3) <= 1e-5
 
@@ -234,7 +234,7 @@ def test_pipe_bottleneck_and_surcharge_return_scenario():
         surcharge_cell_by_node={"N001": "C00001"},
     )
 
-    runoff = {cid: (10.0 if cid == "C00001" else 0.0) for cid in terrain.cells.keys()}
+    runoff = {cid: (10.0 if cid == "C00001" else 0.0) for cid in terrain.cells}
     step = coupling.step(60, runoff)
 
     assert step.total_drainage_capture_m3 == pytest.approx(3.0)

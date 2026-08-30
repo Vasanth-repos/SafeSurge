@@ -30,7 +30,7 @@ def test_surface_to_depth_engine_integration_and_immutability():
     road = RoadFeature(road_id="MAIN_ST", geometry=road_geom, source_crs="EPSG:32644")
 
     # Step 1: Runoff into C00001
-    s_step = surface_engine.step(60, {"C00001": 5.0, **{cid: 0.0 for cid in terrain.cells.keys() if cid != "C00001"}})
+    s_step = surface_engine.step(60, {"C00001": 5.0, **{cid: 0.0 for cid in terrain.cells if cid != "C00001"}})
     c1_storage_before = surface_engine.storage("C00001")
     assert c1_storage_before > 0.0
 

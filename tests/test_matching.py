@@ -22,7 +22,7 @@ def test_matching_exact_and_acceptable_time_difference():
 
     # 20s difference (acceptable)
     obs_skew = SensorObservation("S1", "C104", 40, 25.0, "ONLINE", "ACCEPTED")
-    m2, d2, r2 = match_sensor_to_model(obs_skew, model_depths, model_timestamp_seconds=60, max_time_difference_seconds=30)
+    m2, _d2, _r2 = match_sensor_to_model(obs_skew, model_depths, model_timestamp_seconds=60, max_time_difference_seconds=30)
     assert m2 is True
 
 

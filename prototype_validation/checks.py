@@ -73,10 +73,9 @@ def check_grid_and_d8_integrity() -> CheckResult:
         return False
 
     for cid in d8_cells:
-        if cid not in visited:
-            if is_cyclic(cid):
-                has_cycle = True
-                break
+        if cid not in visited and is_cyclic(cid):
+            has_cycle = True
+            break
 
     if has_cycle:
         return CheckResult(

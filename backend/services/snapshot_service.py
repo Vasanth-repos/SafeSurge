@@ -24,7 +24,7 @@ class SnapshotService:
 
     def ensure_scenario_loaded(self, scenario_id: str) -> str:
         """Loads a scenario into memory if not already cached."""
-        matching = [t for (s, t) in self._store.keys() if s == scenario_id]
+        matching = [t for (s, t) in self._store if s == scenario_id]
         if matching:
             self.active_simulation_id = scenario_id
             return scenario_id
@@ -62,10 +62,10 @@ class SnapshotService:
             return None
 
         # Check if scenario is loaded
-        matching = [t for (s, t) in self._store.keys() if s == sim_id]
+        matching = [t for (s, t) in self._store if s == sim_id]
         if not matching:
             self.ensure_scenario_loaded(sim_id)
-            matching = [t for (s, t) in self._store.keys() if s == sim_id]
+            matching = [t for (s, t) in self._store if s == sim_id]
 
         if not matching:
             return None
@@ -81,7 +81,7 @@ class SnapshotService:
         sim_id = simulation_id or self.active_simulation_id
         if not sim_id:
             return []
-        return sorted([t for (s, t) in self._store.keys() if s == sim_id])
+        return sorted([t for (s, t) in self._store if s == sim_id])
 
     def get_dashboard_state(
         self,

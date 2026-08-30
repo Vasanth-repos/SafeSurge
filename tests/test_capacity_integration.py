@@ -69,7 +69,7 @@ def test_baseline_vs_reduced_capacity_experiment():
     3. Both Run A and Run B strictly conserve mass (Error == 0).
     """
     sim_a, terrain_a = _setup_coupled_system()
-    sim_b, terrain_b = _setup_coupled_system()
+    sim_b, _terrain_b = _setup_coupled_system()
 
     scenario = CapacityScenario(
         scenario_id="test_scen",
@@ -87,7 +87,7 @@ def test_baseline_vs_reduced_capacity_experiment():
     # Run 5 timesteps (60s, 120s, 180s, 240s, 300s)
     for i in range(1, 6):
         t = i * 60
-        r_input = {cid: (4.0 if cid in ("C00001", "C00022") else 0.0) for cid in terrain_a.cells.keys()}
+        r_input = {cid: (4.0 if cid in ("C00001", "C00022") else 0.0) for cid in terrain_a.cells}
 
         # Run A: baseline factors (all 1.0)
         res_a = sim_a.step(t, r_input, capacity_factor_by_edge={"E001": 1.0, "E002": 1.0})
@@ -131,7 +131,7 @@ def test_capacity_restoration_recovery_dynamics():
         ],
     )
 
-    r_input = {cid: (3.0 if cid in ("C00001", "C00022") else 0.0) for cid in terrain.cells.keys()}
+    r_input = {cid: (3.0 if cid in ("C00001", "C00022") else 0.0) for cid in terrain.cells}
 
     # t=60s (Degraded)
     step1 = sim.step(60, r_input, capacity_factor_by_edge=scenario.factors_at(60))
@@ -142,7 +142,7 @@ def test_capacity_restoration_recovery_dynamics():
     assert abs(step2.mass_balance_error_m3) <= 1e-5
 
     # t=180s (Restored to 1.0)
-    step3 = sim.step(180, {cid: 0.0 for cid in terrain.cells.keys()}, capacity_factor_by_edge=scenario.factors_at(180))
+    step3 = sim.step(180, {cid: 0.0 for cid in terrain.cells}, capacity_factor_by_edge=scenario.factors_at(180))
     assert abs(step3.mass_balance_error_m3) <= 1e-5
 
     bal = sim.mass_balance()

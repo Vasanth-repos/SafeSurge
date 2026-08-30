@@ -204,24 +204,24 @@ for i in range(10):
     spread = val_rng.uniform(25, 60)
     cond = val_rng.choice([1.0, 1.0, 0.9, 0.7, 0.5, 0.3])
     outflow = val_rng.uniform(0.35, 0.65)
-    validation_scenarios.append(dict(scenario_id=f"VAL_N{i:02d}", peak_mm_hr=peak,
-                                      peak_time_min=peak_t, spread_min=spread,
-                                      drainage_condition_factor=cond, outflow_fraction=outflow,
-                                      tag="normal"))
+    validation_scenarios.append({"scenario_id": f"VAL_N{i:02d}", "peak_mm_hr": peak,
+                                      "peak_time_min": peak_t, "spread_min": spread,
+                                      "drainage_condition_factor": cond, "outflow_fraction": outflow,
+                                      "tag": "normal"})
 
 # 5 EDGE CASE scenarios - deliberately outside/at the boundary of the
 # training distribution (training used peak_mm_hr in [10,60], condition in {1.0,0.9,0.7,0.5,0.3})
 edge_cases = [
-    dict(scenario_id="VAL_E00_zero_rain", peak_mm_hr=0.0, peak_time_min=90, spread_min=45,
-         drainage_condition_factor=1.0, outflow_fraction=0.5, tag="edge_zero_rain"),
-    dict(scenario_id="VAL_E01_extreme_rain", peak_mm_hr=75.0, peak_time_min=90, spread_min=30,
-         drainage_condition_factor=1.0, outflow_fraction=0.5, tag="edge_extreme_rain"),
-    dict(scenario_id="VAL_E02_extreme_drainage_failure", peak_mm_hr=35.0, peak_time_min=90, spread_min=45,
-         drainage_condition_factor=0.15, outflow_fraction=0.5, tag="edge_drainage_failure"),
-    dict(scenario_id="VAL_E03_combo_worst_case", peak_mm_hr=70.0, peak_time_min=75, spread_min=35,
-         drainage_condition_factor=0.2, outflow_fraction=0.4, tag="edge_combo_worst_case"),
-    dict(scenario_id="VAL_E04_prolonged_drizzle", peak_mm_hr=8.0, peak_time_min=90, spread_min=90,
-         drainage_condition_factor=1.0, outflow_fraction=0.6, tag="edge_prolonged_drizzle"),
+    {"scenario_id": "VAL_E00_zero_rain", "peak_mm_hr": 0.0, "peak_time_min": 90, "spread_min": 45,
+         "drainage_condition_factor": 1.0, "outflow_fraction": 0.5, "tag": "edge_zero_rain"},
+    {"scenario_id": "VAL_E01_extreme_rain", "peak_mm_hr": 75.0, "peak_time_min": 90, "spread_min": 30,
+         "drainage_condition_factor": 1.0, "outflow_fraction": 0.5, "tag": "edge_extreme_rain"},
+    {"scenario_id": "VAL_E02_extreme_drainage_failure", "peak_mm_hr": 35.0, "peak_time_min": 90, "spread_min": 45,
+         "drainage_condition_factor": 0.15, "outflow_fraction": 0.5, "tag": "edge_drainage_failure"},
+    {"scenario_id": "VAL_E03_combo_worst_case", "peak_mm_hr": 70.0, "peak_time_min": 75, "spread_min": 35,
+         "drainage_condition_factor": 0.2, "outflow_fraction": 0.4, "tag": "edge_combo_worst_case"},
+    {"scenario_id": "VAL_E04_prolonged_drizzle", "peak_mm_hr": 8.0, "peak_time_min": 90, "spread_min": 90,
+         "drainage_condition_factor": 1.0, "outflow_fraction": 0.6, "tag": "edge_prolonged_drizzle"},
 ]
 validation_scenarios.extend(edge_cases)
 

@@ -45,7 +45,7 @@ def main():
     # Ingest runoff burst
     for i in range(1, 6):
         t = i * 60
-        r_input = {cid: (4.0 if cid in ("C00001", "C00022") else 0.0) for cid in terrain.cells.keys()}
+        r_input = {cid: (4.0 if cid in ("C00001", "C00022") else 0.0) for cid in terrain.cells}
         res = coupling.step(t, r_input)
 
         c1_store = res.surface_storage_m3_by_cell["C00001"]

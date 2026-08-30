@@ -77,7 +77,7 @@ class SurfaceStorageEngine:
         # Effective surface ponding area per cell
         self.effective_areas_m2: dict[str, float] = {}
         eff_map = effective_areas_m2 or {}
-        for cid in self.terrain.cells.keys():
+        for cid in self.terrain.cells:
             area = float(eff_map.get(cid, self.grid.cell_area_m2))
             if area <= 0.0:
                 raise ValueError(f"Effective area for {cid} must be positive, got {area}")
@@ -98,7 +98,7 @@ class SurfaceStorageEngine:
                 self.routing_fractions[cid] = 0.0
 
         # State storage (m³)
-        self.storage_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        self.storage_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells}
         self.cumulative_runoff_input_m3: float = 0.0
         self.cumulative_boundary_outflow_m3: float = 0.0
         self.cumulative_drainage_capture_m3: float = 0.0
@@ -118,7 +118,7 @@ class SurfaceStorageEngine:
 
     def reset(self) -> None:
         """Resets all cell storage levels, boundary discharges, and timestamp history."""
-        for cid in self.storage_m3.keys():
+        for cid in self.storage_m3:
             self.storage_m3[cid] = 0.0
         self.cumulative_runoff_input_m3 = 0.0
         self.cumulative_boundary_outflow_m3 = 0.0
@@ -137,7 +137,7 @@ class SurfaceStorageEngine:
         S_{t+1} = S_avail - O_t + I_downstream
         """
         outflows_m3: dict[str, float] = {}
-        inflows_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        inflows_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells}
         step_boundary_outflow_m3 = 0.0
 
         for cid, cell in self.terrain.cells.items():
@@ -222,10 +222,10 @@ class SurfaceStorageEngine:
             val = float(runoff_volume_m3_by_cell)
             if val < 0.0 or math.isnan(val) or math.isinf(val):
                 raise ValueError(f"Invalid runoff volume: {val}")
-            for cid in self.terrain.cells.keys():
+            for cid in self.terrain.cells:
                 r_map[cid] = val
         elif isinstance(runoff_volume_m3_by_cell, dict):
-            for cid in runoff_volume_m3_by_cell.keys():
+            for cid in runoff_volume_m3_by_cell:
                 if cid not in self.terrain.cells:
                     raise ValueError(f"Unknown cell ID '{cid}' in runoff input.")
             missing = set(self.terrain.cells.keys()) - set(runoff_volume_m3_by_cell.keys())
@@ -239,7 +239,7 @@ class SurfaceStorageEngine:
             raise TypeError("runoff_volume_m3_by_cell must be a float or Dict[str, float].")
 
         # 2. Parse drainage capture (Layer 5 constraint: must be 0.0)
-        d_map: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        d_map: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells}
         if drainage_capture_m3_by_cell is not None:
             for cid, d_val in drainage_capture_m3_by_cell.items():
                 if d_val > 1e-9:
@@ -249,7 +249,7 @@ class SurfaceStorageEngine:
         # 3. Synchronous Outflow Calculation
         # Outflow is evaluated from available water S_t + R_t before receiving new upstream inflow I_t
         outflows_m3: dict[str, float] = {}
-        inflows_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        inflows_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells}
         step_boundary_outflow_m3 = 0.0
 
         for cid, cell in self.terrain.cells.items():
@@ -359,7 +359,7 @@ class SurfaceStorageEngine:
 
     def get_water_depths_by_cell(self) -> dict[str, float]:
         """Returns mapping of cell_id to water depth in meters."""
-        return {cid: self.storage_m3[cid] / self.effective_areas_m2[cid] for cid in self.terrain.cells.keys()}
+        return {cid: self.storage_m3[cid] / self.effective_areas_m2[cid] for cid in self.terrain.cells}
 
     def get_diagnostics(self) -> dict[str, Any]:
         """Returns spatial depth risk summary across the computational domain."""

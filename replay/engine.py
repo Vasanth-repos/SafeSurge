@@ -185,7 +185,7 @@ class ReplayEngine:
             model_depths = {}
             int_factor = math.sin(min(math.pi, (step_idx / max(1, num_steps)) * math.pi))
             for cid, (x, y) in self.cell_coords.items():
-                r, c = self.cell_rc[cid]
+                _r, _c = self.cell_rc[cid]
                 # High ground sheetflow across entire catchment
                 base_sheet = (2.2 + 1.1 * math.sin(x / 18.0) * math.cos(y / 18.0)) * int_factor
                 # Topographic gravity drainage from NW(high) to SE(low)
@@ -204,10 +204,10 @@ class ReplayEngine:
             # 4. Sensor Telemetry Ingestion with Fault Injection
             observations = []
             sensor_snapshots_list = []
-            for sid, sc in self.sensor_coords.items():
+            for sid in self.sensor_coords:
                 loc_id = self.sensor_locs.get(sid, "C012")
                 nom_depth = model_depths.get(loc_id, 5.0)
-                obs_depth, s_stat, is_mod = self.fault_engine.apply_sensor_override(sid, t, nom_depth, "ONLINE")
+                obs_depth, s_stat, _is_mod = self.fault_engine.apply_sensor_override(sid, t, nom_depth, "ONLINE")
 
                 if obs_depth is not None and s_stat == "ONLINE":
                     observations.append(

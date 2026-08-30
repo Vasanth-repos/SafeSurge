@@ -4,6 +4,7 @@ Simulates stateful node storage, capacity-constrained pipe transport, proportion
 explicit surcharge generation, outlet discharge, and strict mass conservation.
 """
 
+import itertools
 import math
 from dataclasses import dataclass
 from pathlib import Path
@@ -141,7 +142,7 @@ class StatefulDrainageNetwork:
 
     @property
     def node_ids(self) -> list[str]:
-        return [str(k) for k in self.nodes.keys() if isinstance(k, str)]
+        return [str(k) for k in self.nodes if isinstance(k, str)]
 
     @property
     def dt_seconds(self) -> float:
@@ -186,7 +187,7 @@ class StatefulDrainageNetwork:
 
     def reset(self) -> None:
         """Resets all node storage levels, cumulative accounting, and timestamp history."""
-        for nid in self.nodes.keys():
+        for nid in self.nodes:
             self.node_storage_m3[str(nid)] = 0.0
         self.cumulative_inflow_m3 = 0.0
         self.cumulative_outlet_discharge_m3 = 0.0
@@ -294,7 +295,7 @@ class StatefulDrainageNetwork:
         t = int(timestamp_seconds)
 
         # 1. Parse inflows
-        inflow_map: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
+        inflow_map: dict[str, float] = {nid: 0.0 for nid in self.nodes}
         if inflow_volume_m3_by_node:
             for nid, val in inflow_volume_m3_by_node.items():
                 nid_str = str(nid)
@@ -305,7 +306,7 @@ class StatefulDrainageNetwork:
                 inflow_map[nid_str] = float(val)
 
         # 2. Parse capacity degradation factors (0 <= factor <= 1)
-        cap_factors: dict[str, float] = {eid: 1.0 for eid in self.edges.keys()}
+        cap_factors: dict[str, float] = {eid: 1.0 for eid in self.edges}
         if capacity_factor_by_edge:
             for eid, f_val in capacity_factor_by_edge.items():
                 eid_str = str(eid)
@@ -317,11 +318,11 @@ class StatefulDrainageNetwork:
 
         # 3. Synchronous Pipe Outflow Evaluation
         available_at_node: dict[str, float] = {}
-        for nid in self.nodes.keys():
+        for nid in self.nodes:
             available_at_node[nid] = self.node_storage_m3[nid] + inflow_map[nid]
 
         edge_flow_results: dict[str, EdgeFlowResult] = {}
-        downstream_arrivals_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
+        downstream_arrivals_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes}
         total_pipe_transmitted_m3 = 0.0
 
         for nid, node in self.nodes.items():
@@ -388,8 +389,8 @@ class StatefulDrainageNetwork:
             available_at_node[nid] -= transferred_from_node
 
         # 4. Outlets, Node Storage Retention, and Surcharge
-        outlet_discharge_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
-        surcharge_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
+        outlet_discharge_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes}
+        surcharge_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes}
         new_storage_m3: dict[str, float] = {}
 
         step_outlet_total = 0.0
@@ -488,7 +489,7 @@ class StatefulDrainageNetwork:
         min_cap_vol = float("inf")
         limiting_edge = None
 
-        for u, v in zip(path[:-1], path[1:]):
+        for u, v in itertools.pairwise(path):
             edge_data = self.graph[u][v]["data"]
             path_edges.append(edge_data.edge_id)
             cap_vol = edge_data.capacity_m3_s * dt_seconds
