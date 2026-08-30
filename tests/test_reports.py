@@ -87,3 +87,23 @@ def test_download_docx_api_sensor_spike():
 
     assert "+30 min" in full_text
     assert "Water Surge" in full_text or "+90 cm" in full_text
+
+
+def test_download_ml_report_endpoint():
+    client = TestClient(app)
+    response = client.get("/api/reports/download-ml-report")
+    assert response.status_code == 200
+    assert "AURA_FLOOD_ML_Training_and_Validation_Report.docx" in response.headers.get("content-disposition", "")
+    assert len(response.content) > 10000
+
+    # Parse and verify content
+    temp_path = os.path.join("outputs", "reports", "test_ml_report_download.docx")
+    with open(temp_path, "wb") as f:
+        f.write(response.content)
+
+    doc = docx.Document(temp_path)
+    full_text = "\n".join([p.text for p in doc.paragraphs])
+    assert "Machine Learning Engineering" in full_text
+    assert "XGBoost" in full_text
+    assert "synthetic_scenarios_1000.csv" in full_text or len(doc.tables) >= 5
+

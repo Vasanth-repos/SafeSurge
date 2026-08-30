@@ -88,3 +88,25 @@ def download_3hour_docx_report(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": f"Failed to generate DOCX report: {e!s}"},
         )
+
+
+@router.get("/download-ml-report")
+def download_ml_technical_report():
+    """
+    Downloads the comprehensive AURA-FLOOD Machine Learning Engineering & Validation Report
+    in Word (.docx) format, covering all 10 datasets, 80/20 train-test splitting,
+    XGBoost hyperparameters, and the 250 held-out unseen storm validation results.
+    """
+    doc_path = os.path.join("outputs", "reports", "AURA_FLOOD_ML_Training_and_Validation_Report.docx")
+    if not os.path.exists(doc_path):
+        from reporting.generate_ml_dataset_report import create_ml_technical_report
+        create_ml_technical_report(doc_path)
+
+    filename = "AURA_FLOOD_ML_Training_and_Validation_Report.docx"
+    return FileResponse(
+        path=doc_path,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename=filename,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
