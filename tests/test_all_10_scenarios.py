@@ -2,7 +2,6 @@
 Comprehensive validation test suite covering all 10 scenarios from Section 41 of the specification.
 """
 
-import pytest
 from backend.services.simulation_service import SimulationService
 
 

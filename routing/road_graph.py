@@ -2,7 +2,7 @@
 Road network graph representation and risk assessment based on flood depth.
 """
 
-from typing import Dict, List, Tuple, Optional
+
 import networkx as nx
 
 
@@ -14,7 +14,7 @@ class RoadSegment:
         v_node: str,
         length_m: float,
         speed_limit_kmh: float = 40.0,
-        associated_cell_ids: Optional[List[int]] = None,
+        associated_cell_ids: list[int] | None = None,
         name: str = "",
     ):
         self.road_id = road_id
@@ -38,8 +38,8 @@ class RoadSegment:
 
     def update_flood_risk(
         self,
-        cell_depths: Dict[int, float],
-        cell_confidences: Dict[int, float],
+        cell_depths: dict[int, float],
+        cell_confidences: dict[int, float],
     ):
         if not self.associated_cell_ids:
             self.predicted_depth_cm = 0.0
@@ -82,11 +82,11 @@ class RoadSegment:
 
 class RoadNetwork:
     def __init__(self):
-        self.roads: Dict[str, RoadSegment] = {}
-        self.nodes: Dict[str, Tuple[float, float]] = {}  # node_id -> (lat, lon) or (x, y)
+        self.roads: dict[str, RoadSegment] = {}
+        self.nodes: dict[str, tuple[float, float]] = {}  # node_id -> (lat, lon) or (x, y)
         self.graph = nx.Graph()
 
-    def add_node(self, node_id: str, position: Tuple[float, float]):
+    def add_node(self, node_id: str, position: tuple[float, float]):
         self.nodes[node_id] = position
         self.graph.add_node(node_id, pos=position)
 
@@ -101,8 +101,8 @@ class RoadNetwork:
 
     def update_all_risks(
         self,
-        cell_depths: Dict[int, float],
-        cell_confidences: Dict[int, float],
+        cell_depths: dict[int, float],
+        cell_confidences: dict[int, float],
     ):
         for road in self.roads.values():
             road.update_flood_risk(cell_depths, cell_confidences)

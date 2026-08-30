@@ -5,8 +5,8 @@ anomaly spike rejection, and device health state tracking.
 """
 
 from sensors.registry import SensorRegistry
-from sensors.validation import SensorValidator
 from sensors.simulator import load_sensor_replay
+from sensors.validation import SensorValidator
 
 
 def main():

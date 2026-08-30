@@ -7,14 +7,14 @@ for anti-circular agreement evaluation and historical sample weighting.
 from __future__ import annotations
 
 from collections import deque
-from typing import Dict, List, Optional, Tuple
+
 from fusion.models import ObservationHistoryRecord
 
 
 class SensorHistoryTracker:
     def __init__(self, max_history_steps: int = 10):
         self.max_history_steps = max_history_steps
-        self._history_by_sensor: Dict[str, deque[ObservationHistoryRecord]] = {}
+        self._history_by_sensor: dict[str, deque[ObservationHistoryRecord]] = {}
 
     def record_observation(
         self,
@@ -35,7 +35,7 @@ class SensorHistoryTracker:
         )
         self._history_by_sensor[sensor_id].append(record)
 
-    def get_history(self, sensor_id: str) -> List[ObservationHistoryRecord]:
+    def get_history(self, sensor_id: str) -> list[ObservationHistoryRecord]:
         if sensor_id not in self._history_by_sensor:
             return []
         return list(self._history_by_sensor[sensor_id])

@@ -3,8 +3,9 @@ Layer 2 — DEM + D8 Terrain Flow Demo & Validation Entry Point.
 """
 
 from pathlib import Path
-from flood_engine.grid import ComputationalGrid
+
 from flood_engine.d8 import D8Terrain
+from flood_engine.grid import ComputationalGrid
 
 
 def main():

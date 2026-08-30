@@ -2,11 +2,9 @@
 Tests for Layer 22 Mass Conservation Diagnostic & Water Ledger.
 """
 
-import pytest
 from diagnostics.mass_balance import (
-    WaterLedger,
-    evaluate_timestep_balance,
     MassBalanceDiagnostic,
+    evaluate_timestep_balance,
 )
 
 

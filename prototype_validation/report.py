@@ -5,16 +5,16 @@ Generates machine-readable JSON reports and formatted human-readable ASCII summa
 
 from __future__ import annotations
 
-import os
 import json
-from pathlib import Path
-from prototype_validation.models import ValidationReport, CheckStatus
+import os
+
+from prototype_validation.models import ValidationReport
 
 
 def export_validation_reports(
     report: ValidationReport,
     output_dir: str = "outputs/validation",
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     """
     Exports both validation_report.json and validation_report.txt.
     Returns (json_path, txt_path).

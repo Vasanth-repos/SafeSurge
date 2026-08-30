@@ -5,14 +5,15 @@ and proves that agreement is evaluated strictly against the ORIGINAL MODEL.
 """
 
 import pytest
-from fusion.models import ObservationHistoryRecord
-from fusion.history import SensorHistoryTracker
+
 from fusion.confidence import (
-    calculate_coverage,
-    calculate_agreement,
-    calculate_history_factor,
     ConfidenceEstimator,
+    calculate_agreement,
+    calculate_coverage,
+    calculate_history_factor,
 )
+from fusion.history import SensorHistoryTracker
+from fusion.models import ObservationHistoryRecord
 
 
 def test_anti_circularity_agreement_uses_original_model():

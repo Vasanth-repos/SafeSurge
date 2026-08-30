@@ -2,8 +2,10 @@
 Multi-criteria safe route navigation considering travel time, flood risk, and model uncertainty.
 """
 
-from typing import Dict, List, Any, Optional
+from typing import Any
+
 import networkx as nx
+
 from routing.road_graph import RoadNetwork, RoadSegment
 
 
@@ -38,7 +40,7 @@ def find_safe_route(
     mode: str = "emergency",
     lambda_risk: float = 10.0,
     mu_uncertainty: float = 5.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Finds the optimal path avoiding high flood risks using Dijkstra's algorithm.
     """
@@ -76,7 +78,7 @@ def find_safe_route(
     total_travel_time = 0.0
     max_risk_score = 0.0
     min_confidence = 1.0
-    road_sequence: List[Dict[str, Any]] = []
+    road_sequence: list[dict[str, Any]] = []
 
     for i in range(len(path) - 1):
         u, v = path[i], path[i + 1]

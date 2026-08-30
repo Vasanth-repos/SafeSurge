@@ -4,7 +4,6 @@ Replays storm event through full pipeline:
 Rainfall -> Runoff -> Overland Routing -> Drainage -> Depth -> Risk -> Sensor Fusion -> Anomalies -> Road Exposure -> Dynamic Emergency Routing.
 """
 
-import pytest
 from backend.services.simulation_manager import SimulationManager
 
 

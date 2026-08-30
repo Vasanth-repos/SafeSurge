@@ -6,8 +6,9 @@ using freshness, quality, and distance decay, with dry-cell and radius bounds.
 
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, Optional, Tuple
 import math
+from collections.abc import Mapping
+
 from fusion.models import SensorBiasState
 
 
@@ -41,13 +42,13 @@ class SpatialBiasCorrector:
         self,
         cell_id: str,
         cell_model_depth_cm: float,
-        cell_coords_m: Tuple[float, float],
+        cell_coords_m: tuple[float, float],
         sensor_states: Mapping[str, SensorBiasState],
-        sensor_coords_m_by_id: Mapping[str, Tuple[float, float]],
+        sensor_coords_m_by_id: Mapping[str, tuple[float, float]],
         sensor_health_by_id: Mapping[str, str],
         sensor_qualities_by_id: Mapping[str, float],
         current_timestamp_seconds: int,
-        sensor_cell_id_by_id: Optional[Mapping[str, str]] = None,
+        sensor_cell_id_by_id: Mapping[str, str] | None = None,
     ) -> float:
         """
         Calculates spatial correction C_i for a single computational cell.
@@ -117,14 +118,14 @@ class SpatialBiasCorrector:
     def correct_grid(
         self,
         model_depth_cm_by_cell: Mapping[str, float],
-        cell_coords_m_by_id: Mapping[str, Tuple[float, float]],
+        cell_coords_m_by_id: Mapping[str, tuple[float, float]],
         sensor_states: Mapping[str, SensorBiasState],
-        sensor_coords_m_by_id: Mapping[str, Tuple[float, float]],
+        sensor_coords_m_by_id: Mapping[str, tuple[float, float]],
         sensor_health_by_id: Mapping[str, str],
         sensor_qualities_by_id: Mapping[str, float],
         current_timestamp_seconds: int,
-        sensor_cell_id_by_id: Optional[Mapping[str, str]] = None,
-    ) -> Dict[str, Tuple[float, float]]:
+        sensor_cell_id_by_id: Mapping[str, str] | None = None,
+    ) -> dict[str, tuple[float, float]]:
         """
         Returns {cell_id: (correction_cm, corrected_depth_cm)} for every cell.
         """

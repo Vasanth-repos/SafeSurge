@@ -5,6 +5,7 @@ Original Flood Model -> Validated Sensor -> Residual -> EWMA Bias -> Spatial Int
 """
 
 import pytest
+
 from fusion.models import SensorObservation
 from fusion.pipeline import FusionPipeline
 

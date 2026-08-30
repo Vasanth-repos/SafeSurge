@@ -4,8 +4,9 @@ Calculates dynamic risk-avoidance shortest paths and returns route explanation a
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from backend.schemas import RouteRequest
+
 from backend.dependencies import get_simulation_manager
+from backend.schemas import RouteRequest
 from backend.services.simulation_manager import SimulationManager
 
 router = APIRouter(prefix="/api/routes", tags=["Routes"])

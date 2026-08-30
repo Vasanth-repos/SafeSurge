@@ -2,12 +2,11 @@
 Sensor reading validation: physical range, spike/rate-of-rise, and heartbeat checks.
 """
 
-from typing import Optional, Dict, Any
 
 
 def validate_sensor_reading(
     water_level_cm: float,
-    prev_water_level_cm: Optional[float],
+    prev_water_level_cm: float | None,
     dt_seconds: float = 60.0,
     r_critical_cm_min: float = 5.0,
     min_cm: float = 0.0,

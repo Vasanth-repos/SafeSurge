@@ -4,11 +4,10 @@ Loads sensor_01.json and sensor_anomaly_01.json from data/replay/sensors/
 and verifies end-to-end replay processing and anomaly rejection.
 """
 
-import pytest
-from sensors.registry import SensorRegistry
-from sensors.validation import SensorValidator
-from sensors.simulator import load_sensor_replay
 from sensors.models import MeasurementStatus, RejectionReason, SensorState
+from sensors.registry import SensorRegistry
+from sensors.simulator import load_sensor_replay
+from sensors.validation import SensorValidator
 
 
 def test_replay_sensor_01():

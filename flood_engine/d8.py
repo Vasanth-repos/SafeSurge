@@ -4,16 +4,16 @@ Deterministic 8-neighbor downslope routing with explicit terminal semantics,
 flow distances, dimensionless slope ratios, terrain QA diagnostics, and multi-outlet support.
 """
 
-from typing import Dict, List, Optional, Tuple, Any, Union
+import csv
+import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
-import math
-import json
-import csv
+from typing import Any
+
 import numpy as np
 
-from flood_engine.grid import ComputationalGrid, GridCell
-
+from flood_engine.grid import ComputationalGrid
 
 # Fixed deterministic 8-neighbor order for tie-breaking
 NEIGHBOR_ORDER = [
@@ -36,8 +36,8 @@ class D8Cell:
     elevation_m: float
     slope_ratio: float          # Dimensionless slope ratio (dz / distance)
     flow_distance_m: float      # Distance to downstream cell (m)
-    downstream_cell: Optional[str]
-    direction: Optional[str]
+    downstream_cell: str | None
+    direction: str | None
     state: str                  # 'downstream', 'outlet', 'boundary_exit', 'local_sink', 'flat_sink'
     is_boundary: bool
     is_outlet: bool
@@ -52,12 +52,12 @@ class D8Terrain:
     def __init__(
         self,
         grid: ComputationalGrid,
-        cells: Dict[str, D8Cell],
+        cells: dict[str, D8Cell],
         slope_grid: np.ndarray,
         flow_distance_grid: np.ndarray,
         flow_dir_grid: np.ndarray,
         downstream_grid: np.ndarray,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ):
         self.grid = grid
         self.cells = cells
@@ -89,7 +89,7 @@ class D8Terrain:
         flow_distance_grid = np.zeros((rows, cols), dtype=np.float64)
         flow_dir_grid = np.full((rows, cols), None, dtype=object)
         downstream_grid = np.full((rows, cols), None, dtype=object)
-        cells_dict: Dict[str, D8Cell] = {}
+        cells_dict: dict[str, D8Cell] = {}
 
         for r in range(rows):
             for c in range(cols):
@@ -125,8 +125,8 @@ class D8Terrain:
                 # 2. Inspect 8 neighbors in fixed deterministic order
                 best_slope = 0.0
                 best_dist = 0.0
-                best_dir: Optional[str] = None
-                best_downstream_id: Optional[str] = None
+                best_dir: str | None = None
+                best_downstream_id: str | None = None
                 has_equal_neighbor = False
 
                 for direction_name, dr, dc, dist_factor in NEIGHBOR_ORDER:
@@ -193,7 +193,7 @@ class D8Terrain:
         terrain.metadata = terrain.generate_qa_metadata()
         return terrain
 
-    def generate_qa_metadata(self) -> Dict[str, Any]:
+    def generate_qa_metadata(self) -> dict[str, Any]:
         """Calculates comprehensive terrain QA diagnostics and carries Layer 1 provenance."""
         val = self.validate_d8()
         slopes = [c.slope_ratio for c in self.cells.values() if c.state == "downstream"]
@@ -230,7 +230,7 @@ class D8Terrain:
             "depression_policy": "Preserve potential real urban depressions; DEM conditioning is preprocessing only.",
         }
 
-    def trace_to_terminal(self, start_cell_id: str, max_steps: int = 1000) -> List[str]:
+    def trace_to_terminal(self, start_cell_id: str, max_steps: int = 1000) -> list[str]:
         """
         Traces continuous downstream flow path until a terminal state is reached
         (outlet, boundary_exit, local_sink, or flat_sink).
@@ -257,7 +257,7 @@ class D8Terrain:
 
         return path
 
-    def validate_d8(self) -> Dict[str, Any]:
+    def validate_d8(self) -> dict[str, Any]:
         """
         Performs strict structural validation on the D8 terrain topology:
         1. Every valid cell is classified into exactly one valid state.
@@ -330,7 +330,7 @@ class D8Terrain:
             "violations": violations[:10],
         }
 
-    def export_routing_table_csv(self, output_csv_path: Union[str, Path]) -> Path:
+    def export_routing_table_csv(self, output_csv_path: str | Path) -> Path:
         """
         Exports human-readable routing mapping:
         cell_id, row, col, elevation_m, slope_ratio, flow_distance_m, direction, downstream_cell, state, is_boundary, is_outlet
@@ -355,7 +355,7 @@ class D8Terrain:
 
         return csv_path
 
-    def save_to_file(self, output_path: Union[str, Path]) -> Tuple[Path, Path, Path]:
+    def save_to_file(self, output_path: str | Path) -> tuple[Path, Path, Path]:
         """Saves D8 terrain artifacts: .npz arrays, .metadata.json provenance, and .csv routing table."""
         base_path = Path(output_path)
         base_path.parent.mkdir(parents=True, exist_ok=True)

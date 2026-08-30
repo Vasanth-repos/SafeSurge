@@ -5,13 +5,10 @@ Defines standard test suites for master normal storm, fault injection, and recov
 
 from __future__ import annotations
 
-from typing import List, Dict, Tuple, Any
 from replay.faults import Fault, FaultType
-from replay.scenarios import ScenarioRunner
-from flood_engine.snapshot import SimulationSnapshot
 
 
-def get_fault_suite() -> List[Tuple[str, List[Fault]]]:
+def get_fault_suite() -> list[tuple[str, list[Fault]]]:
     """Returns the 7 canonical fault scenarios."""
     return [
         ("F1_sensor_offline", [
@@ -38,7 +35,7 @@ def get_fault_suite() -> List[Tuple[str, List[Fault]]]:
     ]
 
 
-def get_recovery_suite() -> List[Tuple[str, List[Fault]]]:
+def get_recovery_suite() -> list[tuple[str, list[Fault]]]:
     """Returns recovery test suites where faults are deactivated after an operational window."""
     return [
         ("R1_sensor_recovery", [

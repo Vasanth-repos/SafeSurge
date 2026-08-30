@@ -5,20 +5,21 @@ deterministic single-deduction surface capture, 1-timestep delayed surcharge,
 and strict system-wide mass conservation.
 """
 
+
 import pytest
-import math
-from flood_engine.grid import ComputationalGrid
-from flood_engine.d8 import D8Terrain
-from flood_engine.surface import SurfaceStorageEngine
-from flood_engine.drainage import StatefulDrainageNetwork, DrainageNode, DrainageEdge
+
 from flood_engine.coupling import (
     DrainageInlet,
     InletCellMapping,
     SurfaceDrainageCouplingEngine,
-    calculate_capture_volume,
-    allocate_inlet_capacity,
     allocate_cell_capture,
+    allocate_inlet_capacity,
+    calculate_capture_volume,
 )
+from flood_engine.d8 import D8Terrain
+from flood_engine.drainage import DrainageEdge, DrainageNode, StatefulDrainageNetwork
+from flood_engine.grid import ComputationalGrid
+from flood_engine.surface import SurfaceStorageEngine
 
 
 def test_capture_below_capacity():

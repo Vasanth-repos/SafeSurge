@@ -6,9 +6,9 @@ mass balance accounting, sensor telemetry, anomaly diagnostics, and dynamic rout
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, Any, Mapping
+from typing import Any
 
 
 class SystemStatus(str, Enum):
@@ -39,7 +39,7 @@ class CellSnapshot:
     confidence: float
     status: str = "VALID"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "cell_id": self.cell_id,
             "row": self.row,
@@ -65,7 +65,7 @@ class RoadSnapshot:
     risk: str
     confidence: float
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "road_id": self.road_id,
             "from_node": self.from_node,
@@ -83,12 +83,12 @@ class SensorSnapshot:
     sensor_id: str
     location_id: str
     status: str
-    last_valid_reading_cm: Optional[float]
-    last_valid_timestamp_seconds: Optional[int]
+    last_valid_reading_cm: float | None
+    last_valid_timestamp_seconds: int | None
     age_seconds: int
     bias_cm: float
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "sensor_id": self.sensor_id,
             "location_id": self.location_id,
@@ -109,7 +109,7 @@ class ForecastSnapshot:
     confidence: float
     uncertainty_status: str = "PROTOTYPE"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "status": self.status,
             "depth_cm": round(self.depth_cm, 2),
@@ -131,7 +131,7 @@ class MassBalanceSnapshot:
     relative_error: float
     status: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "runoff_input_m3": round(self.runoff_input_m3, 4),
             "previous_storage_m3": round(self.previous_storage_m3, 4),
@@ -151,17 +151,17 @@ class SimulationSnapshot:
     simulation_status: str
     system_status: str
     rainfall_status: str
-    flood_cells: Tuple[CellSnapshot, ...]
-    road_risks: Tuple[RoadSnapshot, ...]
-    drainage_states: Tuple[Dict[str, Any], ...]
-    sensor_states: Tuple[SensorSnapshot, ...]
-    anomalies: Tuple[Dict[str, Any], ...]
-    forecast: Optional[ForecastSnapshot]
+    flood_cells: tuple[CellSnapshot, ...]
+    road_risks: tuple[RoadSnapshot, ...]
+    drainage_states: tuple[dict[str, Any], ...]
+    sensor_states: tuple[SensorSnapshot, ...]
+    anomalies: tuple[dict[str, Any], ...]
+    forecast: ForecastSnapshot | None
     mass_balance: MassBalanceSnapshot
-    active_faults: Tuple[str, ...] = ()
-    degraded_reasons: Tuple[str, ...] = ()
+    active_faults: tuple[str, ...] = ()
+    degraded_reasons: tuple[str, ...] = ()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "simulation_id": self.simulation_id,
             "timestamp_seconds": self.timestamp_seconds,

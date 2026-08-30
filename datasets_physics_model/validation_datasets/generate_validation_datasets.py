@@ -22,10 +22,10 @@ Outputs:
   - validation_report.json / .csv  actual scored metrics against the saved ML model
 """
 
-import json
 import csv
 import math
 import random
+
 import numpy as np
 import pandas as pd
 

@@ -5,8 +5,9 @@ large-residual rejection threshold, and clamping safety bounds.
 """
 
 import pytest
+
+from fusion.bias import SensorBiasEstimator, calculate_residual, update_ewma_bias
 from fusion.models import SensorObservation
-from fusion.bias import calculate_residual, update_ewma_bias, SensorBiasEstimator
 
 
 def test_residual_calculation():

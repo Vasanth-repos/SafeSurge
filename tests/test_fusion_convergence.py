@@ -4,7 +4,6 @@ Injects a fixed synthetic offset/bias and asserts corrected prediction
 converges exponentially toward observed ground truth over N timesteps.
 """
 
-import pytest
 from backend.services.simulation_service import SimulationService
 
 

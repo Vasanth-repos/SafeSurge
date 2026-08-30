@@ -3,9 +3,9 @@ Layer 5 Surface Diagnostics:
 Classifies surface flood depth into standard risk tiers without altering physical mass conservation.
 """
 
-from typing import Dict, Any
-import numpy as np
+from typing import Any
 
+import numpy as np
 
 RISK_TIERS = [
     ("CRITICAL",  0.60),  # >= 60 cm
@@ -25,7 +25,7 @@ def classify_depth_risk(depth_m: float) -> str:
     return "NORMAL"
 
 
-def summarize_grid_depths(depths_by_cell: Dict[str, float]) -> Dict[str, Any]:
+def summarize_grid_depths(depths_by_cell: dict[str, float]) -> dict[str, Any]:
     """Generates statistical and risk category summaries across all computational cells."""
     if not depths_by_cell:
         return {

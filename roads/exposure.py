@@ -6,7 +6,8 @@ affected road length fraction, and confidence metrics.
 
 from __future__ import annotations
 
-from typing import List, Mapping, Optional, Sequence, Tuple
+from collections.abc import Mapping, Sequence
+
 from roads.models import RoadCellExposure
 
 
@@ -14,7 +15,7 @@ def calculate_road_depth(
     exposures: Sequence[RoadCellExposure],
     cell_depths_by_id: Mapping[str, float],
     minimum_exposure_fraction: float = 0.10,
-) -> Tuple[float, float, float]:
+) -> tuple[float, float, float]:
     """
     Computes:
     1. Exposure-weighted mean depth: H_mean = sum(f_i * H_i) / sum(f_i)
@@ -54,7 +55,7 @@ def calculate_road_depth(
 def calculate_road_confidence(
     exposures: Sequence[RoadCellExposure],
     cell_confidences_by_id: Mapping[str, float],
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Computes:
     1. Exposure-weighted confidence: C_road = sum(f_i * C_i) / sum(f_i)

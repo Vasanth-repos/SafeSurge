@@ -6,37 +6,34 @@ generating time-indexed immutable SimulationSnapshot sequences.
 
 from __future__ import annotations
 
-from enum import Enum
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Any, Mapping, Sequence
 import math
-import json
-from pathlib import Path
+from collections.abc import Sequence
+from enum import Enum
+
 from shapely.geometry import LineString, Polygon
 
+from anomalies.detector import AnomalyDetector
+from diagnostics.mass_balance import MassBalanceDiagnostic
 from flood_engine.snapshot import (
-    SimulationSnapshot,
     CellSnapshot,
+    ForecastSnapshot,
+    RainfallStatus,
     RoadSnapshot,
     SensorSnapshot,
-    ForecastSnapshot,
-    MassBalanceSnapshot,
+    SimulationSnapshot,
     SystemStatus,
-    RainfallStatus,
 )
-from diagnostics.mass_balance import MassBalanceDiagnostic, evaluate_timestep_balance
-from replay.faults import FaultInjectionEngine, Fault, FaultType
-from sensors.registry import SensorRegistry
-from sensors.validation import SensorValidator
-from fusion.pipeline import FusionPipeline
 from fusion.models import SensorObservation
-from anomalies.detector import AnomalyDetector
-from roads.models import Road
+from fusion.pipeline import FusionPipeline
+from replay.faults import Fault, FaultInjectionEngine
 from roads.mapping import RoadSpatialMapper
+from roads.models import Road
 from roads.risk import RoadRiskEngine
 from routing.graph import DirectedRoadGraph
-from routing.router import EmergencyRouter
 from routing.models import RoadEdge
+from routing.router import EmergencyRouter
+from sensors.registry import SensorRegistry
+from sensors.validation import SensorValidator
 
 
 class ReplayStatus(str, Enum):
@@ -69,10 +66,10 @@ class ReplayEngine:
 
     def _build_catchment(self):
         # 10x10 computational grid (100 cells)
-        self.cell_coords: Dict[str, Tuple[float, float]] = {}
-        self.cell_rc: Dict[str, Tuple[int, int]] = {}
-        self.cell_geometries: Dict[str, Polygon] = {}
-        self.cell_elevations: Dict[str, float] = {}
+        self.cell_coords: dict[str, tuple[float, float]] = {}
+        self.cell_rc: dict[str, tuple[int, int]] = {}
+        self.cell_geometries: dict[str, Polygon] = {}
+        self.cell_elevations: dict[str, float] = {}
 
         for r in range(10):
             for c in range(10):
@@ -143,8 +140,8 @@ class ReplayEngine:
         scenario_name: str,
         total_minutes: int = 180,
         timestep_seconds: int = 60,
-        faults: Optional[Sequence[Fault]] = None,
-    ) -> List[SimulationSnapshot]:
+        faults: Sequence[Fault] | None = None,
+    ) -> list[SimulationSnapshot]:
         """
         Executes full deterministic scenario replay and returns list of immutable snapshots.
         """
@@ -158,7 +155,7 @@ class ReplayEngine:
         else:
             self.fault_engine = FaultInjectionEngine()
 
-        snapshots: List[SimulationSnapshot] = []
+        snapshots: list[SimulationSnapshot] = []
         num_steps = (total_minutes * 60) // timestep_seconds + 1
 
         prev_storage_m3 = 0.0

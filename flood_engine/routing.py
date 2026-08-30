@@ -3,21 +3,19 @@ Slope-weighted 2D surface routing using D8 steepest-descent flow direction
 with synchronous update rules and mass conservation.
 """
 
-from typing import Dict, Optional, Tuple
 import math
-import numpy as np
 
 
 def compute_surface_outflows(
-    cell_storages: Dict[int, float],
-    flow_dir: Dict[int, Optional[int]],
-    elevations: Dict[int, float],
-    cell_positions: Dict[int, Tuple[int, int]],
+    cell_storages: dict[int, float],
+    flow_dir: dict[int, int | None],
+    elevations: dict[int, float],
+    cell_positions: dict[int, tuple[int, int]],
     dt: float = 60.0,
     k: float = 0.1,
     f_max: float = 0.5,
     cell_size_m: float = 10.0,
-) -> Tuple[Dict[int, float], Dict[int, float], float]:
+) -> tuple[dict[int, float], dict[int, float], float]:
     """
     PASS 1: Compute surface water transfers between cells based on snapshot storage at time t.
     Returns:
@@ -25,8 +23,8 @@ def compute_surface_outflows(
       - cell_inflows: Dict[cell_id, total_inflow_from_upstream_cells_m3]
       - boundary_outflow_total: total m3 escaping beyond catchment boundary
     """
-    internal_outflows: Dict[int, float] = {cid: 0.0 for cid in cell_storages}
-    cell_inflows: Dict[int, float] = {cid: 0.0 for cid in cell_storages}
+    internal_outflows: dict[int, float] = {cid: 0.0 for cid in cell_storages}
+    cell_inflows: dict[int, float] = {cid: 0.0 for cid in cell_storages}
     boundary_outflow_total: float = 0.0
 
     for cid, storage in cell_storages.items():

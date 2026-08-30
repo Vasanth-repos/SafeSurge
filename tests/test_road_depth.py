@@ -5,14 +5,14 @@ area-weighted depth, coverage fractions, quality states, and missing coverage ha
 """
 
 import pytest
-from shapely.geometry import Polygon, LineString, Point
-from flood_engine.grid import ComputationalGrid
+from shapely.geometry import LineString, Polygon
+
 from flood_engine.depth import (
-    RoadFeature,
     DepthEngine,
+    RoadFeature,
     road_to_polygon,
-    validate_metric_crs,
 )
+from flood_engine.grid import ComputationalGrid
 
 
 def test_line_road_requires_width():

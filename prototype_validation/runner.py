@@ -8,39 +8,38 @@ from __future__ import annotations
 
 import time
 from datetime import datetime
-from typing import List, Dict, Tuple, Any, Optional
 
-from prototype_validation.models import (
-    CheckResult,
-    CheckStatus,
-    CheckSeverity,
-    ValidationReport,
-)
-from prototype_validation.thresholds import ValidationThresholds
+from backend.services.snapshot_service import SnapshotService
 from prototype_validation.assertions import (
-    assert_non_negative_storage,
-    assert_non_negative_depth,
     assert_mass_conservation,
+    assert_non_negative_depth,
+    assert_non_negative_storage,
     assert_snapshot_timestamp_consistency,
 )
 from prototype_validation.checks import (
+    check_dynamic_emergency_routing,
     check_environment,
     check_grid_and_d8_integrity,
     check_rainfall_determinism,
     check_sensor_spike_rejection,
-    check_dynamic_emergency_routing,
+)
+from prototype_validation.models import (
+    CheckResult,
+    CheckSeverity,
+    CheckStatus,
+    ValidationReport,
 )
 from prototype_validation.scenarios import get_fault_suite, get_recovery_suite
-from replay.scenarios import ScenarioRunner
+from prototype_validation.thresholds import ValidationThresholds
 from replay.engine import ReplayEngine
-from backend.services.snapshot_service import SnapshotService
+from replay.scenarios import ScenarioRunner
 
 
 class PrototypeValidationRunner:
     def __init__(
         self,
         config_path: str = "config.yaml",
-        thresholds: Optional[ValidationThresholds] = None,
+        thresholds: ValidationThresholds | None = None,
     ):
         self.config_path = config_path
         self.thresholds = thresholds or ValidationThresholds()
@@ -52,7 +51,7 @@ class PrototypeValidationRunner:
     ) -> ValidationReport:
         """Executes full end-to-end master normal validation."""
         started_at = datetime.utcnow().isoformat() + "Z"
-        checks: List[CheckResult] = []
+        checks: list[CheckResult] = []
 
         # 1. Environment & Configuration Check
         checks.append(check_environment())
@@ -132,10 +131,10 @@ class PrototypeValidationRunner:
             summary=summary,
         )
 
-    def validate_fault_suite(self) -> List[CheckResult]:
+    def validate_fault_suite(self) -> list[CheckResult]:
         """Executes all 7 canonical fault scenarios and verifies stability."""
         engine = ReplayEngine(config_path=self.config_path)
-        fault_checks: List[CheckResult] = []
+        fault_checks: list[CheckResult] = []
 
         for name, faults in get_fault_suite():
             snaps = engine.run_scenario(
@@ -173,10 +172,10 @@ class PrototypeValidationRunner:
 
         return fault_checks
 
-    def validate_recovery_suite(self) -> List[CheckResult]:
+    def validate_recovery_suite(self) -> list[CheckResult]:
         """Executes recovery scenarios where faults cease and verifies clean restoration."""
         engine = ReplayEngine(config_path=self.config_path)
-        recovery_checks: List[CheckResult] = []
+        recovery_checks: list[CheckResult] = []
 
         for name, faults in get_recovery_suite():
             snaps = engine.run_scenario(

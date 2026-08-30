@@ -8,11 +8,12 @@ Unit and Integration Tests for AURA-FLOOD XGBoost Model Integration:
 """
 
 import os
-import pytest
+
 from fastapi.testclient import TestClient
+
 from backend.app import app
-from ml.model import AuraFloodScenarioXGBoost, PhysicsGuidedFloodNowcaster
 from ml.infer import predict_catchment_depths
+from ml.model import AuraFloodScenarioXGBoost
 
 client = TestClient(app)
 

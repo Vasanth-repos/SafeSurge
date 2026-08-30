@@ -4,17 +4,17 @@ Verifies effective capacity scaling (C_eff = C0 * F), base capacity immutability
 timeline event progression, status labeling, SCENARIO mode guarantees, and utilization.
 """
 
+
 import pytest
-import math
+
 from flood_engine.capacity import (
-    effective_capacity_m3_s,
-    capacity_status,
-    utilization,
     CapacityEvent,
     CapacityScenario,
-    CapacityScenarioState,
     build_state,
+    capacity_status,
+    effective_capacity_m3_s,
     load_capacity_scenario,
+    utilization,
 )
 
 

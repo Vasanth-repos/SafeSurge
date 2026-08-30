@@ -8,14 +8,14 @@ from __future__ import annotations
 
 import os
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 import docx
-from docx.shared import Inches, Pt, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
+from docx.shared import Inches, Pt, RGBColor
 
 from flood_engine.snapshot import SimulationSnapshot
 
@@ -42,12 +42,12 @@ def set_cell_margins(cell, top=80, bottom=80, left=100, right=100):
 
 
 def create_3hour_prediction_docx(
-    snapshots: List[SimulationSnapshot],
+    snapshots: list[SimulationSnapshot],
     scenario_id: str = "storm_01",
     output_path: str = "outputs/reports/flood_nowcasting_3hr_report.docx",
     lead_time_minutes: int = 0,
-    live_state: Optional[Dict[str, Any]] = None,
-    active_faults: Optional[Dict[str, bool]] = None,
+    live_state: dict[str, Any] | None = None,
+    active_faults: dict[str, bool] | None = None,
 ) -> str:
     """
     Generates a full, dynamic Flood Prediction & Emergency Response Advisory Report (.docx)

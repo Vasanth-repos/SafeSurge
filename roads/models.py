@@ -6,7 +6,7 @@ Data classes for road segments, cell intersection exposures, and risk assessment
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, Tuple
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -38,7 +38,7 @@ class RoadRisk:
     confidence: float
     minimum_cell_confidence: float
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "road_id": self.road_id,
             "timestamp_seconds": self.timestamp_seconds,

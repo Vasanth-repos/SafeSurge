@@ -6,7 +6,8 @@ Verifies zero-loss mass balance: Input Runoff = Storage Change + Drainage + Boun
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any
+
 from flood_engine.snapshot import MassBalanceSnapshot
 
 
@@ -62,7 +63,7 @@ class MassBalanceDiagnostic:
     ):
         self.abs_tol = float(absolute_tolerance_m3)
         self.rel_tol = float(relative_tolerance)
-        self.history: List[MassBalanceSnapshot] = []
+        self.history: list[MassBalanceSnapshot] = []
 
     def reset(self) -> None:
         self.history.clear()
@@ -87,7 +88,7 @@ class MassBalanceDiagnostic:
         self.history.append(mb)
         return mb
 
-    def evaluate_simulation_summary(self) -> Dict[str, Any]:
+    def evaluate_simulation_summary(self) -> dict[str, Any]:
         if not self.history:
             return {"status": "NO_DATA", "steps": 0}
 

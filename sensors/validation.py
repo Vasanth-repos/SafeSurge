@@ -6,18 +6,17 @@ consistency checks to produce ACCEPTED/REJECTED verdicts with audit tracking.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple, Any
+from sensors.float_switch import validate_float_consistency
+from sensors.health import SensorHealthTracker
 from sensors.models import (
-    SensorState,
     MeasurementStatus,
     RejectionReason,
     SensorEnvelope,
+    SensorState,
     ValidationResult,
 )
-from sensors.registry import SensorRegistry, SensorConfig
+from sensors.registry import SensorRegistry
 from sensors.ultrasonic import process_measurement
-from sensors.float_switch import validate_float_consistency
-from sensors.health import SensorHealthTracker
 
 
 def validate_rate_of_rise(
@@ -69,13 +68,13 @@ class SensorValidator:
 
         # Stateful memory:
         # (sensor_id, boot_id) -> last sequence
-        self._last_sequence: Dict[Tuple[str, str], int] = {}
+        self._last_sequence: dict[tuple[str, str], int] = {}
 
         # sensor_id -> (last_accepted_level_cm, last_accepted_measured_at_seconds)
-        self._last_accepted: Dict[str, Tuple[float, int]] = {}
+        self._last_accepted: dict[str, tuple[float, int]] = {}
 
         # Audit history
-        self.audit_log: List[ValidationResult] = []
+        self.audit_log: list[ValidationResult] = []
 
     def reset(self) -> None:
         self._last_sequence.clear()
@@ -206,10 +205,10 @@ class SensorValidator:
         envelope: SensorEnvelope,
         reason: RejectionReason,
         state: SensorState,
-        flags: Tuple[str, ...],
-        location_id: Optional[str] = None,
-        distance_cm: Optional[float] = None,
-        water_level_cm: Optional[float] = None,
+        flags: tuple[str, ...],
+        location_id: str | None = None,
+        distance_cm: float | None = None,
+        water_level_cm: float | None = None,
     ) -> ValidationResult:
         res = ValidationResult(
             sensor_id=envelope.sensor_id,

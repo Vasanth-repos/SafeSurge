@@ -4,10 +4,12 @@ Compares Physics-Only vs Pure-ML vs Physics-Guided Machine Learning (PGML).
 """
 
 import time
+
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from ml.train import generate_training_dataset
+
 from ml.infer import get_or_load_model
+from ml.train import generate_training_dataset
 
 
 def run_comparative_evaluation():

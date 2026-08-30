@@ -3,8 +3,8 @@ Layer 19 — Backend REST API Integration Tests:
 Verifies FastAPI routing endpoints, health check, simulation replays, sensor ingestion, and routing requests.
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from backend.app import app
 
 client = TestClient(app)

@@ -5,12 +5,10 @@ Validates binary contact closure consistency against continuous ultrasonic water
 
 from __future__ import annotations
 
-from typing import Optional
-
 
 def validate_float_consistency(
-    water_level_cm: Optional[float],
-    float_triggered: Optional[bool],
+    water_level_cm: float | None,
+    float_triggered: bool | None,
     trigger_level_cm: float,
     tolerance_cm: float = 3.0,
 ) -> bool:

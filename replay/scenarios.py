@@ -6,14 +6,15 @@ Loads scenario definitions with embedded faults and executes replay pipeline.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 import yaml
 
 from replay.engine import ReplayEngine, SimulationSnapshot
 from replay.faults import Fault, FaultType
 
 
-def load_scenario_from_yaml(yaml_path: str) -> Dict[str, Any]:
+def load_scenario_from_yaml(yaml_path: str) -> dict[str, Any]:
     p = Path(yaml_path)
     if not p.exists():
         raise FileNotFoundError(f"Scenario configuration not found: {p}")
@@ -21,7 +22,7 @@ def load_scenario_from_yaml(yaml_path: str) -> Dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def parse_faults_from_dict(faults_data: List[Dict[str, Any]]) -> List[Fault]:
+def parse_faults_from_dict(faults_data: list[dict[str, Any]]) -> list[Fault]:
     faults = []
     for fd in faults_data:
         faults.append(
@@ -40,7 +41,7 @@ class ScenarioRunner:
     def __init__(self, config_path: str = "config.yaml"):
         self.engine = ReplayEngine(config_path=config_path)
 
-    def run(self, yaml_path: str) -> List[SimulationSnapshot]:
+    def run(self, yaml_path: str) -> list[SimulationSnapshot]:
         data = load_scenario_from_yaml(yaml_path)
         s_id = data.get("scenario_id", "custom_storm")
         tot_min = int(data.get("total_minutes", 180))

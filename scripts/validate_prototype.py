@@ -1,5 +1,4 @@
 import sys
-import os
 from pathlib import Path
 
 # Add project root to Python search path
@@ -7,9 +6,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import argparse
-from prototype_validation.runner import PrototypeValidationRunner
-from prototype_validation.models import CheckStatus, ValidationReport
+
+from prototype_validation.models import CheckStatus
 from prototype_validation.report import export_validation_reports
+from prototype_validation.runner import PrototypeValidationRunner
 
 
 def main():

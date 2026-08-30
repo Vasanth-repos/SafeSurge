@@ -5,14 +5,15 @@ float switch consistency, and rejection audit logging.
 """
 
 import pytest
+
 from sensors.models import (
-    SensorState,
     MeasurementStatus,
     RejectionReason,
     SensorEnvelope,
+    SensorState,
 )
-from sensors.registry import SensorRegistry, SensorConfig
-from sensors.validation import SensorValidator, validate_rate_of_rise
+from sensors.registry import SensorConfig, SensorRegistry
+from sensors.validation import SensorValidator
 
 
 @pytest.fixture

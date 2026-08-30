@@ -6,12 +6,12 @@ for resilience and stress-testing simulations without modifying base network geo
 
 from __future__ import annotations
 
-from bisect import bisect_right
-from dataclasses import dataclass
-from typing import Iterable, Mapping, Sequence, Dict, List, Optional, Tuple, Any, Union
-from pathlib import Path
 import json
 import math
+from bisect import bisect_right
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
+from pathlib import Path
 
 EPSILON = 1e-12
 
@@ -63,7 +63,7 @@ def effective_capacity_m3_s(
 @dataclass(frozen=True)
 class CapacityEvent:
     timestamp_seconds: int
-    edge_ids: Tuple[str, ...]
+    edge_ids: tuple[str, ...]
     capacity_factor: float
 
     def __post_init__(self):
@@ -135,7 +135,7 @@ class CapacityScenario:
     def factors_at(
         self,
         timestamp_seconds: int,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         if (
             isinstance(timestamp_seconds, bool)
             or not isinstance(timestamp_seconds, int)
@@ -156,7 +156,7 @@ class CapacityScenario:
         self,
         timestamp_seconds: int,
         base_capacity_m3_s_by_edge: Mapping[str, float],
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         expected = set(self.edge_ids)
         provided = set(base_capacity_m3_s_by_edge)
 
@@ -189,8 +189,8 @@ class CapacityScenarioState:
     timestamp_seconds: int
     scenario_id: str
     mode: str
-    capacity_factor_by_edge: Dict[str, float]
-    effective_capacity_m3_s_by_edge: Dict[str, float]
+    capacity_factor_by_edge: dict[str, float]
+    effective_capacity_m3_s_by_edge: dict[str, float]
 
     def __post_init__(self):
         if self.mode != "SCENARIO":
@@ -236,8 +236,8 @@ def utilization(
 
 
 def load_capacity_scenario(
-    path: Union[str, Path],
-    known_edge_ids: Optional[Iterable[str]] = None,
+    path: str | Path,
+    known_edge_ids: Iterable[str] | None = None,
 ) -> CapacityScenario:
     p = Path(path)
     if not p.exists():

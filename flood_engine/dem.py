@@ -2,8 +2,8 @@
 DEM Preprocessing: Priority Flood Fill (Depression Filling) and D8 Flow Direction Assignment.
 """
 
-from typing import Dict, List, Optional, Tuple
 import heapq
+
 import numpy as np
 
 
@@ -11,7 +11,7 @@ def cell_to_id(r: int, c: int, cols: int) -> int:
     return r * cols + c
 
 
-def id_to_cell(cell_id: int, cols: int) -> Tuple[int, int]:
+def id_to_cell(cell_id: int, cols: int) -> tuple[int, int]:
     return divmod(cell_id, cols)
 
 
@@ -25,7 +25,7 @@ def priority_flood_fill(elevation_grid: np.ndarray) -> np.ndarray:
     visited = np.zeros((rows, cols), dtype=bool)
 
     # Min-priority queue of (elevation, r, c)
-    pq: List[Tuple[float, int, int]] = []
+    pq: list[tuple[float, int, int]] = []
 
     # Initialize with all boundary cells
     for r in range(rows):
@@ -62,13 +62,13 @@ def priority_flood_fill(elevation_grid: np.ndarray) -> np.ndarray:
 
 def compute_d8_flow_directions(
     elevation_grid: np.ndarray, cell_size_m: float = 10.0
-) -> Dict[int, Optional[int]]:
+) -> dict[int, int | None]:
     """
     Computes D8 flow direction for each cell to its steepest descent neighbor.
     Returns mapping: cell_id -> downstream_neighbor_cell_id (or None if boundary sink/outlet).
     """
     rows, cols = elevation_grid.shape
-    flow_dir: Dict[int, Optional[int]] = {}
+    flow_dir: dict[int, int | None] = {}
 
     d_rows = [-1, -1, -1, 0, 0, 1, 1, 1]
     d_cols = [-1, 0, 1, -1, 1, -1, 0, 1]
@@ -84,7 +84,7 @@ def compute_d8_flow_directions(
             curr_elev = elevation_grid[r, c]
 
             max_slope = 0.0
-            steepest_neighbor_id: Optional[int] = None
+            steepest_neighbor_id: int | None = None
 
             for dr, dc, dist in zip(d_rows, d_cols, distances):
                 nr, nc = r + dr, c + dc

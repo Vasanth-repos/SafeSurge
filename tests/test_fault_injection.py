@@ -2,9 +2,7 @@
 Tests for Layer 24 Fault Injection Framework & Disruption Scenarios.
 """
 
-import pytest
-from replay.faults import Fault, FaultType, FaultInjectionEngine
-from replay.scenarios import ScenarioRunner
+from replay.faults import Fault, FaultInjectionEngine, FaultType
 
 
 def test_sensor_offline_fault():

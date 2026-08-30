@@ -4,8 +4,8 @@ Runs a complete storm scenario from rainfall ingestion to sensor telemetry,
 flood depth fusion, safe emergency route computation, and mass balance conservation.
 """
 
-import pytest
 from fastapi.testclient import TestClient
+
 from backend.app import app
 
 

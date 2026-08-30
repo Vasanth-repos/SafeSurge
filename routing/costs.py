@@ -6,7 +6,7 @@ Blocks UNSAFE roads with infinite cost when unsafe_edges_blocked is enabled.
 
 from __future__ import annotations
 
-from typing import Dict, Mapping
+from collections.abc import Mapping
 
 
 def calculate_cost(

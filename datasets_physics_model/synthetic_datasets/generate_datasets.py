@@ -16,10 +16,10 @@ because a hackathon demo needs everything to line up spatially.
 All values are SYNTHETIC. Do not present as real municipal data.
 """
 
-import json
 import csv
-import random
+import json
 import math
+import random
 
 random.seed(42)
 
@@ -383,6 +383,7 @@ with open("historical_floods.csv", "w", newline="") as f:
 
 print("Generated files:")
 import os
+
 for fn in sorted(os.listdir(".")):
     if fn != "generate_datasets.py":
         print(" -", fn)

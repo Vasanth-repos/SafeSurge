@@ -3,10 +3,9 @@ Hydrological Feature Extraction for Physics-Guided Machine Learning (PGML).
 Transforms raw terrain, soil, drainage, and meteorology into normalized feature vectors.
 """
 
-from typing import Dict, List, Any
 import math
-import numpy as np
 
+import numpy as np
 
 FEATURE_NAMES = [
     "elevation_m",
@@ -31,7 +30,7 @@ def compute_initial_abstraction(curve_number: float) -> float:
     return 0.2 * s_mm
 
 
-def extract_cell_static_features(row: int, col: int) -> Dict[str, float]:
+def extract_cell_static_features(row: int, col: int) -> dict[str, float]:
     """Extract physical topography, soil, and drainage features for a grid cell."""
     x = col * 10.0 + 5.0
     y = row * 10.0 + 5.0
@@ -81,12 +80,12 @@ def extract_cell_static_features(row: int, col: int) -> Dict[str, float]:
 
 
 def build_feature_vector(
-    static_feats: Dict[str, float],
+    static_feats: dict[str, float],
     lead_time_min: float,
     rain_rate_mm_hr: float,
     cumulative_rain_mm: float,
     drain_capacity_factor: float = 1.0,
-) -> List[float]:
+) -> list[float]:
     """Combine static catchment features with dynamic meteorological/drainage state."""
     return [
         static_feats["elevation_m"],

@@ -5,13 +5,12 @@ Evaluates device communication health based on packet arrival age (ONLINE, STALE
 
 from __future__ import annotations
 
-from typing import Optional, Dict
 from sensors.models import SensorState
 
 
 def evaluate_sensor_health(
     now_received_seconds: int,
-    last_received_seconds: Optional[int],
+    last_received_seconds: int | None,
     stale_after_seconds: int = 30,
     offline_after_seconds: int = 180,
 ) -> SensorState:
@@ -47,7 +46,7 @@ class SensorHealthTracker:
     ):
         self.stale_after_seconds = stale_after_seconds
         self.offline_after_seconds = offline_after_seconds
-        self._last_received_by_sensor: Dict[str, int] = {}
+        self._last_received_by_sensor: dict[str, int] = {}
 
     def record_heartbeat(self, sensor_id: str, received_at_seconds: int) -> None:
         self._last_received_by_sensor[sensor_id] = received_at_seconds

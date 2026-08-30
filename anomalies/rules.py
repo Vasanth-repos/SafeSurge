@@ -6,8 +6,6 @@ sensor contact-closure inconsistency checks, and drainage capacity anomaly detec
 
 from __future__ import annotations
 
-from typing import Optional
-
 
 def calculate_rise_rate(
     previous_depth_cm: float,

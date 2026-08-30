@@ -2,15 +2,15 @@
 Layer 7 — Surface ↔ Drainage Coupling Demo Entry Point.
 """
 
-from flood_engine.grid import ComputationalGrid
-from flood_engine.d8 import D8Terrain
-from flood_engine.surface import SurfaceStorageEngine
-from flood_engine.drainage import StatefulDrainageNetwork, DrainageNode, DrainageEdge
 from flood_engine.coupling import (
     DrainageInlet,
     InletCellMapping,
     SurfaceDrainageCouplingEngine,
 )
+from flood_engine.d8 import D8Terrain
+from flood_engine.drainage import StatefulDrainageNetwork
+from flood_engine.grid import ComputationalGrid
+from flood_engine.surface import SurfaceStorageEngine
 
 
 def main():

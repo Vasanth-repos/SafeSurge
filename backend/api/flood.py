@@ -3,8 +3,9 @@ API Endpoints — Flood Grid & Nowcast Forecast:
 Returns fused grid depths, original model depths, risk classifications, and anomaly detections.
 """
 
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from typing import Optional
+
 from backend.dependencies import get_simulation_manager
 from backend.services.simulation_manager import SimulationManager
 
@@ -13,8 +14,8 @@ router = APIRouter(prefix="/api/flood", tags=["Flood"])
 
 @router.get("/grid")
 def get_flood_grid(
-    simulation_id: Optional[str] = None,
-    timestamp_seconds: Optional[int] = None,
+    simulation_id: str | None = None,
+    timestamp_seconds: int | None = None,
     manager: SimulationManager = Depends(get_simulation_manager),
 ):
     from backend.app import sim_service
@@ -46,7 +47,7 @@ def get_flood_roads():
 
 @router.get("/forecast")
 def get_flood_forecast(
-    simulation_id: Optional[str] = None,
+    simulation_id: str | None = None,
     lead_time_minutes: int = Query(30, ge=0),
     manager: SimulationManager = Depends(get_simulation_manager),
 ):

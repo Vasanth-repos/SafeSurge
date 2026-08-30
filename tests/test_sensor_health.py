@@ -3,9 +3,8 @@ Layer 12 — Sensor Health State Tests:
 Verifies connectivity state transitions (ONLINE -> STALE -> OFFLINE) and clock skew invalidations.
 """
 
-import pytest
+from sensors.health import SensorHealthTracker, evaluate_sensor_health
 from sensors.models import SensorState
-from sensors.health import evaluate_sensor_health, SensorHealthTracker
 
 
 def test_sensor_health_transitions():

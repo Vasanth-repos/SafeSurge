@@ -3,9 +3,7 @@ End-to-End Resilience & Disruption Scenario Tests (Layer 24-25):
 Verifies that all 7 operational faults maintain causality, stability, and graceful degradation.
 """
 
-import pytest
 from replay.scenarios import ScenarioRunner
-from replay.faults import Fault, FaultType
 
 
 def test_scenario_baseline_storm_01():

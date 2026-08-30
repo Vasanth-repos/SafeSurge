@@ -9,10 +9,11 @@ Computes transparent, anti-circular confidence scores [0, 1] based on:
 
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, Optional, Tuple
 import math
-from fusion.models import CellConfidence, ObservationHistoryRecord
+from collections.abc import Mapping
+
 from fusion.history import SensorHistoryTracker
+from fusion.models import CellConfidence, ObservationHistoryRecord
 from fusion.spatial import calculate_freshness
 
 
@@ -24,10 +25,10 @@ def calculate_coverage(distance_m: float, max_distance_m: float = 1000.0) -> flo
 
 
 def calculate_agreement(
-    history_records: List[ObservationHistoryRecord],
+    history_records: list[ObservationHistoryRecord],
     scale_cm: float = 20.0,
     minimum_observations: int = 5,
-) -> Tuple[float, int]:
+) -> tuple[float, int]:
     """
     Computes agreement against ORIGINAL model depth:
     MAE = (1/N) * sum(|H_sensor - H_ORIGINAL_model|)
@@ -81,8 +82,8 @@ class ConfidenceEstimator:
     def estimate_cell_confidence(
         self,
         cell_id: str,
-        cell_coords_m: Tuple[float, float],
-        sensor_coords_m_by_id: Mapping[str, Tuple[float, float]],
+        cell_coords_m: tuple[float, float],
+        sensor_coords_m_by_id: Mapping[str, tuple[float, float]],
         sensor_health_by_id: Mapping[str, str],
         sensor_last_updated_by_id: Mapping[str, int],
         history_tracker: SensorHistoryTracker,
@@ -94,7 +95,7 @@ class ConfidenceEstimator:
         cx, cy = cell_coords_m
 
         # Find closest valid sensor
-        nearest_sid: Optional[str] = None
+        nearest_sid: str | None = None
         min_dist_m: float = float("inf")
 
         for sid, (sx, sy) in sensor_coords_m_by_id.items():
@@ -156,13 +157,13 @@ class ConfidenceEstimator:
 
     def estimate_grid(
         self,
-        cell_coords_m_by_id: Mapping[str, Tuple[float, float]],
-        sensor_coords_m_by_id: Mapping[str, Tuple[float, float]],
+        cell_coords_m_by_id: Mapping[str, tuple[float, float]],
+        sensor_coords_m_by_id: Mapping[str, tuple[float, float]],
         sensor_health_by_id: Mapping[str, str],
         sensor_last_updated_by_id: Mapping[str, int],
         history_tracker: SensorHistoryTracker,
         current_timestamp_seconds: int,
-    ) -> Dict[str, CellConfidence]:
+    ) -> dict[str, CellConfidence]:
         return {
             cid: self.estimate_cell_confidence(
                 cell_id=cid,

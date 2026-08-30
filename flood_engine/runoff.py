@@ -5,12 +5,10 @@ Enforces cumulative SCS-CN monotonicity, timestamp integrity, spatial land-use C
 and mass balance accounting.
 """
 
-from typing import Dict, List, Optional, Tuple, Any, Union
+import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
-import math
-import json
-import numpy as np
 
 from flood_engine.config import load_config
 from replay.rainfall import RainfallStep, SpatialRainfallStep
@@ -20,12 +18,12 @@ class CellRunoffState:
     def __init__(
         self,
         cell_id: str = "",
-        curve_number: Optional[float] = None,
-        cn_value: Optional[float] = None,
+        curve_number: float | None = None,
+        cn_value: float | None = None,
         area_m2: float = 100.0,
         land_use: str = "urban_composite",
-        potential_retention_S: Optional[float] = None,
-        initial_abstraction_Ia: Optional[float] = None,
+        potential_retention_S: float | None = None,
+        initial_abstraction_Ia: float | None = None,
         cumulative_rainfall_mm: float = 0.0,
         cumulative_runoff_mm: float = 0.0,
         incremental_runoff_mm: float = 0.0,
@@ -59,7 +57,7 @@ class CellRunoffState:
 class RunoffStep:
     timestamp_seconds: int
     timestep_seconds: int
-    cell_states: Dict[str, CellRunoffState]
+    cell_states: dict[str, CellRunoffState]
     total_rainfall_volume_m3: float
     total_runoff_volume_m3: float
     total_non_runoff_volume_m3: float
@@ -94,12 +92,12 @@ def compute_cumulative_scs_cn_runoff(cumulative_p_mm: float, potential_retention
 class RunoffEngine:
     def __init__(
         self,
-        cell_areas_m2: Dict[str, float],
-        curve_numbers: Optional[Dict[str, float]] = None,
-        land_uses: Optional[Dict[str, str]] = None,
-        default_cn: Optional[float] = None,
+        cell_areas_m2: dict[str, float],
+        curve_numbers: dict[str, float] | None = None,
+        land_uses: dict[str, str] | None = None,
+        default_cn: float | None = None,
         expected_timestep_seconds: int = 60,
-        config_path: Optional[Union[str, Path]] = "config.yaml",
+        config_path: str | Path | None = "config.yaml",
     ):
         self.cell_areas_m2 = {cid: float(a) for cid, a in cell_areas_m2.items()}
         for cid, a in self.cell_areas_m2.items():
@@ -119,10 +117,10 @@ class RunoffEngine:
             self.default_cn = float(default_cn)
             self.expected_timestep_seconds = expected_timestep_seconds
 
-        self.curve_numbers: Dict[str, float] = {}
-        self.land_uses: Dict[str, str] = {}
-        self.retention_S: Dict[str, float] = {}
-        self.abstraction_Ia: Dict[str, float] = {}
+        self.curve_numbers: dict[str, float] = {}
+        self.land_uses: dict[str, str] = {}
+        self.retention_S: dict[str, float] = {}
+        self.abstraction_Ia: dict[str, float] = {}
 
         cn_map = curve_numbers or {}
         lu_map = land_uses or {}
@@ -138,14 +136,14 @@ class RunoffEngine:
             self.abstraction_Ia[cid] = 0.2 * s
 
         # State tracking per cell
-        self.cumulative_rainfall_mm: Dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2.keys()}
-        self.cumulative_runoff_mm: Dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2.keys()}
+        self.cumulative_rainfall_mm: dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2.keys()}
+        self.cumulative_runoff_mm: dict[str, float] = {cid: 0.0 for cid in self.cell_areas_m2.keys()}
         self.cumulative_direct_runoff_volume_m3: float = 0.0
         self.cumulative_gross_rainfall_volume_m3: float = 0.0
 
         # Timestamp tracking
-        self.last_timestamp_seconds: Optional[int] = None
-        self.step_history: List[RunoffStep] = []
+        self.last_timestamp_seconds: int | None = None
+        self.step_history: list[RunoffStep] = []
 
     def reset(self) -> None:
         """Resets all cumulative hydrological state and timestamp history."""
@@ -177,7 +175,7 @@ class RunoffEngine:
     def process_timestep(
         self,
         timestamp_seconds: int,
-        rainfall_input: Union[float, Dict[str, float]],
+        rainfall_input: float | dict[str, float],
     ) -> RunoffStep:
         """
         Executes one hydrological timestep:
@@ -192,7 +190,7 @@ class RunoffEngine:
         t = int(timestamp_seconds)
 
         # Convert scalar or spatial rainfall to per-cell mapping
-        rainfall_by_cell: Dict[str, float] = {}
+        rainfall_by_cell: dict[str, float] = {}
         if isinstance(rainfall_input, (int, float)):
             val = float(rainfall_input)
             if math.isnan(val) or math.isinf(val) or val < 0.0:
@@ -215,7 +213,7 @@ class RunoffEngine:
         else:
             raise TypeError("rainfall_input must be a float/int or Dict[str, float].")
 
-        cell_states: Dict[str, CellRunoffState] = {}
+        cell_states: dict[str, CellRunoffState] = {}
         step_rain_vol = 0.0
         step_runoff_vol = 0.0
 
@@ -273,7 +271,7 @@ class RunoffEngine:
         self.step_history.append(step_result)
         return step_result
 
-    def process_replay_step(self, step: Union[RainfallStep, SpatialRainfallStep]) -> RunoffStep:
+    def process_replay_step(self, step: RainfallStep | SpatialRainfallStep) -> RunoffStep:
         """Processes a single step emitted directly by Layer 3 RainfallReplay."""
         if isinstance(step, RainfallStep):
             return self.process_timestep(step.timestamp_seconds, step.rainfall_mm)
@@ -282,7 +280,7 @@ class RunoffEngine:
         else:
             raise TypeError(f"Unsupported replay step type: {type(step)}")
 
-    def mass_balance(self) -> Dict[str, float]:
+    def mass_balance(self) -> dict[str, float]:
         """Returns cumulative gross rainfall, direct runoff, and initial/soil abstraction volume."""
         non_runoff_vol = max(0.0, self.cumulative_gross_rainfall_volume_m3 - self.cumulative_direct_runoff_volume_m3)
         runoff_fraction = (
@@ -300,8 +298,8 @@ class RunoffEngine:
     @classmethod
     def from_cell_properties_file(
         cls,
-        cell_props_path: Union[str, Path],
-        config_path: Union[str, Path] = "config.yaml",
+        cell_props_path: str | Path,
+        config_path: str | Path = "config.yaml",
     ) -> "RunoffEngine":
         """Loads spatial CN and land-use mapping from JSON dataset."""
         path = Path(cell_props_path)

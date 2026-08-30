@@ -6,8 +6,8 @@ Loads, parses, and validates per-sensor hardware configurations and geometry ref
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Optional, Any, Union
 from pathlib import Path
+
 import yaml
 
 
@@ -41,13 +41,13 @@ class SensorConfig:
 
 
 class SensorRegistry:
-    def __init__(self, sensors: Optional[Dict[str, SensorConfig]] = None):
-        self._sensors: Dict[str, SensorConfig] = dict(sensors) if sensors else {}
+    def __init__(self, sensors: dict[str, SensorConfig] | None = None):
+        self._sensors: dict[str, SensorConfig] = dict(sensors) if sensors else {}
 
     def register(self, config: SensorConfig) -> None:
         self._sensors[config.sensor_id] = config
 
-    def get(self, sensor_id: str) -> Optional[SensorConfig]:
+    def get(self, sensor_id: str) -> SensorConfig | None:
         return self._sensors.get(sensor_id)
 
     def __contains__(self, sensor_id: str) -> bool:
@@ -57,7 +57,7 @@ class SensorRegistry:
         return len(self._sensors)
 
     @classmethod
-    def load_from_yaml(cls, path: Union[str, Path] = "data/sensors/registry.yaml") -> SensorRegistry:
+    def load_from_yaml(cls, path: str | Path = "data/sensors/registry.yaml") -> SensorRegistry:
         p = Path(path)
         if not p.exists():
             raise FileNotFoundError(f"Sensor registry file not found: {p}")

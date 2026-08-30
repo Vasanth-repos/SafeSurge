@@ -4,7 +4,6 @@ Artificially causes a road segment to flood to UNSAFE level, asserting the
 emergency routing engine diverts around it via a safe alternative path.
 """
 
-import pytest
 from backend.services.simulation_service import SimulationService
 
 

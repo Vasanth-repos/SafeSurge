@@ -5,7 +5,8 @@ and invalid configuration parameter rejections.
 """
 
 import pytest
-from sensors.registry import SensorRegistry, SensorConfig
+
+from sensors.registry import SensorConfig, SensorRegistry
 
 
 def test_load_registry_from_yaml():

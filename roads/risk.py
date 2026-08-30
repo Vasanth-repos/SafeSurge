@@ -5,9 +5,10 @@ Classifies aggregated road exposure depths into SAFE, WATCH, HIGH, UNSAFE states
 
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, Optional, Sequence
-from roads.models import Road, RoadRisk, RoadCellExposure
-from roads.exposure import calculate_road_depth, calculate_road_confidence
+from collections.abc import Mapping, Sequence
+
+from roads.exposure import calculate_road_confidence, calculate_road_depth
+from roads.models import RoadCellExposure, RoadRisk
 
 
 def classify_road_risk(
@@ -90,7 +91,7 @@ class RoadRiskEngine:
         exposures_by_road: Mapping[str, Sequence[RoadCellExposure]],
         cell_depths_by_id: Mapping[str, float],
         cell_confidences_by_id: Mapping[str, float],
-    ) -> Dict[str, RoadRisk]:
+    ) -> dict[str, RoadRisk]:
         return {
             r_id: self.evaluate_road(
                 road_id=r_id,

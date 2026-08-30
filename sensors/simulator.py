@@ -5,13 +5,13 @@ Parses sensor replay JSON files and generates structured SensorEnvelope packets.
 
 from __future__ import annotations
 
-from typing import List, Dict, Any, Union
-from pathlib import Path
 import json
+from pathlib import Path
+
 from sensors.models import SensorEnvelope
 
 
-def load_sensor_replay(path: Union[str, Path]) -> List[SensorEnvelope]:
+def load_sensor_replay(path: str | Path) -> list[SensorEnvelope]:
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(f"Sensor replay file not found: {p}")

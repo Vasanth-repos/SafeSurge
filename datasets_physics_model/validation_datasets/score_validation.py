@@ -1,7 +1,8 @@
 import json
+
 import joblib
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.metrics import mean_absolute_error, r2_score
 
 try:

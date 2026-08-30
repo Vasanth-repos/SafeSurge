@@ -1,9 +1,9 @@
 def test_core_packages_import():
-    import flood_engine
-    import sensors
-    import routing
-    import replay
     import backend
+    import flood_engine
+    import replay
+    import routing
+    import sensors
 
     assert flood_engine is not None
     assert sensors is not None

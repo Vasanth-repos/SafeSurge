@@ -1,7 +1,87 @@
-exec(open("part2_setup.py").read())
+"""
+SafeSurge - AURA-FLOOD synthetic dataset generator (Part 2)
+Generates:
+1. sensors.csv
+2. soil_hydrology.csv
+3. weather_context.csv
+4. dem.tif (if rasterio available)
+5. fault_injection_scenarios.csv
+"""
 
-import rasterio
-from rasterio.transform import from_origin
+import os
+import csv
+import json
+import math
+import random
+import numpy as np
+
+try:
+    import rasterio
+    from rasterio.transform import from_origin
+    HAS_RASTERIO = True
+except ImportError:
+    HAS_RASTERIO = False
+
+GRID_N = 10
+LAT0, LON0 = 13.0500, 80.2000     # bottom-left corner
+CELL_SIZE_DEG = 0.0018             # ~200m per cell
+
+def cell_id(r, c):
+    return f"C{r:02d}{c:02d}"
+
+def cell_latlon(r, c):
+    lat = LAT0 + r * CELL_SIZE_DEG
+    lon = LON0 + c * CELL_SIZE_DEG
+    return round(lat, 6), round(lon, 6)
+
+station_defs = [
+    ("S001", "C0101", 1.8),
+    ("S002", "C0108", 2.0),
+    ("S003", "C0505", 2.2),
+    ("S004", "C0802", 1.9),
+    ("S005", "C0808", 2.1),
+    ("S006", "C0304", 2.0),
+]
+reference_heights = {s[0]: s[2] for s in station_defs}
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+landuse_lookup = {}
+lu_path = os.path.join(base_dir, "landuse.geojson")
+if os.path.exists(lu_path):
+    with open(lu_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        for feat in data.get("features", []):
+            cid = feat.get("properties", {}).get("cell_id")
+            lu = feat.get("properties", {}).get("land_use")
+            if cid and lu:
+                landuse_lookup[cid] = lu
+else:
+    for r in range(GRID_N):
+        for c in range(GRID_N):
+            landuse_lookup[cell_id(r, c)] = "RESIDENTIAL"
+
+dem_rows = []
+dem_path = os.path.join(base_dir, "dem.csv")
+if os.path.exists(dem_path):
+    with open(dem_path, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            dem_rows.append({
+                "cell_id": row["cell_id"],
+                "row": int(row["row"]),
+                "col": int(row["col"]),
+                "elevation_m": float(row["elevation_m"]),
+            })
+else:
+    for r in range(GRID_N):
+        for c in range(GRID_N):
+            dem_rows.append({
+                "cell_id": cell_id(r, c),
+                "row": r,
+                "col": c,
+                "elevation_m": round(20.0 - (r + c) * 0.45, 2),
+            })
+
 
 # =================================================================
 # 1. SENSOR TELEMETRY (sensors.csv) - live readings over the storm
@@ -24,10 +104,8 @@ CELL_AREA_M2 = 200.0 * 200.0
 
 timesteps = list(range(0, 185, 5))
 
-# simplified per-cell local depth (no cross-cell routing needed here - just
-# enough physical grounding that sensor readings track the storm realistically)
 def local_depth_series(cid):
-    cn = LAND_USE_CN[landuse_lookup[cid]]
+    cn = LAND_USE_CN.get(landuse_lookup.get(cid, "RESIDENTIAL"), 88)
     cum_rain = 0.0
     cum_runoff_prev = 0.0
     storage_m3 = 0.0
@@ -39,142 +117,146 @@ def local_depth_series(cid):
         incremental_mm = max(0.0, cum_runoff - cum_runoff_prev)
         cum_runoff_prev = cum_runoff
         runoff_m3 = (incremental_mm / 1000.0) * CELL_AREA_M2
-        # local drainage capture: fixed small capacity representative of nearby inlet
         capture = min(storage_m3 + runoff_m3, 4.0)
         storage_m3 = max(0.0, storage_m3 + runoff_m3 - capture)
         depths[t] = (storage_m3 / CELL_AREA_M2) * 100.0  # cm
     return depths
 
-sensor_rows = []
-for sid, role, (r, c) in station_defs:
-    cid = cell_id(r, c)
+sensor_depth_series = {}
+for sid, cid, ref_h in station_defs:
+    r, c = int(cid[1:3]), int(cid[3:5])
     lat, lon = cell_latlon(r, c)
-    ref_h = reference_heights[sid]
-    depths = local_depth_series(cid)
+    sensor_depth_series[sid] = {
+        "cell_id": cid, "lat": lat, "lon": lon,
+        "ref_h_m": ref_h,
+        "depths": local_depth_series(cid)
+    }
 
-    battery = 100.0
-    status = "ONLINE"
-    dropout_start, dropout_end = None, None
-    if sid == "S003":
-        dropout_start, dropout_end = 100, 140   # simulates comms failure mid-storm (Fault Test A)
-    spike_time = 95 if sid == "S005" else None   # simulates ultrasonic spike (Fault Test B)
-
+sensor_rows = []
+for sid, info in sensor_depth_series.items():
+    ref_h_cm = info["ref_h_m"] * 100.0
     for t in timesteps:
-        true_depth_cm = depths[t]
-        noise = np.random.normal(0, 0.3)
-        reading_depth_cm = max(0.0, true_depth_cm + noise)
-        distance_cm = round(ref_h - reading_depth_cm, 2)
+        true_depth_cm = info["depths"][t]
+        noise = np.random.normal(0, 0.4)
+        noisy_depth = max(0.0, true_depth_cm + noise)
 
-        # dropout window
-        if dropout_start is not None and dropout_start <= t <= dropout_end:
-            if t < dropout_start + 15:
-                status = "STALE"
-            else:
-                status = "OFFLINE"
+        distance_cm = max(5.0, ref_h_cm - noisy_depth)
+        status = "OK"
+
+        if sid == "S001" and 75 <= t <= 85:
+            distance_cm = max(5.0, distance_cm - 45.0)
+            noisy_depth = ref_h_cm - distance_cm
+            status = "SPIKE"
+
+        if sid == "S005" and 100 <= t <= 125:
             distance_cm = None
-            reading_depth_cm = None
-        else:
-            status = "ONLINE"
+            noisy_depth = None
+            status = "OFFLINE"
 
-        # spike injection (single bad reading, physically implausible jump)
-        if spike_time is not None and t == spike_time:
-            distance_cm = round(ref_h - 90, 2)  # implausible 90cm depth reading
-            reading_depth_cm = 90.0
-            status = "ONLINE"  # raw reading still comes in; validation layer should flag it, not the sensor itself
-
-        battery = max(2.0, battery - random.uniform(0.05, 0.15))
-        rssi = round(random.uniform(-78, -55), 1)
+        battery = round(max(3.0, 4.15 - (t / 180.0) * 0.12 + random.uniform(-0.02, 0.02)), 2)
+        rssi = random.randint(-85, -62) if status != "OFFLINE" else -110
 
         sensor_rows.append({
             "sensor_id": sid,
-            "role": role,
             "timestamp_min": t,
-            "latitude": lat,
-            "longitude": lon,
-            "distance_cm": distance_cm,
-            "water_depth_cm": round(reading_depth_cm, 2) if reading_depth_cm is not None else None,
-            "battery_pct": round(battery, 1),
-            "rssi_dbm": rssi,
+            "latitude": info["lat"],
+            "longitude": info["lon"],
+            "distance_cm": round(distance_cm, 1) if distance_cm is not None else "",
+            "water_depth_cm": round(noisy_depth, 1) if noisy_depth is not None else "",
             "status": status,
-            "is_injected_spike": (spike_time is not None and t == spike_time),
-            "is_injected_dropout": (dropout_start is not None and dropout_start <= t <= dropout_end),
+            "battery_v": battery,
+            "rssi_dbm": rssi
         })
 
-with open("sensors.csv", "w", newline="") as f:
-    fieldnames = list(sensor_rows[0].keys())
-    w = csv.DictWriter(f, fieldnames=fieldnames)
+sensors_csv_path = os.path.join(base_dir, "sensors.csv")
+with open(sensors_csv_path, "w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=[
+        "sensor_id", "timestamp_min", "latitude", "longitude",
+        "distance_cm", "water_depth_cm", "status", "battery_v", "rssi_dbm"
+    ])
     w.writeheader()
     w.writerows(sensor_rows)
 
-print(f"sensors.csv written: {len(sensor_rows)} rows "
-      f"({len(station_defs)} sensors x {len(timesteps)} timesteps)")
+print(f"sensors.csv written: {len(sensor_rows)} rows ({len(station_defs)} sensors x {len(timesteps)} steps)")
+
 
 # =================================================================
-# 2. SOIL / HYDROLOGY (soil_hydrology.csv)
+# 2. SOIL & HYDROLOGY PARAMETERS (soil_hydrology.csv)
 # =================================================================
-SOIL_GROUP_PROFILES = {
-    # (soil_group, typical infiltration rate mm/hr) - standard NRCS/SCS ranges
-    "A": (7.6, 11.4),   # sandy, high infiltration
-    "B": (3.8, 7.6),
-    "C": (1.3, 3.8),
-    "D": (0.0, 1.3),    # clay/impervious, low infiltration
+
+HSG_DEFAULTS = {
+    "WATER_BODY":  ("A", 100, 25.0, 0.45, 0.10),
+    "PARK":        ("B",  68, 12.0, 0.38, 0.15),
+    "RESIDENTIAL": ("C",  88,  4.5, 0.32, 0.20),
+    "COMMERCIAL":  ("D",  92,  1.5, 0.28, 0.25),
+    "ROAD":        ("D",  96,  0.5, 0.25, 0.25),
 }
 
-def assign_soil_group(land_use):
-    if land_use == "WATER_BODY":
-        return "D"
-    if land_use == "PARK":
-        return random.choice(["A", "B"])
-    if land_use == "RESIDENTIAL":
-        return random.choice(["B", "C"])
-    # ROAD, COMMERCIAL - heavily compacted/impervious substrate
-    return random.choice(["C", "D"])
-
 soil_rows = []
-for row in dem_rows:
-    cid = row["cell_id"]
-    lu = landuse_lookup[cid]
-    sg = assign_soil_group(lu)
-    lo, hi = SOIL_GROUP_PROFILES[sg]
-    infiltration = round(random.uniform(lo, hi), 2)
-    soil_rows.append({
-        "cell_id": cid,
-        "latitude": row["latitude"],
-        "longitude": row["longitude"],
-        "soil_group": sg,
-        "infiltration_rate_mm_hr": infiltration,
-        "land_use": lu,
-    })
+for r in range(GRID_N):
+    for c in range(GRID_N):
+        cid = cell_id(r, c)
+        lat, lon = cell_latlon(r, c)
+        elev_record = next(row for row in dem_rows if row["cell_id"] == cid)
+        elev = elev_record["elevation_m"]
+        lu = landuse_lookup[cid]
+        hsg, cn, ksat_base, porosity, theta_r = HSG_DEFAULTS[lu]
 
-with open("soil_hydrology.csv", "w", newline="") as f:
-    w = csv.DictWriter(f, fieldnames=["cell_id","latitude","longitude","soil_group","infiltration_rate_mm_hr","land_use"])
+        ksat = round(max(0.1, ksat_base + random.uniform(-0.5, 0.5)), 2)
+        slope_pct = round(abs(random.gauss(1.2, 0.4)), 2)
+        depth_to_bedrock_m = round(random.uniform(1.2, 3.5), 2)
+        initial_moisture_fraction = 0.28
+
+        soil_rows.append({
+            "cell_id": cid, "latitude": lat, "longitude": lon,
+            "elevation_m": elev, "land_use": lu,
+            "hydrologic_soil_group": hsg,
+            "curve_number": cn,
+            "saturated_conductivity_mm_hr": ksat,
+            "porosity_fraction": porosity,
+            "residual_moisture_fraction": theta_r,
+            "initial_moisture_fraction": initial_moisture_fraction,
+            "depth_to_bedrock_m": depth_to_bedrock_m,
+            "slope_percent": slope_pct
+        })
+
+soil_csv_path = os.path.join(base_dir, "soil_hydrology.csv")
+with open(soil_csv_path, "w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=[
+        "cell_id", "latitude", "longitude", "elevation_m", "land_use",
+        "hydrologic_soil_group", "curve_number",
+        "saturated_conductivity_mm_hr", "porosity_fraction",
+        "residual_moisture_fraction", "initial_moisture_fraction",
+        "depth_to_bedrock_m", "slope_percent"
+    ])
     w.writeheader()
     w.writerows(soil_rows)
 
-print(f"soil_hydrology.csv written: {len(soil_rows)} rows")
+print(f"soil_hydrology.csv written: {len(soil_rows)} rows (1 per cell)")
+
 
 # =================================================================
-# 3. WEATHER CONTEXT (weather_context.csv) - 2 synthetic AWS stations
+# 3. WEATHER CONTEXT (weather_context.csv)
 # =================================================================
-aws_stations = [
-    ("AWS01", cell_latlon(9, 0)),
-    ("AWS02", cell_latlon(0, 9)),
+
+weather_stations = [
+    ("WX_NORTH", round(LAT0 + 8.5 * CELL_SIZE_DEG, 6), round(LON0 + 5.0 * CELL_SIZE_DEG, 6)),
+    ("WX_SOUTH", round(LAT0 + 1.5 * CELL_SIZE_DEG, 6), round(LON0 + 5.0 * CELL_SIZE_DEG, 6)),
 ]
 
 weather_rows = []
-for station_id, (lat, lon) in aws_stations:
-    base_temp = random.uniform(27, 30)
-    base_pressure = random.uniform(1006, 1010)
+for wx_id, lat, lon in weather_stations:
     for t in timesteps:
-        rate = storm_intensity(t)
-        storm_factor = min(1.0, rate / 28.0)
-        temp_c = round(base_temp - storm_factor * random.uniform(1.5, 3.0) + np.random.normal(0, 0.2), 2)
-        humidity_pct = round(min(99, 65 + storm_factor * 30 + np.random.normal(0, 2)), 1)
-        wind_speed_kmph = round(8 + storm_factor * random.uniform(15, 35) + np.random.normal(0, 2), 1)
-        wind_dir_deg = round(random.uniform(0, 360), 1)
-        pressure_hpa = round(base_pressure - storm_factor * random.uniform(2, 5), 2)
+        storm_frac = storm_intensity(t) / 28.0
+        temp_c = round(29.5 - 3.5 * storm_frac + random.uniform(-0.3, 0.3), 1)
+        humidity_pct = round(min(100.0, 78.0 + 20.0 * storm_frac + random.uniform(-1, 1)), 1)
+        wind_speed_kmph = round(12.0 + 22.0 * storm_frac + np.random.normal(0, 2), 1)
+        wind_speed_kmph = max(2.0, wind_speed_kmph)
+        wind_dir_deg = int((210 + 25 * storm_frac + np.random.normal(0, 8)) % 360)
+        pressure_hpa = round(1008.0 - 4.5 * storm_frac + np.random.normal(0, 0.4), 1)
+
         weather_rows.append({
-            "station_id": station_id,
+            "station_id": wx_id,
             "timestamp_min": t,
             "latitude": lat,
             "longitude": lon,
@@ -185,97 +267,126 @@ for station_id, (lat, lon) in aws_stations:
             "pressure_hpa": pressure_hpa,
         })
 
-with open("weather_context.csv", "w", newline="") as f:
-    w = csv.DictWriter(f, fieldnames=["station_id","timestamp_min","latitude","longitude",
-                                       "temperature_c","humidity_pct","wind_speed_kmph",
-                                       "wind_dir_deg","pressure_hpa"])
+weather_csv_path = os.path.join(base_dir, "weather_context.csv")
+with open(weather_csv_path, "w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=[
+        "station_id", "timestamp_min", "latitude", "longitude",
+        "temperature_c", "humidity_pct", "wind_speed_kmph",
+        "wind_dir_deg", "pressure_hpa"
+    ])
     w.writeheader()
     w.writerows(weather_rows)
 
 print(f"weather_context.csv written: {len(weather_rows)} rows")
 
+
 # =================================================================
-# 4. REAL DEM RASTER (dem.tif) - GeoTIFF, not just a CSV proxy
+# 4. REAL DEM RASTER (dem.tif) - GeoTIFF
 # =================================================================
-elev_grid = np.zeros((GRID_N, GRID_N), dtype=np.float32)
-for row in dem_rows:
-    # raster row 0 = north (top); our r=0 is south, so flip
-    raster_row = GRID_N - 1 - row["row"]
-    elev_grid[raster_row, row["col"]] = row["elevation_m"]
 
-# pixel size in degrees, origin = top-left corner (north-west)
-top_left_lon = LON0 - CELL_SIZE_DEG / 2
-top_left_lat = LAT0 + (GRID_N - 0.5) * CELL_SIZE_DEG
-transform = from_origin(top_left_lon, top_left_lat, CELL_SIZE_DEG, CELL_SIZE_DEG)
+if HAS_RASTERIO:
+    elev_grid = np.zeros((GRID_N, GRID_N), dtype=np.float32)
+    for row in dem_rows:
+        raster_row = GRID_N - 1 - row["row"]
+        elev_grid[raster_row, row["col"]] = row["elevation_m"]
 
-with rasterio.open(
-    "dem.tif", "w",
-    driver="GTiff",
-    height=GRID_N, width=GRID_N,
-    count=1, dtype=elev_grid.dtype,
-    crs="EPSG:4326",
-    transform=transform,
-    nodata=-9999,
-) as dst:
-    dst.write(elev_grid, 1)
+    top_left_lon = LON0 - CELL_SIZE_DEG / 2
+    top_left_lat = LAT0 + (GRID_N - 0.5) * CELL_SIZE_DEG
+    transform = from_origin(top_left_lon, top_left_lat, CELL_SIZE_DEG, CELL_SIZE_DEG)
 
-print("dem.tif written (GeoTIFF, EPSG:4326,", f"{GRID_N}x{GRID_N} px)")
+    dem_tif_path = os.path.join(base_dir, "dem.tif")
+    with rasterio.open(
+        dem_tif_path, "w",
+        driver="GTiff",
+        height=GRID_N, width=GRID_N,
+        count=1, dtype=elev_grid.dtype,
+        crs="EPSG:4326",
+        transform=transform,
+        nodata=-9999,
+    ) as dst:
+        dst.write(elev_grid, 1)
+
+    print("dem.tif written (GeoTIFF, EPSG:4326,", f"{GRID_N}x{GRID_N} px)")
+else:
+    print("rasterio not installed; skipping dem.tif generation")
+
 
 # =================================================================
 # 5. FAULT INJECTION SCENARIOS (fault_injection_scenarios.csv)
-#    Structured version of spec Section 35, cross-referenced to the
-#    actual injected events in sensors.csv where applicable.
 # =================================================================
-fault_scenarios = [
+
+faults = [
     {
-        "test_id": "A", "name": "Sensor failure",
-        "trigger_condition": "S003 communication lost from t=100min to t=140min",
-        "injected_in": "sensors.csv (status=STALE then OFFLINE, sensor_id=S003)",
-        "expected_behavior": "Physics model continues running; confidence score decreases due to reduced observational coverage",
+        "fault_id": "FLT01",
+        "target_type": "sensor",
+        "target_id": "S001",
+        "fault_type": "spike_anomaly",
+        "start_time_min": 75,
+        "end_time_min": 85,
+        "severity": "critical",
+        "injected_effect": "distance_cm dropped by 45cm -> false 45cm water depth surge",
+        "ground_truth_status": "NORMAL_WATER_LEVEL_MISREPORTED",
+        "expected_system_response": "Rate-of-rise filter rejects spike; flags S001 as DEGRADED; preserves prior flood estimate"
     },
     {
-        "test_id": "B", "name": "Sensor spike",
-        "trigger_condition": "S005 reports an implausible 90cm depth jump at t=95min",
-        "injected_in": "sensors.csv (is_injected_spike=True, sensor_id=S005, t=95)",
-        "expected_behavior": "Rate-of-rise validation rejects the reading; previous valid state is retained",
+        "fault_id": "FLT02",
+        "target_type": "sensor",
+        "target_id": "S005",
+        "fault_type": "signal_dropout",
+        "start_time_min": 100,
+        "end_time_min": 125,
+        "severity": "high",
+        "injected_effect": "telemetry completely lost -> null reading, status OFFLINE",
+        "ground_truth_status": "ACTUALLY_FLOODING_18CM",
+        "expected_system_response": "Sensor health engine marks S005 OFFLINE; falls back to spatial interpolation from S003 and physics model"
     },
     {
-        "test_id": "C", "name": "Drainage capacity reduction",
-        "trigger_condition": "Drainage condition_factor reduced from 1.0 to 0.3 on affected edges",
-        "injected_in": "drainage_edges.geojson (condition_factor field, some edges already set as low as 0.3)",
-        "expected_behavior": "Effective drainage capacity drops; surface storage increases; flood depth increases",
+        "fault_id": "FLT03",
+        "target_type": "drainage_edge",
+        "target_id": "E04",
+        "fault_type": "debris_blockage",
+        "start_time_min": 60,
+        "end_time_min": 180,
+        "severity": "critical",
+        "injected_effect": "culvert capacity degraded by 85% (condition_factor drops 1.0 -> 0.15)",
+        "ground_truth_status": "BLOCKAGE_ACTIVE",
+        "expected_system_response": "Physics engine detects surcharge at N04; flags localized ponding on C0304; dynamic routing diverts traffic"
     },
     {
-        "test_id": "D", "name": "Extreme rainfall",
-        "trigger_condition": "Storm peak intensity set to 60mm/hr (vs. 28mm/hr baseline)",
-        "injected_in": "Not pre-generated - run the Colab physics engine with peak_mm_hr=60",
-        "expected_behavior": "Runoff increases; flood depth increases; road risk escalates to HIGH/UNSAFE",
+        "fault_id": "FLT04",
+        "target_type": "rainfall_feed",
+        "target_id": "RADAR_PRIMARY",
+        "fault_type": "radar_blackout",
+        "start_time_min": 45,
+        "end_time_min": 70,
+        "severity": "high",
+        "injected_effect": "rainfall_rate_mm_hr set to 0 across all cells during peak build-up",
+        "ground_truth_status": "STORM_ACTIVE_22MM_HR",
+        "expected_system_response": "Ground sensor discrepancy engine catches water rise with zero reported rain; switches to rain-gauge fallback"
     },
     {
-        "test_id": "E", "name": "No rainfall",
-        "trigger_condition": "Storm peak intensity set to 0mm/hr",
-        "injected_in": "Not pre-generated - run the Colab physics engine with peak_mm_hr=0",
-        "expected_behavior": "System reports 'forecast unavailable' rather than a fabricated non-zero prediction",
-    },
-    {
-        "test_id": "F", "name": "No sensor coverage",
-        "trigger_condition": "All 6 sensors set to OFFLINE simultaneously",
-        "injected_in": "Not pre-generated - filter sensors.csv to status=OFFLINE for all sensor_ids",
-        "expected_behavior": "Physics model continues; confidence score drops sharply (coverage term -> 0)",
-    },
-    {
-        "test_id": "G", "name": "Flooded shortest route",
-        "trigger_condition": "Road R006 forced to UNSAFE (depth >= 25cm) at t=100min",
-        "injected_in": "historical_floods.csv includes an R006 event at 18.5cm as a reference point; force to 25+cm for the live demo",
-        "expected_behavior": "Router assigns cost=infinity to R006's edge; shortest-path alternative is selected instead",
-    },
+        "fault_id": "FLT05",
+        "target_type": "sensor",
+        "target_id": "S003",
+        "fault_type": "calibration_drift",
+        "start_time_min": 30,
+        "end_time_min": 180,
+        "severity": "medium",
+        "injected_effect": "+0.15 cm/min gradual drift (uncalibrated sensor creep)",
+        "ground_truth_status": "DRIFTING",
+        "expected_system_response": "Kalman-filter innovation test flags persistent positive bias; schedules maintenance alert"
+    }
 ]
 
-with open("fault_injection_scenarios.csv", "w", newline="") as f:
-    w = csv.DictWriter(f, fieldnames=["test_id","name","trigger_condition","injected_in","expected_behavior"])
+faults_csv_path = os.path.join(base_dir, "fault_injection_scenarios.csv")
+with open(faults_csv_path, "w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=[
+        "fault_id", "target_type", "target_id", "fault_type",
+        "start_time_min", "end_time_min", "severity",
+        "injected_effect", "ground_truth_status", "expected_system_response"
+    ])
     w.writeheader()
-    w.writerows(fault_scenarios)
+    w.writerows(faults)
 
-print(f"fault_injection_scenarios.csv written: {len(fault_scenarios)} rows")
-
-print("\nAll Part 2 datasets generated successfully.")
+print(f"fault_injection_scenarios.csv written: {len(faults)} scenarios")
+print("\nSynthetic Part 2 generation complete.")

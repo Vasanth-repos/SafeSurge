@@ -6,9 +6,10 @@ capacity reduction, extreme precipitation, and road blockage).
 
 from __future__ import annotations
 
-from enum import Enum
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Sequence
+from enum import Enum
+from typing import Any
 
 
 class FaultType(str, Enum):
@@ -27,20 +28,20 @@ class Fault:
     fault_type: FaultType
     start_seconds: int
     end_seconds: int
-    parameters: Dict[str, Any] = field(default_factory=dict)
+    parameters: dict[str, Any] = field(default_factory=dict)
 
     def is_active(self, timestamp_seconds: int) -> bool:
         return self.start_seconds <= timestamp_seconds <= self.end_seconds
 
 
 class FaultInjectionEngine:
-    def __init__(self, faults: Optional[Sequence[Fault]] = None):
-        self.faults: List[Fault] = list(faults) if faults else []
+    def __init__(self, faults: Sequence[Fault] | None = None):
+        self.faults: list[Fault] = list(faults) if faults else []
 
     def add_fault(self, fault: Fault) -> None:
         self.faults.append(fault)
 
-    def get_active_faults(self, timestamp_seconds: int) -> List[Fault]:
+    def get_active_faults(self, timestamp_seconds: int) -> list[Fault]:
         return [f for f in self.faults if f.is_active(timestamp_seconds)]
 
     def apply_rainfall_multiplier(self, timestamp_seconds: int, base_rainfall_mm: float) -> float:
@@ -62,7 +63,7 @@ class FaultInjectionEngine:
         timestamp_seconds: int,
         nominal_reading_cm: float,
         nominal_status: str,
-    ) -> Tuple[Optional[float], str, bool]:
+    ) -> tuple[float | None, str, bool]:
         """
         Returns (reading_cm, status, is_modified)
         """

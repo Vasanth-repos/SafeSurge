@@ -5,13 +5,14 @@ progressive downstream valley accumulation, boundary discharge accounting,
 numerical stability across timesteps, effective ponding areas, and depth diagnostics.
 """
 
-import pytest
 import math
-import numpy as np
-from flood_engine.grid import ComputationalGrid
+
+import pytest
+
 from flood_engine.d8 import D8Terrain
+from flood_engine.grid import ComputationalGrid
 from flood_engine.surface import SurfaceStorageEngine
-from flood_engine.surface_diagnostics import classify_depth_risk, summarize_grid_depths
+from flood_engine.surface_diagnostics import classify_depth_risk
 
 
 def test_mass_conservation_invariant():

@@ -7,14 +7,13 @@ queues 1-timestep delayed surcharge back onto the surface, and maintains strict 
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Mapping, Sequence, Dict, List, Optional, Tuple, Any, Union
 import math
-from pathlib import Path
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from typing import Any
 
-from flood_engine.config import load_config
-from flood_engine.surface import SurfaceStorageEngine, CellSurfaceState
-from flood_engine.drainage import StatefulDrainageNetwork, DrainageStepResult
+from flood_engine.drainage import DrainageStepResult, StatefulDrainageNetwork
+from flood_engine.surface import SurfaceStorageEngine
 
 EPSILON_M3 = 1e-9
 
@@ -72,17 +71,17 @@ class CouplingStepResult:
     timestamp_seconds: int
     total_runoff_input_m3: float
     total_drainage_capture_m3: float
-    surface_storage_m3_by_cell: Dict[str, float]
-    drainage_inflow_m3_by_node: Dict[str, float]
-    drainage_storage_m3_by_node: Dict[str, float]
+    surface_storage_m3_by_cell: dict[str, float]
+    drainage_inflow_m3_by_node: dict[str, float]
+    drainage_storage_m3_by_node: dict[str, float]
     drainage_outlet_volume_m3: float
-    drainage_surcharge_m3_by_node: Dict[str, float]
-    pending_surcharge_m3_by_cell: Dict[str, float]
+    drainage_surcharge_m3_by_node: dict[str, float]
+    pending_surcharge_m3_by_cell: dict[str, float]
     surface_boundary_outflow_m3: float
     total_surface_storage_m3: float
     total_drainage_storage_m3: float
     mass_balance_error_m3: float
-    inlet_results: Tuple[InletCaptureResult, ...]
+    inlet_results: tuple[InletCaptureResult, ...]
 
 
 def calculate_capture_volume(
@@ -106,7 +105,7 @@ def allocate_inlet_capacity(
     available_by_cell: Mapping[str, float],
     capacity_m3_s: float,
     dt_seconds: float,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     if capacity_m3_s < 0:
         raise ValueError("capacity_m3_s must be >= 0")
     if dt_seconds <= 0:
@@ -129,7 +128,7 @@ def allocate_cell_capture(
     available_m3: float,
     inlet_capacities_m3_s: Mapping[str, float],
     dt_seconds: float,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     if available_m3 < -EPSILON_M3:
         raise ValueError("available_m3 cannot be negative")
     if dt_seconds <= 0:
@@ -157,7 +156,7 @@ class SurfaceDrainageCouplingEngine:
         inlets: Sequence[DrainageInlet],
         mappings: Sequence[InletCellMapping],
         dt_seconds: float = 60.0,
-        surcharge_cell_by_node: Optional[Mapping[str, str]] = None,
+        surcharge_cell_by_node: Mapping[str, str] | None = None,
     ):
         if dt_seconds <= 0:
             raise ValueError("dt_seconds must be > 0")
@@ -201,8 +200,8 @@ class SurfaceDrainageCouplingEngine:
         self.inlet_by_id = inlet_by_id
 
         # Construct lookup maps
-        self.inlets_by_cell: Dict[str, List[DrainageInlet]] = {}
-        self.cells_by_inlet: Dict[str, List[str]] = {}
+        self.inlets_by_cell: dict[str, list[DrainageInlet]] = {}
+        self.cells_by_inlet: dict[str, list[str]] = {}
 
         for mapping in mappings:
             inlet_obj = inlet_by_id[mapping.inlet_id]
@@ -210,7 +209,7 @@ class SurfaceDrainageCouplingEngine:
             self.cells_by_inlet.setdefault(mapping.inlet_id, []).append(mapping.cell_id)
 
         # Surcharge node -> surface cell mapping
-        self.surcharge_cell_by_node: Dict[str, str] = {}
+        self.surcharge_cell_by_node: dict[str, str] = {}
         if surcharge_cell_by_node:
             for nid, cid in surcharge_cell_by_node.items():
                 if nid not in known_nodes:
@@ -226,14 +225,14 @@ class SurfaceDrainageCouplingEngine:
                     self.surcharge_cell_by_node[inlet.node_id] = cells[0]
 
         # Dynamic State: Pending surcharge delayed by 1 timestep
-        self._pending_surcharge_m3_by_cell: Dict[str, float] = {
+        self._pending_surcharge_m3_by_cell: dict[str, float] = {
             cid: 0.0 for cid in self.surface_engine.cell_ids
         }
         self._cumulative_runoff_m3: float = 0.0
         self._cumulative_surface_boundary_m3: float = 0.0
         self._cumulative_drainage_outlet_m3: float = 0.0
-        self._last_timestamp_seconds: Optional[int] = None
-        self.history: List[CouplingStepResult] = []
+        self._last_timestamp_seconds: int | None = None
+        self.history: list[CouplingStepResult] = []
 
     def reset(self) -> None:
         """Resets all surface, drainage, and coupling pending state."""
@@ -268,7 +267,7 @@ class SurfaceDrainageCouplingEngine:
         self,
         timestamp_seconds: int,
         runoff_volume_m3_by_cell: Mapping[str, float],
-        capacity_factor_by_edge: Optional[Mapping[str, float]] = None,
+        capacity_factor_by_edge: Mapping[str, float] | None = None,
     ) -> CouplingStepResult:
         """
         Executes one coupled surface-drainage simulation timestep:
@@ -295,7 +294,7 @@ class SurfaceDrainageCouplingEngine:
                 raise ValueError(f"Invalid runoff volume for cell {cid}: {vol}")
 
         # 2. Build available surface water per cell
-        available_surface_m3: Dict[str, float] = {}
+        available_surface_m3: dict[str, float] = {}
         for cid in self.surface_engine.cell_ids:
             s_current = self.surface_engine.storage(cid)
             r_val = float(runoff_volume_m3_by_cell[cid])
@@ -303,9 +302,9 @@ class SurfaceDrainageCouplingEngine:
             available_surface_m3[cid] = s_current + r_val + surch_pend
 
         # 3. Resolve Inlet Captures
-        inlet_results_list: List[InletCaptureResult] = []
-        capture_by_cell: Dict[str, float] = {cid: 0.0 for cid in self.surface_engine.cell_ids}
-        drainage_inflow_by_node: Dict[str, float] = {nid: 0.0 for nid in self.drainage_network.node_ids}
+        inlet_results_list: list[InletCaptureResult] = []
+        capture_by_cell: dict[str, float] = {cid: 0.0 for cid in self.surface_engine.cell_ids}
+        drainage_inflow_by_node: dict[str, float] = {nid: 0.0 for nid in self.drainage_network.node_ids}
 
         # Handle each cell's inlets
         for cid in self.surface_engine.cell_ids:
@@ -362,7 +361,7 @@ class SurfaceDrainageCouplingEngine:
                     )
 
         # 4. Calculate Remaining Surface Water
-        remaining_surface_m3: Dict[str, float] = {}
+        remaining_surface_m3: dict[str, float] = {}
         for cid in self.surface_engine.cell_ids:
             rem = available_surface_m3[cid] - capture_by_cell[cid]
             remaining_surface_m3[cid] = max(0.0, rem)
@@ -383,7 +382,7 @@ class SurfaceDrainageCouplingEngine:
         )
 
         # 7. Map Surcharge to Delayed Next-Timestep Surface Storage
-        next_pending_surcharge: Dict[str, float] = {cid: 0.0 for cid in self.surface_engine.cell_ids}
+        next_pending_surcharge: dict[str, float] = {cid: 0.0 for cid in self.surface_engine.cell_ids}
         for nid, surch_vol in drainage_result.surcharge_volume_m3_by_node.items():
             if surch_vol > EPSILON_M3:
                 target_cell = self.surcharge_cell_by_node.get(nid)
@@ -434,7 +433,7 @@ class SurfaceDrainageCouplingEngine:
         self.history.append(step_res)
         return step_res
 
-    def mass_balance(self) -> Dict[str, Any]:
+    def mass_balance(self) -> dict[str, Any]:
         """Returns cumulative coupled system mass balance audit."""
         total_surface_storage = sum(self.surface_engine.storage_m3.values())
         total_drainage_storage = sum(self.drainage_network.node_storage_m3.values())

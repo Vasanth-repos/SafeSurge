@@ -6,10 +6,10 @@ Combines XGBoost gradient boosting regression with strict physical invariants:
 3. Monotonic rainfall response (Q >= 0 when P > Ia)
 """
 
-from typing import Optional, List, Dict, Any
-import numpy as np
-import joblib
 import os
+
+import joblib
+import numpy as np
 
 try:
     import xgboost as xgb
@@ -50,9 +50,9 @@ class PhysicsGuidedFloodNowcaster:
                 random_state=42,
             )
         self.is_fitted = False
-        self.feature_names: List[str] = []
+        self.feature_names: list[str] = []
 
-    def fit(self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None) -> "PhysicsGuidedFloodNowcaster":
+    def fit(self, X: np.ndarray, y: np.ndarray, feature_names: list[str] | None = None) -> "PhysicsGuidedFloodNowcaster":
         """Fit model with physical targets."""
         y_clean = np.maximum(0.0, y)
         self.model.fit(X, y_clean)
@@ -61,7 +61,7 @@ class PhysicsGuidedFloodNowcaster:
             self.feature_names = list(feature_names)
         return self
 
-    def predict(self, X: np.ndarray, cumulative_rain_mm: Optional[float] = None) -> np.ndarray:
+    def predict(self, X: np.ndarray, cumulative_rain_mm: float | None = None) -> np.ndarray:
         """
         Run inference with physical post-processing guards:
         1. Hard floor: h >= 0.0 cm (non-negative storage invariant)
@@ -108,7 +108,7 @@ class AuraFloodScenarioXGBoost:
         "drainage_degradation_factor",
     ]
 
-    def __init__(self, artifact_path: Optional[str] = None):
+    def __init__(self, artifact_path: str | None = None):
         self.artifact_path = artifact_path or os.path.join(
             os.path.dirname(__file__), "artifacts", "aura_flood_xgb.joblib"
         )

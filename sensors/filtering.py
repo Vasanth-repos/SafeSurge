@@ -6,17 +6,17 @@ and aggregates representative distance using median calculation.
 
 from __future__ import annotations
 
-from typing import Sequence, Tuple, Optional
 import math
+from collections.abc import Sequence
 from statistics import median
 
 
 def filter_echoes(
-    samples: Sequence[Optional[float]],
+    samples: Sequence[float | None],
     min_distance_cm: float,
     max_distance_cm: float,
     minimum_valid_samples: int,
-) -> Tuple[Optional[float], int]:
+) -> tuple[float | None, int]:
     """
     Filters raw echo burst:
     1. Removes None and non-finite values.

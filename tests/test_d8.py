@@ -4,12 +4,12 @@ Verifies D8 steepest descent, tie-breaking, terminal state semantics (boundary_e
 flow distance measurements, irregular catchment geometries, multiple outlets, and QA diagnostics.
 """
 
-import pytest
 import math
+
 import numpy as np
-from pathlib import Path
+
+from flood_engine.d8 import D8Terrain
 from flood_engine.grid import ComputationalGrid
-from flood_engine.d8 import D8Terrain, D8Cell, NEIGHBOR_ORDER
 
 
 def test_d8_slope_and_direction_calculation():

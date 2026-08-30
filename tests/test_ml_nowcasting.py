@@ -3,14 +3,13 @@ Unit & Integration Tests for Physics-Guided Machine Learning (PGML) Engine.
 Verifies training, non-negative depth guards, inference latency, and API endpoints.
 """
 
-import pytest
 import numpy as np
 from fastapi.testclient import TestClient
-from ml.model import PhysicsGuidedFloodNowcaster
-from ml.infer import predict_catchment_depths, get_or_load_model
-from ml.features import build_catchment_feature_matrix
-from backend.app import app
 
+from backend.app import app
+from ml.features import build_catchment_feature_matrix
+from ml.infer import get_or_load_model, predict_catchment_depths
+from ml.model import PhysicsGuidedFloodNowcaster
 
 client = TestClient(app)
 

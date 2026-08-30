@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any
+
 from flood_engine.snapshot import SimulationSnapshot
-from replay.engine import ReplayEngine
 from replay.scenarios import ScenarioRunner
 
 
@@ -11,8 +11,8 @@ class SnapshotService:
         self.config_path = config_path
         self.runner = ScenarioRunner(config_path=config_path)
         # In-memory snapshot store: (simulation_id, timestamp_seconds) -> SimulationSnapshot
-        self._store: Dict[Tuple[str, int], SimulationSnapshot] = {}
-        self.active_simulation_id: Optional[str] = None
+        self._store: dict[tuple[str, int], SimulationSnapshot] = {}
+        self.active_simulation_id: str | None = None
         self._initialize_baseline_storm()
 
     def _initialize_baseline_storm(self):
@@ -54,9 +54,9 @@ class SnapshotService:
 
     def get_snapshot(
         self,
-        simulation_id: Optional[str] = None,
-        timestamp_seconds: Optional[int] = None,
-    ) -> Optional[SimulationSnapshot]:
+        simulation_id: str | None = None,
+        timestamp_seconds: int | None = None,
+    ) -> SimulationSnapshot | None:
         sim_id = simulation_id or self.active_simulation_id
         if not sim_id:
             return None
@@ -77,7 +77,7 @@ class SnapshotService:
 
         return self._store.get((sim_id, target_t))
 
-    def get_all_timestamps(self, simulation_id: Optional[str] = None) -> List[int]:
+    def get_all_timestamps(self, simulation_id: str | None = None) -> list[int]:
         sim_id = simulation_id or self.active_simulation_id
         if not sim_id:
             return []
@@ -86,11 +86,11 @@ class SnapshotService:
     def get_dashboard_state(
         self,
         lead_time_minutes: int = 0,
-        scenario_id: Optional[str] = None,
+        scenario_id: str | None = None,
         fault_spike: bool = False,
         fault_offline: bool = False,
         fault_blockage: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         if scenario_id:
             actual_id = self.ensure_scenario_loaded(scenario_id)
             sim_id = actual_id or scenario_id

@@ -3,17 +3,18 @@ Real-Time Inference Engine for Physics-Guided Machine Learning (PGML).
 Executes sub-millisecond nowcasting of grid cell depths.
 """
 
-import time
-import os
 import math
-from typing import Dict, Any, Optional
+import os
+import time
+from typing import Any
+
 import numpy as np
+
 from ml.features import build_catchment_feature_matrix
 from ml.model import PhysicsGuidedFloodNowcaster
 
-
 MODEL_ARTIFACT_PATH = os.path.join(os.path.dirname(__file__), "artifacts", "pgml_nowcaster.joblib")
-_LOADED_MODEL: Optional[PhysicsGuidedFloodNowcaster] = None
+_LOADED_MODEL: PhysicsGuidedFloodNowcaster | None = None
 
 
 def get_or_load_model() -> PhysicsGuidedFloodNowcaster:
@@ -35,7 +36,7 @@ def predict_catchment_depths(
     lead_time_minutes: float,
     scenario_id: str = "storm_01",
     drain_capacity_factor: float = 1.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Run high-speed PGML inference for all 100 catchment cells.
     Returns cell predictions, peak depth, and benchmark latency.

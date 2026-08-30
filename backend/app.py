@@ -4,23 +4,24 @@ Mounts all REST API routers, provides /health liveness probe,
 and orchestrates requests across backend domain services.
 """
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import os
 
-from backend.api.rainfall import router as rainfall_router
-from backend.api.simulation import router as simulation_router
-from backend.api.sensors import router as sensors_router
+from backend.api.dashboard import router as dashboard_router
+from backend.api.diagnostics import router as diagnostics_router
 from backend.api.flood import router as flood_router
+from backend.api.ml import router as ml_router
+from backend.api.rainfall import router as rainfall_router
+from backend.api.reports import router as reports_router
 from backend.api.roads import router as roads_router
 from backend.api.routes import router as routes_router
-from backend.api.diagnostics import router as diagnostics_router
 from backend.api.scenarios import router as scenarios_router
+from backend.api.sensors import router as sensors_router
+from backend.api.simulation import router as simulation_router
 from backend.api.snapshots import router as snapshots_router
-from backend.api.dashboard import router as dashboard_router
-from backend.api.reports import router as reports_router
-from backend.api.ml import router as ml_router
 from backend.services.simulation_service import SimulationService
 
 # Core simulation service instance for legacy scenario endpoints

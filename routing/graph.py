@@ -5,16 +5,18 @@ Maintains directed topology and edge states updated dynamically from flood risk 
 
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from collections.abc import Mapping, Sequence
+
 import networkx as nx
-from routing.models import RoadEdge, RoadEdgeState
+
 from roads.models import RoadRisk
+from routing.models import RoadEdge, RoadEdgeState
 
 
 class DirectedRoadGraph:
-    def __init__(self, edges: Optional[Sequence[RoadEdge]] = None):
+    def __init__(self, edges: Sequence[RoadEdge] | None = None):
         self.graph = nx.DiGraph()
-        self.edge_by_id: Dict[str, RoadEdge] = {}
+        self.edge_by_id: dict[str, RoadEdge] = {}
         if edges:
             for e in edges:
                 self.add_edge(e)
@@ -29,13 +31,13 @@ class DirectedRoadGraph:
             length=edge.length_m,
         )
 
-    def get_edge(self, road_id: str) -> Optional[RoadEdge]:
+    def get_edge(self, road_id: str) -> RoadEdge | None:
         return self.edge_by_id.get(road_id)
 
     def build_dynamic_states(
         self,
         road_risks: Mapping[str, RoadRisk],
-    ) -> Dict[str, RoadEdgeState]:
+    ) -> dict[str, RoadEdgeState]:
         states = {}
         for r_id, edge in self.edge_by_id.items():
             risk_obj = road_risks.get(r_id)

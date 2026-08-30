@@ -4,13 +4,13 @@ Verifies that reports dynamically adapt to scenario, lead time, and fault inject
 """
 
 import os
-import pytest
-from fastapi.testclient import TestClient
+
 import docx
+from fastapi.testclient import TestClient
 
 from backend.app import app
-from reporting.docx_generator import create_3hour_prediction_docx
 from replay.scenarios import ScenarioRunner
+from reporting.docx_generator import create_3hour_prediction_docx
 
 
 def test_create_3hour_prediction_docx_direct():

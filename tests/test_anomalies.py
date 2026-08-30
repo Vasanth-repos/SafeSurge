@@ -5,15 +5,16 @@ synchronized sensor inconsistency, and capacity anomaly detection.
 """
 
 import pytest
-from anomalies.models import AnomalyType, AnomalySeverity
+
+from anomalies.detector import AnomalyDetector
+from anomalies.models import AnomalySeverity, AnomalyType
 from anomalies.rules import (
     calculate_rise_rate,
-    detect_rapid_rise,
-    detect_model_disagreement,
-    detect_sensor_inconsistency,
     detect_capacity_anomaly,
+    detect_model_disagreement,
+    detect_rapid_rise,
+    detect_sensor_inconsistency,
 )
-from anomalies.detector import AnomalyDetector
 
 
 def test_rapid_rise_and_falling_water():

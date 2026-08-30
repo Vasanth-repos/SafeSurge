@@ -2,7 +2,6 @@
 Sensor health and lifecycle state machine (ONLINE, STALE, OFFLINE, INVALID).
 """
 
-from typing import Dict, Any, Optional
 
 
 class SensorNode:
@@ -27,15 +26,15 @@ class SensorNode:
         # Runtime state
         self.status: str = "ONLINE"  # 'ONLINE', 'STALE', 'OFFLINE', 'INVALID'
         self.missed_heartbeats: int = 0
-        self.last_valid_reading_cm: Optional[float] = None
-        self.last_reading_cm: Optional[float] = None
+        self.last_valid_reading_cm: float | None = None
+        self.last_reading_cm: float | None = None
         self.last_quality_flag: str = "VALID"
         self.current_bias: float = 0.0
         self.recent_errors: list = []
         self.battery: int = 100
         self.signal_quality: float = 1.0
         self.float_state: bool = False
-        self.redundancy_state: Optional[str] = None  # e.g., 'WATER_PRESENT_DEPTH_UNKNOWN'
+        self.redundancy_state: str | None = None  # e.g., 'WATER_PRESENT_DEPTH_UNKNOWN'
 
     def update_health(
         self,

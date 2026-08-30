@@ -3,11 +3,12 @@ API Endpoints — Sensor Telemetry Ingestion & Health:
 Ingests physical/simulated sensor packets, applies Layer 11-12 validation, and reports device health.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from backend.schemas import SensorReadingRequest
+from fastapi import APIRouter, Depends
+
 from backend.dependencies import get_simulation_manager
+from backend.schemas import SensorReadingRequest
 from backend.services.simulation_manager import SimulationManager
-from sensors.models import SensorEnvelope, MeasurementStatus
+from sensors.models import MeasurementStatus, SensorEnvelope
 
 router = APIRouter(prefix="/api/sensors", tags=["Sensors"])
 

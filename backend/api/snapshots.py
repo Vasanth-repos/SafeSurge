@@ -3,8 +3,8 @@ API Endpoints — Snapshots (Layers 20–25):
 Direct immutable snapshot inspection by simulation_id and timestamp_seconds.
 """
 
-from fastapi import APIRouter, HTTPException, Query, status
-from typing import Optional
+from fastapi import APIRouter, HTTPException, status
+
 from backend.services.snapshot_service import SnapshotService
 
 router = APIRouter(prefix="/api/snapshots", tags=["Snapshots"])

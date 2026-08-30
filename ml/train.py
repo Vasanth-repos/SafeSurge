@@ -3,18 +3,22 @@ Training Pipeline for Physics-Guided Machine Learning (PGML) Nowcasting Engine.
 Compiles simulation states across scenarios and fits the surrogate model.
 """
 
-import os
 import math
-import numpy as np
-from typing import Tuple
-from ml.features import FEATURE_NAMES, extract_cell_static_features, build_feature_vector
-from ml.model import PhysicsGuidedFloodNowcaster
+import os
 
+import numpy as np
+
+from ml.features import (
+    FEATURE_NAMES,
+    build_feature_vector,
+    extract_cell_static_features,
+)
+from ml.model import PhysicsGuidedFloodNowcaster
 
 MODEL_ARTIFACT_PATH = os.path.join(os.path.dirname(__file__), "artifacts", "pgml_nowcaster.joblib")
 
 
-def generate_training_dataset() -> Tuple[np.ndarray, np.ndarray]:
+def generate_training_dataset() -> tuple[np.ndarray, np.ndarray]:
     """
     Compile synthetic training dataset across storm timesteps and scenarios.
     Ground-truth labels come from the coupled 2D hydrodynamic simulation engine.
@@ -99,7 +103,7 @@ def train_and_save_model(artifact_path: str = MODEL_ARTIFACT_PATH) -> PhysicsGui
     mae = float(np.mean(np.abs(preds_test - y_test)))
     r2 = float(1.0 - np.sum((y_test - preds_test) ** 2) / np.sum((y_test - np.mean(y_test)) ** 2))
 
-    print(f"Evaluation Results on Test Split:")
+    print("Evaluation Results on Test Split:")
     print(f"  - Test RMSE: {rmse:.3f} cm")
     print(f"  - Test MAE:  {mae:.3f} cm")
     print(f"  - Test R^2:  {r2:.4f}")

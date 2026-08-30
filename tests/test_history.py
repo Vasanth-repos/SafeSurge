@@ -4,6 +4,7 @@ Verifies rolling deque bounds, chronological ordering, and model/observed pair t
 """
 
 import pytest
+
 from fusion.history import SensorHistoryTracker
 
 

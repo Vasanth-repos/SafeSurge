@@ -5,14 +5,14 @@ IMPORTANT: This code DOES NOT retrain the model.
 """
 
 import os
-import sys
-import pandas as pd
-import numpy as np
-import matplotlib
-matplotlib.use("Agg")  # Non-interactive backend for headless environments
-import matplotlib.pyplot as plt
-import joblib
 
+import matplotlib
+import numpy as np
+import pandas as pd
+
+matplotlib.use("Agg")  # Non-interactive backend for headless environments
+import joblib
+import matplotlib.pyplot as plt
 from sklearn.metrics import (
     mean_absolute_error,
     mean_squared_error,
@@ -38,7 +38,7 @@ for p in possible_paths:
 
 if validation_path is None:
     raise FileNotFoundError(
-        f"Validation dataset not found in any of candidate locations:\n" + "\n".join(possible_paths)
+        "Validation dataset not found in any of candidate locations:\n" + "\n".join(possible_paths)
     )
 
 df_val_new = pd.read_csv(validation_path)

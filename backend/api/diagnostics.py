@@ -2,8 +2,8 @@
 Mass balance and system health diagnostics endpoints.
 """
 
-from typing import List, Optional
 from fastapi import APIRouter, Depends
+
 from backend.models.schemas import MassBalanceResponse
 
 router = APIRouter(prefix="/api/diagnostics", tags=["Diagnostics"])
@@ -35,7 +35,7 @@ def get_mass_balance_diagnostic(sim=Depends(get_sim_service)):
     return latest
 
 
-@router.get("/history", response_model=List[MassBalanceResponse])
+@router.get("/history", response_model=list[MassBalanceResponse])
 def get_mass_balance_history(sim=Depends(get_sim_service)):
     """
     Returns historical mass balance logs across simulation steps.

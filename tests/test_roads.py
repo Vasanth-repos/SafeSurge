@@ -6,10 +6,11 @@ exposure-weighted confidence, and risk classification.
 
 import pytest
 from shapely.geometry import LineString, Polygon
-from roads.models import Road, RoadCellExposure
+
+from roads.exposure import calculate_road_depth
 from roads.mapping import RoadSpatialMapper
-from roads.exposure import calculate_road_depth, calculate_road_confidence
-from roads.risk import classify_road_risk, RoadRiskEngine
+from roads.models import Road, RoadCellExposure
+from roads.risk import classify_road_risk
 
 
 def test_road_spatial_intersection_and_exposure_fraction():

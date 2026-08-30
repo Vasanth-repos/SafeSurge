@@ -4,12 +4,12 @@ Simulates stateful node storage, capacity-constrained pipe transport, proportion
 explicit surcharge generation, outlet discharge, and strict mass conservation.
 """
 
-from typing import Dict, List, Optional, Tuple, Any, Union
+import math
 from dataclasses import dataclass
 from pathlib import Path
-import math
+from typing import Any
+
 import networkx as nx
-import numpy as np
 
 from flood_engine.config import load_config
 
@@ -25,8 +25,8 @@ class DrainageNode:
         storage_capacity_m3: float = 10.0,
         invert_elevation_m: float = 0.0,
         ground_elevation_m: float = 1.0,
-        associated_cell_id: Optional[Any] = None,
-        cell_id: Optional[Any] = None,
+        associated_cell_id: Any | None = None,
+        cell_id: Any | None = None,
         capacity_factor: float = 1.0,
         name: str = "",
         **kwargs,
@@ -56,8 +56,8 @@ class DrainageEdge:
         from_node: Any,
         to_node: Any,
         length_m: float = 50.0,
-        capacity_m3_s: Optional[float] = None,
-        base_capacity_m3_s: Optional[float] = None,
+        capacity_m3_s: float | None = None,
+        base_capacity_m3_s: float | None = None,
         diameter_m: float = 0.8,
         slope: float = 0.01,
         upstream_invert_elevation_m: float = 0.0,
@@ -95,10 +95,10 @@ class EdgeFlowResult:
 class DrainageStepResult:
     timestamp_seconds: int
     timestep_seconds: int
-    node_storage_m3_by_node: Dict[str, float]
-    edge_flows: Dict[str, EdgeFlowResult]
-    outlet_discharge_m3_by_node: Dict[str, float]
-    surcharge_volume_m3_by_node: Dict[str, float]
+    node_storage_m3_by_node: dict[str, float]
+    edge_flows: dict[str, EdgeFlowResult]
+    outlet_discharge_m3_by_node: dict[str, float]
+    surcharge_volume_m3_by_node: dict[str, float]
     external_inflow_m3: float
     transmitted_volume_m3: float
     outlet_volume_m3: float
@@ -110,13 +110,13 @@ class DrainageStepResult:
 class StatefulDrainageNetwork:
     def __init__(
         self,
-        nodes: Optional[List[DrainageNode]] = None,
-        edges: Optional[List[DrainageEdge]] = None,
+        nodes: list[DrainageNode] | None = None,
+        edges: list[DrainageEdge] | None = None,
         expected_timestep_seconds: int = 60,
-        config_path: Optional[Union[str, Path]] = "config.yaml",
+        config_path: str | Path | None = "config.yaml",
     ):
-        self.nodes: Dict[str, DrainageNode] = {}
-        self.edges: Dict[str, DrainageEdge] = {}
+        self.nodes: dict[str, DrainageNode] = {}
+        self.edges: dict[str, DrainageEdge] = {}
         self.graph = nx.DiGraph()
         self.expected_timestep_seconds = int(expected_timestep_seconds)
 
@@ -125,12 +125,12 @@ class StatefulDrainageNetwork:
             self.expected_timestep_seconds = int(cfg.get("simulation", {}).get("timestep_seconds", self.expected_timestep_seconds))
 
         # Dynamic State (m³)
-        self.node_storage_m3: Dict[str, float] = {}
+        self.node_storage_m3: dict[str, float] = {}
         self.cumulative_inflow_m3: float = 0.0
         self.cumulative_outlet_discharge_m3: float = 0.0
         self.cumulative_surcharge_m3: float = 0.0
-        self.last_timestamp_seconds: Optional[int] = None
-        self.history: List[DrainageStepResult] = []
+        self.last_timestamp_seconds: int | None = None
+        self.history: list[DrainageStepResult] = []
 
         if nodes:
             for n in nodes:
@@ -140,7 +140,7 @@ class StatefulDrainageNetwork:
                 self.add_edge(e)
 
     @property
-    def node_ids(self) -> List[str]:
+    def node_ids(self) -> list[str]:
         return [str(k) for k in self.nodes.keys() if isinstance(k, str)]
 
     @property
@@ -194,7 +194,7 @@ class StatefulDrainageNetwork:
         self.last_timestamp_seconds = None
         self.history.clear()
 
-    def outgoing_edges(self, node_id: Any) -> List[DrainageEdge]:
+    def outgoing_edges(self, node_id: Any) -> list[DrainageEdge]:
         edges = []
         nid_str = str(node_id)
         if nid_str in self.graph:
@@ -202,7 +202,7 @@ class StatefulDrainageNetwork:
                 edges.append(data["data"])
         return edges
 
-    def incoming_edges(self, node_id: Any) -> List[DrainageEdge]:
+    def incoming_edges(self, node_id: Any) -> list[DrainageEdge]:
         edges = []
         nid_str = str(node_id)
         if nid_str in self.graph:
@@ -211,7 +211,7 @@ class StatefulDrainageNetwork:
         return edges
 
     @property
-    def cell_to_node(self) -> Dict[Any, Any]:
+    def cell_to_node(self) -> dict[Any, Any]:
         """Mapping from computational cell_id to node_id."""
         mapping = {}
         for n in self.nodes.values():
@@ -225,7 +225,7 @@ class StatefulDrainageNetwork:
                 mapping[n.associated_cell_id] = n.node_id
         return mapping
 
-    def get_inlet_for_cell(self, cell_id: Any) -> Optional[DrainageNode]:
+    def get_inlet_for_cell(self, cell_id: Any) -> DrainageNode | None:
         """Retrieves drainage node associated with a specific computational cell ID."""
         cid_str = str(cell_id)
         for n in self.nodes.values():
@@ -259,7 +259,7 @@ class StatefulDrainageNetwork:
         cap_vol = target_node.base_capacity_m3_s * getattr(target_node, "capacity_factor", 1.0) * float(dt_seconds)
         return min(max(0.0, float(available_m3)), cap_vol)
 
-    def validate_timestamp(self, timestamp_seconds: int, dt_seconds: Optional[int] = None) -> None:
+    def validate_timestamp(self, timestamp_seconds: int, dt_seconds: int | None = None) -> None:
         """Enforces strictly advancing timestamps matching configured spacing."""
         if not isinstance(timestamp_seconds, (int, float)) or math.isnan(timestamp_seconds) or math.isinf(timestamp_seconds):
             raise ValueError(f"Invalid timestamp: {timestamp_seconds}")
@@ -276,9 +276,9 @@ class StatefulDrainageNetwork:
     def step(
         self,
         timestamp_seconds: int,
-        inflow_volume_m3_by_node: Optional[Dict[str, float]] = None,
-        capacity_factor_by_edge: Optional[Dict[str, float]] = None,
-        dt_seconds: Optional[int] = None,
+        inflow_volume_m3_by_node: dict[str, float] | None = None,
+        capacity_factor_by_edge: dict[str, float] | None = None,
+        dt_seconds: int | None = None,
     ) -> DrainageStepResult:
         """
         Executes one stateful drainage network simulation timestep:
@@ -294,7 +294,7 @@ class StatefulDrainageNetwork:
         t = int(timestamp_seconds)
 
         # 1. Parse inflows
-        inflow_map: Dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
+        inflow_map: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
         if inflow_volume_m3_by_node:
             for nid, val in inflow_volume_m3_by_node.items():
                 nid_str = str(nid)
@@ -305,7 +305,7 @@ class StatefulDrainageNetwork:
                 inflow_map[nid_str] = float(val)
 
         # 2. Parse capacity degradation factors (0 <= factor <= 1)
-        cap_factors: Dict[str, float] = {eid: 1.0 for eid in self.edges.keys()}
+        cap_factors: dict[str, float] = {eid: 1.0 for eid in self.edges.keys()}
         if capacity_factor_by_edge:
             for eid, f_val in capacity_factor_by_edge.items():
                 eid_str = str(eid)
@@ -316,12 +316,12 @@ class StatefulDrainageNetwork:
                 cap_factors[eid_str] = float(f_val)
 
         # 3. Synchronous Pipe Outflow Evaluation
-        available_at_node: Dict[str, float] = {}
+        available_at_node: dict[str, float] = {}
         for nid in self.nodes.keys():
             available_at_node[nid] = self.node_storage_m3[nid] + inflow_map[nid]
 
-        edge_flow_results: Dict[str, EdgeFlowResult] = {}
-        downstream_arrivals_m3: Dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
+        edge_flow_results: dict[str, EdgeFlowResult] = {}
+        downstream_arrivals_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
         total_pipe_transmitted_m3 = 0.0
 
         for nid, node in self.nodes.items():
@@ -388,9 +388,9 @@ class StatefulDrainageNetwork:
             available_at_node[nid] -= transferred_from_node
 
         # 4. Outlets, Node Storage Retention, and Surcharge
-        outlet_discharge_m3: Dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
-        surcharge_m3: Dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
-        new_storage_m3: Dict[str, float] = {}
+        outlet_discharge_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
+        surcharge_m3: dict[str, float] = {nid: 0.0 for nid in self.nodes.keys()}
+        new_storage_m3: dict[str, float] = {}
 
         step_outlet_total = 0.0
         step_surcharge_total = 0.0
@@ -452,7 +452,7 @@ class StatefulDrainageNetwork:
         self.history.append(step_res)
         return step_res
 
-    def mass_balance(self) -> Dict[str, Any]:
+    def mass_balance(self) -> dict[str, Any]:
         """Returns cumulative mass balance accounting across the drainage network."""
         current_stored = sum(self.node_storage_m3.values())
         error_m3 = (
@@ -476,7 +476,7 @@ class StatefulDrainageNetwork:
         target_node: Any,
         volume_m3: float,
         dt_seconds: float = 60.0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Diagnostic path traversal helper."""
         src_str = str(source_node)
         tgt_str = str(target_node)

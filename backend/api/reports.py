@@ -5,13 +5,13 @@ Adapts dynamically to the exact live simulation state, current lead time, inject
 """
 
 import os
-from typing import Optional
-from fastapi import APIRouter, Query, HTTPException, status
+
+from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import FileResponse
 
+from backend.api.snapshots import get_snapshot_service
 from replay.scenarios import ScenarioRunner
 from reporting.docx_generator import create_3hour_prediction_docx
-from backend.api.snapshots import get_snapshot_service
 
 router = APIRouter(prefix="/api/reports", tags=["Reports"])
 
@@ -86,5 +86,5 @@ def download_3hour_docx_report(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"error": f"Failed to generate DOCX report: {str(e)}"},
+            detail={"error": f"Failed to generate DOCX report: {e!s}"},
         )

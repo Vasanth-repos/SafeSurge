@@ -6,15 +6,15 @@ verifying state immutability, road coverage preservation, and deterministic clas
 
 import pytest
 from shapely.geometry import Polygon
-from flood_engine.grid import ComputationalGrid
+
 from flood_engine.d8 import D8Terrain
-from flood_engine.surface import SurfaceStorageEngine
 from flood_engine.depth import DepthEngine, RoadFeature
+from flood_engine.grid import ComputationalGrid
 from flood_engine.risk import (
-    RiskEngine,
-    RiskState,
     DataStatus,
+    RiskEngine,
 )
+from flood_engine.surface import SurfaceStorageEngine
 
 
 def test_full_chain_layer5_layer9_layer10_integration():

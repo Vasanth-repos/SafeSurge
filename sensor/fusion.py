@@ -2,9 +2,7 @@
 Sensor data fusion: exponential smoothing bias correction and spatial IDW propagation.
 """
 
-from typing import Dict, Tuple, List, Optional
 import math
-import numpy as np
 
 
 def update_sensor_bias(
@@ -12,7 +10,7 @@ def update_sensor_bias(
     observed_depth_cm: float,
     prev_bias: float = 0.0,
     alpha: float = 0.3,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Computes new bias: new_bias = alpha * (observed - predicted) + (1 - alpha) * prev_bias
     Returns (new_bias, raw_error).
@@ -23,9 +21,9 @@ def update_sensor_bias(
 
 
 def propagate_spatial_bias(
-    target_pos: Tuple[int, int],
-    active_sensor_biases: Dict[int, float],
-    sensor_positions: Dict[int, Tuple[int, int]],
+    target_pos: tuple[int, int],
+    active_sensor_biases: dict[int, float],
+    sensor_positions: dict[int, tuple[int, int]],
     cell_size_m: float = 10.0,
 ) -> float:
     """

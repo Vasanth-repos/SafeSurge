@@ -5,13 +5,14 @@ proportional branching, explicit surcharge generation, outlet discharge,
 synchronous transmission, and strict mass conservation.
 """
 
-import pytest
 import math
+
+import pytest
+
 from flood_engine.drainage import (
-    StatefulDrainageNetwork,
-    DrainageNode,
     DrainageEdge,
-    DrainageStepResult,
+    DrainageNode,
+    StatefulDrainageNetwork,
 )
 
 

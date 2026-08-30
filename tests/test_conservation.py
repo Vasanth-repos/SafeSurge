@@ -3,7 +3,6 @@ Scenario 1: Mass Conservation Validation
 Runs a replay storm and asserts |balance_error| <= tolerance at every single timestep.
 """
 
-import pytest
 from backend.services.simulation_service import SimulationService
 
 

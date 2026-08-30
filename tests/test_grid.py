@@ -4,9 +4,10 @@ Verifies ComputationalGrid catchment masking, boundary discovery,
 outlet validation, O(1) cell lookup, and metadata persistence.
 """
 
-import pytest
+
 import numpy as np
-from pathlib import Path
+import pytest
+
 from flood_engine.grid import ComputationalGrid, GridCell
 
 

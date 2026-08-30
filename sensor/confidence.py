@@ -2,14 +2,14 @@
 Composite confidence scoring: coverage, freshness, and windowed agreement.
 """
 
-from typing import List
+
 import numpy as np
 
 
 def compute_confidence_score(
     sensor_coverage: float,
     freshness: float,
-    recent_errors_window: List[float],
+    recent_errors_window: list[float],
     wc: float = 0.3,
     wf: float = 0.2,
     wa: float = 0.5,

@@ -6,8 +6,8 @@ historical observation windows, spatial confidence metrics, and fused cell field
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -26,8 +26,8 @@ class SensorBiasState:
     sensor_id: str
     bias_cm: float = 0.0
     observation_count: int = 0
-    last_updated_seconds: Optional[int] = None
-    last_residual_cm: Optional[float] = None
+    last_updated_seconds: int | None = None
+    last_residual_cm: float | None = None
     is_eligible: bool = False
 
 
@@ -47,11 +47,11 @@ class CellConfidence:
     freshness: float
     agreement: float
     history_factor: float
-    nearest_sensor_id: Optional[str] = None
-    sensor_age_seconds: Optional[int] = None
+    nearest_sensor_id: str | None = None
+    sensor_age_seconds: int | None = None
     agreement_observation_count: int = 0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "score": round(self.score, 4),
             "coverage": round(self.coverage, 4),
@@ -72,7 +72,7 @@ class FusedCellResult:
     corrected_depth_cm: float
     confidence: CellConfidence
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "cell_id": self.cell_id,
             "depth": {
@@ -92,10 +92,10 @@ class FusedCellResult:
 @dataclass(frozen=True)
 class FusionStepResult:
     timestamp_seconds: int
-    cells: Dict[str, FusedCellResult]
-    sensor_biases: Dict[str, float]
+    cells: dict[str, FusedCellResult]
+    sensor_biases: dict[str, float]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "timestamp_seconds": self.timestamp_seconds,
             "sensor_biases": {sid: round(b, 4) for sid, b in self.sensor_biases.items()},

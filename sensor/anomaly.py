@@ -2,24 +2,24 @@
 Sensor and hydrological anomaly detection.
 """
 
-from typing import List, Optional
+
 from sensor.health import SensorNode
 
 
 def detect_sensor_anomalies(
     sensor: SensorNode,
     model_predicted_depth_cm: float,
-    prev_reading_cm: Optional[float],
+    prev_reading_cm: float | None,
     dt_seconds: float = 60.0,
     r_critical_cm_min: float = 5.0,
     tau_disagreement_cm: float = 10.0,
     drain_capacity_factor: float = 1.0,
-) -> List[str]:
+) -> list[str]:
     """
     Detects sensor spikes, physical rate anomalies, model disagreements,
     sensor/float inconsistencies, and drainage capacity anomalies.
     """
-    flags: List[str] = []
+    flags: list[str] = []
 
     if sensor.last_reading_cm is None:
         return ["NORMAL"]
@@ -37,9 +37,7 @@ def detect_sensor_anomalies(
         flags.append("MODEL_DISAGREEMENT")
 
     # 3. Check sensor/float inconsistency
-    if sensor.float_state and sensor.last_reading_cm < 2.0 and sensor.last_quality_flag == "VALID":
-        flags.append("SENSOR_INCONSISTENCY")
-    elif not sensor.float_state and sensor.last_reading_cm > 40.0:
+    if sensor.float_state and sensor.last_reading_cm < 2.0 and sensor.last_quality_flag == "VALID" or not sensor.float_state and sensor.last_reading_cm > 40.0:
         flags.append("SENSOR_INCONSISTENCY")
 
     # 4. Correlate with drainage condition

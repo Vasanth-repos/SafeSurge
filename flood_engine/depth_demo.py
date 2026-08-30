@@ -4,13 +4,14 @@ Transforms surface flood storage into cell-average depth fields and projects
 inundation onto road segments via area-weighted spatial overlay.
 """
 
-from shapely.geometry import Polygon, LineString
-from flood_engine.grid import ComputationalGrid
+from shapely.geometry import LineString, Polygon
+
 from flood_engine.depth import (
     DepthEngine,
     RoadFeature,
     classify_depth,
 )
+from flood_engine.grid import ComputationalGrid
 
 
 def main():

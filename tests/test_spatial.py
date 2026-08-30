@@ -5,8 +5,9 @@ correction bounds, and offline sensor exclusion.
 """
 
 import pytest
+
 from fusion.models import SensorBiasState
-from fusion.spatial import calculate_freshness, SpatialBiasCorrector
+from fusion.spatial import SpatialBiasCorrector, calculate_freshness
 
 
 def test_freshness_decay():

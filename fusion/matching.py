@@ -6,7 +6,8 @@ and verifies temporal alignment tolerances.
 
 from __future__ import annotations
 
-from typing import Mapping, Optional, Tuple
+from collections.abc import Mapping
+
 from fusion.models import SensorObservation
 
 
@@ -15,7 +16,7 @@ def match_sensor_to_model(
     model_depth_cm_by_cell: Mapping[str, float],
     model_timestamp_seconds: int,
     max_time_difference_seconds: int = 30,
-) -> Tuple[bool, Optional[float], Optional[float]]:
+) -> tuple[bool, float | None, float | None]:
     """
     Matches sensor observation to grid cell:
     1. Checks if observation.cell_id exists in model output.

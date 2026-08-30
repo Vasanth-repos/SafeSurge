@@ -4,8 +4,9 @@ Verifies matching logic, time skew tolerances, and missing cell handling.
 """
 
 import pytest
-from fusion.models import SensorObservation
+
 from fusion.matching import match_sensor_to_model
+from fusion.models import SensorObservation
 
 
 def test_matching_exact_and_acceptable_time_difference():

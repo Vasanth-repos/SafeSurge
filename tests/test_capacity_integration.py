@@ -5,22 +5,22 @@ Capacity Degradation -> Reduced Pipe Throughput -> Increased Node Storage -> Sur
 with strict mass conservation across both baseline and degraded scenarios.
 """
 
+
 import pytest
-import math
-from flood_engine.grid import ComputationalGrid
-from flood_engine.d8 import D8Terrain
-from flood_engine.surface import SurfaceStorageEngine
-from flood_engine.drainage import StatefulDrainageNetwork, DrainageNode, DrainageEdge
+
+from flood_engine.capacity import (
+    CapacityEvent,
+    CapacityScenario,
+)
 from flood_engine.coupling import (
     DrainageInlet,
     InletCellMapping,
     SurfaceDrainageCouplingEngine,
 )
-from flood_engine.capacity import (
-    load_capacity_scenario,
-    CapacityScenario,
-    CapacityEvent,
-)
+from flood_engine.d8 import D8Terrain
+from flood_engine.drainage import DrainageEdge, DrainageNode, StatefulDrainageNetwork
+from flood_engine.grid import ComputationalGrid
+from flood_engine.surface import SurfaceStorageEngine
 
 
 def _setup_coupled_system():
@@ -105,6 +105,7 @@ def test_baseline_vs_reduced_capacity_experiment():
     # Total surcharge in Run B must be >= Run A
     surch_a = sum(s.total_drainage_capture_m3 - s.drainage_outlet_volume_m3 for s in steps_a)
     surch_b = sum(s.total_drainage_capture_m3 - s.drainage_outlet_volume_m3 for s in steps_b)
+    assert surch_b >= surch_a
 
     assert steps_b[-1].pending_surcharge_m3_by_cell["C00022"] >= steps_a[-1].pending_surcharge_m3_by_cell["C00022"]
 

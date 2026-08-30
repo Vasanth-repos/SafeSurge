@@ -6,18 +6,19 @@ and ranks headline primary classification with severity grading.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple, Any, Mapping
+from typing import Any
+
 from anomalies.models import (
-    AnomalyType,
-    AnomalySeverity,
     AnomalyAssessment,
+    AnomalySeverity,
+    AnomalyType,
 )
 from anomalies.rules import (
     calculate_rise_rate,
-    detect_rapid_rise,
-    detect_model_disagreement,
-    detect_sensor_inconsistency,
     detect_capacity_anomaly,
+    detect_model_disagreement,
+    detect_rapid_rise,
+    detect_sensor_inconsistency,
 )
 
 # Priority order for headline primary classification
@@ -56,14 +57,14 @@ class AnomalyDetector:
         cell_id: str,
         timestamp_seconds: int,
         current_depth_cm: float,
-        previous_depth_cm: Optional[float] = None,
-        previous_timestamp_seconds: Optional[int] = None,
-        original_model_depth_cm: Optional[float] = None,
-        sensor_depth_cm: Optional[float] = None,
+        previous_depth_cm: float | None = None,
+        previous_timestamp_seconds: int | None = None,
+        original_model_depth_cm: float | None = None,
+        sensor_depth_cm: float | None = None,
         sensor_valid: bool = False,
-        float_state: Optional[str] = None,
+        float_state: str | None = None,
         float_valid: bool = False,
-        float_timestamp_seconds: Optional[int] = None,
+        float_timestamp_seconds: int | None = None,
         capacity_factor: float = 1.0,
         expected_capture_m3: float = 0.0,
         observed_capture_m3: float = 0.0,
@@ -71,8 +72,8 @@ class AnomalyDetector:
         """
         Evaluates all anomaly criteria for a cell snapshot.
         """
-        detected: List[AnomalyType] = []
-        details: Dict[str, Any] = {}
+        detected: list[AnomalyType] = []
+        details: dict[str, Any] = {}
 
         # 1. Rapid Rise
         rise_rate_cm_min = 0.0

@@ -2,15 +2,16 @@
 FastAPI Endpoints for Physics-Guided Machine Learning (PGML) & AURA-FLOOD XGBoost Flood Nowcasting.
 """
 
-from typing import Optional
+
 from fastapi import APIRouter, Query
-from ml.infer import predict_catchment_depths, get_or_load_model
+
 from ml.features import FEATURE_NAMES
+from ml.infer import predict_catchment_depths
 from ml.model import AuraFloodScenarioXGBoost
 
 router = APIRouter(prefix="/api/ml", tags=["Machine Learning Nowcasting"])
 
-_scenario_xgb_model: Optional[AuraFloodScenarioXGBoost] = None
+_scenario_xgb_model: AuraFloodScenarioXGBoost | None = None
 
 
 def get_scenario_xgb() -> AuraFloodScenarioXGBoost:
@@ -23,7 +24,7 @@ def get_scenario_xgb() -> AuraFloodScenarioXGBoost:
 @router.get("/predict")
 def get_ml_prediction(
     lead_time_minutes: int = Query(0, ge=0, le=180),
-    scenario_id: Optional[str] = Query("storm_01"),
+    scenario_id: str | None = Query("storm_01"),
     drain_capacity_factor: float = Query(1.0, ge=0.0, le=1.0),
 ):
     """
@@ -111,10 +112,11 @@ def get_ml_metrics():
 @router.get("/validate-xgboost")
 def run_xgboost_validation_endpoint():
     """Triggers the independent XGBoost validation script and returns the scored evaluation."""
-    import pandas as pd
-    import numpy as np
-    import joblib
     import os
+
+    import joblib
+    import numpy as np
+    import pandas as pd
     from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
     val_path = os.path.join("datasets_physics_model", "validation_datasets", "validation_data_scenario_level.csv")

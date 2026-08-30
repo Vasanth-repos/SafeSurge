@@ -5,9 +5,9 @@ Enums and dataclasses for deterministic physical and operational anomaly assessm
 
 from __future__ import annotations
 
-from enum import Enum
 from dataclasses import dataclass
-from typing import Tuple, Dict, Any, Optional
+from enum import Enum
+from typing import Any
 
 
 class AnomalyType(str, Enum):
@@ -28,12 +28,12 @@ class AnomalySeverity(str, Enum):
 class AnomalyAssessment:
     cell_id: str
     timestamp_seconds: int
-    detected: Tuple[AnomalyType, ...]
+    detected: tuple[AnomalyType, ...]
     primary: AnomalyType
     severity: AnomalySeverity
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "cell_id": self.cell_id,
             "timestamp_seconds": self.timestamp_seconds,

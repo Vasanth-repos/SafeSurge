@@ -2,12 +2,10 @@
 End-to-End Integration Test: Layer 5 (Surface Storage) -> Layer 6 (Drainage Network Coupling).
 """
 
-import pytest
-import math
-from flood_engine.grid import ComputationalGrid
 from flood_engine.d8 import D8Terrain
+from flood_engine.drainage import DrainageEdge, DrainageNode, StatefulDrainageNetwork
+from flood_engine.grid import ComputationalGrid
 from flood_engine.surface import SurfaceStorageEngine
-from flood_engine.drainage import StatefulDrainageNetwork, DrainageNode, DrainageEdge
 
 
 def test_surface_to_drainage_coupling_conservation():

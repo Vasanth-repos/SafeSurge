@@ -6,30 +6,26 @@ and stores immutable time-indexed simulation snapshots.
 
 from __future__ import annotations
 
-from enum import Enum
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any, Mapping, Tuple
-import time
 import math
+import time
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any
+
 from shapely.geometry import LineString, Polygon
 
-from flood_engine.runoff import RunoffEngine, CellRunoffState
-from flood_engine.surface import SurfaceStorageEngine
-from flood_engine.drainage import StatefulDrainageNetwork, DrainageNode, DrainageEdge
-from flood_engine.coupling import SurfaceDrainageCouplingEngine
-from flood_engine.depth import DepthEngine
-from flood_engine.risk import RiskEngine, RiskProfile
-from sensors.registry import SensorRegistry
-from sensors.validation import SensorValidator
-from fusion.pipeline import FusionPipeline
-from fusion.models import SensorObservation
 from anomalies.detector import AnomalyDetector
-from roads.models import Road, RoadRisk
+from flood_engine.risk import RiskEngine
+from fusion.models import SensorObservation
+from fusion.pipeline import FusionPipeline
 from roads.mapping import RoadSpatialMapper
+from roads.models import Road, RoadRisk
 from roads.risk import RoadRiskEngine
 from routing.graph import DirectedRoadGraph
-from routing.router import EmergencyRouter
 from routing.models import RoadEdge
+from routing.router import EmergencyRouter
+from sensors.registry import SensorRegistry
+from sensors.validation import SensorValidator
 
 
 class SimulationStatus(str, Enum):
@@ -44,10 +40,10 @@ class SimulationStatus(str, Enum):
 class SimulationSnapshot:
     simulation_id: str
     timestamp_seconds: int
-    flood_grid: Dict[str, Any]
-    anomalies: Dict[str, Any]
-    road_risks: Dict[str, Any]
-    sensor_states: Dict[str, Any]
+    flood_grid: dict[str, Any]
+    anomalies: dict[str, Any]
+    road_risks: dict[str, Any]
+    sensor_states: dict[str, Any]
 
 
 @dataclass
@@ -57,7 +53,7 @@ class SimulationInstance:
     status: SimulationStatus = SimulationStatus.IDLE
     current_timestamp_seconds: int = 0
     forecast_minutes: int = 180
-    snapshots: Dict[int, SimulationSnapshot] = None
+    snapshots: dict[int, SimulationSnapshot] = None
 
     def __post_init__(self):
         if self.snapshots is None:
@@ -67,8 +63,8 @@ class SimulationInstance:
 class SimulationManager:
     def __init__(self, config_path: str = "config.yaml"):
         self.config_path = config_path
-        self._simulations: Dict[str, SimulationInstance] = {}
-        self.active_simulation_id: Optional[str] = None
+        self._simulations: dict[str, SimulationInstance] = {}
+        self.active_simulation_id: str | None = None
 
         # Base engine initialization
         self.sensor_registry = SensorRegistry.load_from_yaml("data/sensors/registry.yaml")
@@ -83,9 +79,9 @@ class SimulationManager:
 
     def _build_demo_topology(self):
         # 10x10 grid (100 cells, 10m x 10m)
-        self.cell_coords: Dict[str, Tuple[float, float]] = {}
-        self.cell_geometries: Dict[str, Polygon] = {}
-        self.cell_elevations: Dict[str, float] = {}
+        self.cell_coords: dict[str, tuple[float, float]] = {}
+        self.cell_geometries: dict[str, Polygon] = {}
+        self.cell_elevations: dict[str, float] = {}
 
         for r in range(10):
             for c in range(10):
@@ -151,7 +147,6 @@ class SimulationManager:
         return instance
 
     def _run_simulation_replay(self, instance: SimulationInstance):
-        depth_engine = DepthEngine()
         prev_depths = {cid: 0.0 for cid in self.cell_coords}
         prev_t = 0
 
@@ -227,10 +222,10 @@ class SimulationManager:
             prev_depths = cell_depth_map
             prev_t = t
 
-    def get_simulation(self, simulation_id: str) -> Optional[SimulationInstance]:
+    def get_simulation(self, simulation_id: str) -> SimulationInstance | None:
         return self._simulations.get(simulation_id)
 
-    def get_snapshot(self, simulation_id: str, timestamp_seconds: Optional[int] = None) -> Optional[SimulationSnapshot]:
+    def get_snapshot(self, simulation_id: str, timestamp_seconds: int | None = None) -> SimulationSnapshot | None:
         sim = self.get_simulation(simulation_id)
         if not sim or not sim.snapshots:
             return None

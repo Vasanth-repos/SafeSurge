@@ -2,8 +2,6 @@
 Cell storage and synchronous water balance state management.
 """
 
-from typing import Dict, List, Tuple
-import numpy as np
 
 
 class GridCellState:
@@ -35,17 +33,17 @@ class GridCellState:
 
 
 def synchronous_storage_update(
-    cells: Dict[int, GridCellState],
-    incremental_runoffs: Dict[int, float],
-    surface_inflows: Dict[int, float],
-    surface_outflows: Dict[int, float],
-    drain_captures: Dict[int, float],
+    cells: dict[int, GridCellState],
+    incremental_runoffs: dict[int, float],
+    surface_inflows: dict[int, float],
+    surface_outflows: dict[int, float],
+    drain_captures: dict[int, float],
 ) -> None:
     """
     Applies the conservation-governed storage update across all cells synchronously:
     S_{t+1} = max(0, S_t + Runoff_t + Inflow_t - Outflow_t - DrainCapture_t)
     """
-    next_storages: Dict[int, float] = {}
+    next_storages: dict[int, float] = {}
 
     for cid, cell in cells.items():
         r_in = incremental_runoffs.get(cid, 0.0)

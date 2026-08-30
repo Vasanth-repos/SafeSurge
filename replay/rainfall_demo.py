@@ -2,8 +2,7 @@
 Layer 3 — Rainfall Replay Demo Entry Point.
 """
 
-from pathlib import Path
-from replay.rainfall import load_rainfall_replay, ScalarRainfallReplay
+from replay.rainfall import ScalarRainfallReplay, load_rainfall_replay
 
 
 def main():
@@ -18,7 +17,7 @@ def main():
         config_path=config_path,
     )
 
-    print(f"Config: config.yaml")
+    print("Config: config.yaml")
     print(f"Source: {source_file}")
     print(f"Configured timestep: {replay.timestep_seconds} seconds")
     print(f"Replay timestep: {replay.timestep_seconds} seconds")

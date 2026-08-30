@@ -6,10 +6,9 @@ without silent clamping.
 
 from __future__ import annotations
 
-from typing import Optional
+from sensors.filtering import filter_echoes
 from sensors.models import SensorEnvelope, UltrasonicMeasurement
 from sensors.registry import SensorConfig
-from sensors.filtering import filter_echoes
 
 
 def distance_to_water_level(

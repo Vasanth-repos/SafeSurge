@@ -6,9 +6,9 @@ validation verdicts, device health states, and audit packets.
 
 from __future__ import annotations
 
-from enum import Enum
 from dataclasses import dataclass
-from typing import Tuple, Optional, Any, Dict
+from enum import Enum
+from typing import Any
 
 
 class SensorState(str, Enum):
@@ -44,10 +44,10 @@ class SensorEnvelope:
     sequence: int
     measured_at_seconds: int
     received_at_seconds: int
-    distance_samples_cm: Tuple[Optional[float], ...]
-    float_triggered: Optional[bool] = None
+    distance_samples_cm: tuple[float | None, ...]
+    float_triggered: bool | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "sensor_id": self.sensor_id,
             "boot_id": self.boot_id,
@@ -66,10 +66,10 @@ class UltrasonicMeasurement:
     sequence: int
     measured_at_seconds: int
     received_at_seconds: int
-    distance_cm: Optional[float]
-    water_level_cm: Optional[float]
+    distance_cm: float | None
+    water_level_cm: float | None
     valid_echo_count: int
-    float_triggered: Optional[bool] = None
+    float_triggered: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -79,15 +79,15 @@ class ValidationResult:
     sequence: int
     measured_at_seconds: int
     received_at_seconds: int
-    distance_cm: Optional[float]
-    water_level_cm: Optional[float]
+    distance_cm: float | None
+    water_level_cm: float | None
     sensor_state: SensorState
     measurement_status: MeasurementStatus
     rejection_reason: RejectionReason
-    quality_flags: Tuple[str, ...] = ()
-    location_id: Optional[str] = None
+    quality_flags: tuple[str, ...] = ()
+    location_id: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "sensor_id": self.sensor_id,
             "location_id": self.location_id,

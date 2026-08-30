@@ -4,10 +4,8 @@ Verifies automated Prototype Health Check, invariant assertions, fault resilienc
 and recovery suites.
 """
 
-import pytest
-from prototype_validation.runner import PrototypeValidationRunner
 from prototype_validation.models import CheckStatus
-from prototype_validation.thresholds import ValidationThresholds
+from prototype_validation.runner import PrototypeValidationRunner
 
 
 def test_full_prototype_validation_report_pass():

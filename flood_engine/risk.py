@@ -6,11 +6,13 @@ Classifies computed flood depths (cm) into configurable prototype risk states
 
 from __future__ import annotations
 
-from enum import Enum
-from dataclasses import dataclass
-from typing import Mapping, Sequence, Dict, List, Optional, Tuple, Any, Union
 import math
+from collections.abc import Mapping
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
+from typing import Any
+
 import yaml
 
 
@@ -98,7 +100,7 @@ def load_risk_profile(config: Mapping[str, Any]) -> RiskProfile:
     )
 
 
-def load_risk_profile_from_yaml(config_path: Union[str, Path] = "config.yaml") -> RiskProfile:
+def load_risk_profile_from_yaml(config_path: str | Path = "config.yaml") -> RiskProfile:
     p = Path(config_path)
     if not p.exists():
         raise FileNotFoundError(f"Configuration file not found: {p}")
@@ -159,8 +161,8 @@ class RiskResult:
     reference_time_seconds: int
     valid_time_seconds: int
     lead_time_seconds: int
-    depth_cm: Optional[float]
-    risk_state: Optional[RiskState]
+    depth_cm: float | None
+    risk_state: RiskState | None
     data_status: DataStatus
     source: DataSource
     risk_profile_id: str
@@ -172,11 +174,11 @@ class RoadRiskResult:
     reference_time_seconds: int
     valid_time_seconds: int
     lead_time_seconds: int
-    weighted_depth_cm: Optional[float]
-    max_intersecting_cell_depth_cm: Optional[float]
+    weighted_depth_cm: float | None
+    max_intersecting_cell_depth_cm: float | None
     coverage_fraction: float
     coverage_status: str
-    risk_state: Optional[RiskState]
+    risk_state: RiskState | None
     data_status: DataStatus
     source: DataSource
     risk_profile_id: str
@@ -184,7 +186,7 @@ class RoadRiskResult:
 
 def classify_location(
     location_id: str,
-    depth_cm: Optional[float],
+    depth_cm: float | None,
     reference_time_seconds: int,
     valid_time_seconds: int,
     profile: RiskProfile,
@@ -227,7 +229,7 @@ def classify_cell_depths(
     cell_depths: Mapping[str, Any],
     reference_time_seconds: int,
     profile: RiskProfile,
-) -> Dict[str, RiskResult]:
+) -> dict[str, RiskResult]:
     results = {}
     for cell_id, cd in cell_depths.items():
         v_time = int(getattr(cd, "timestamp_seconds", reference_time_seconds))
@@ -253,7 +255,7 @@ def classify_road_depths(
     road_depths: Mapping[str, Any],
     reference_time_seconds: int,
     profile: RiskProfile,
-) -> Dict[str, RoadRiskResult]:
+) -> dict[str, RoadRiskResult]:
     results = {}
     for road_id, rd in road_depths.items():
         v_time = int(getattr(rd, "timestamp_seconds", reference_time_seconds))
@@ -292,7 +294,7 @@ def classify_road_depths(
     return results
 
 
-def serialize_risk(result: RiskResult) -> Dict[str, Any]:
+def serialize_risk(result: RiskResult) -> dict[str, Any]:
     return {
         "location_id": result.location_id,
         "reference_time_seconds": result.reference_time_seconds,
@@ -306,7 +308,7 @@ def serialize_risk(result: RiskResult) -> Dict[str, Any]:
     }
 
 
-def serialize_road_risk(result: RoadRiskResult) -> Dict[str, Any]:
+def serialize_road_risk(result: RoadRiskResult) -> dict[str, Any]:
     return {
         "road_id": result.road_id,
         "reference_time_seconds": result.reference_time_seconds,
@@ -328,8 +330,8 @@ def serialize_road_risk(result: RoadRiskResult) -> Dict[str, Any]:
 class RiskEngine:
     def __init__(
         self,
-        profile: Optional[RiskProfile] = None,
-        config: Optional[Mapping[str, Any]] = None,
+        profile: RiskProfile | None = None,
+        config: Mapping[str, Any] | None = None,
     ):
         if profile is not None:
             self.profile = profile
@@ -339,14 +341,14 @@ class RiskEngine:
             self.profile = load_risk_profile_from_yaml("config.yaml")
 
     @classmethod
-    def load_from_config(cls, config_path: Union[str, Path] = "config.yaml") -> RiskEngine:
+    def load_from_config(cls, config_path: str | Path = "config.yaml") -> RiskEngine:
         return cls(profile=load_risk_profile_from_yaml(config_path))
 
     def classify_cells(
         self,
         cell_depths: Mapping[str, Any],
         reference_time_seconds: int,
-    ) -> Dict[str, RiskResult]:
+    ) -> dict[str, RiskResult]:
         return classify_cell_depths(
             cell_depths=cell_depths,
             reference_time_seconds=reference_time_seconds,
@@ -357,7 +359,7 @@ class RiskEngine:
         self,
         road_depths: Mapping[str, Any],
         reference_time_seconds: int,
-    ) -> Dict[str, RoadRiskResult]:
+    ) -> dict[str, RoadRiskResult]:
         return classify_road_depths(
             road_depths=road_depths,
             reference_time_seconds=reference_time_seconds,
@@ -368,7 +370,7 @@ class RiskEngine:
         self,
         depth_result: Any,
         reference_time_seconds: int,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         cells = self.classify_cells(
             cell_depths=getattr(depth_result, "cells", {}),
             reference_time_seconds=reference_time_seconds,

@@ -4,13 +4,13 @@ Deterministic scalar and spatial precipitation replay with schema validation,
 provenance fingerprinting, configuration timestep alignment, and physical unit conversions.
 """
 
-from typing import Dict, List, Optional, Tuple, Any, Iterator, Set, Union
-from dataclasses import dataclass
-from pathlib import Path
 import hashlib
 import json
 import math
-import numpy as np
+from collections.abc import Iterator
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 from flood_engine.config import load_config
 
@@ -27,7 +27,7 @@ class RainfallStep:
 class SpatialRainfallStep:
     timestamp_seconds: int
     timestep_seconds: int
-    cells: Dict[str, float]
+    cells: dict[str, float]
 
 
 def rainfall_mm_to_meters(rainfall_mm: float) -> float:
@@ -61,7 +61,7 @@ def compute_content_fingerprint(data: Any) -> str:
 class ScalarRainfallReplay:
     def __init__(
         self,
-        steps: List[RainfallStep],
+        steps: list[RainfallStep],
         timestep_seconds: int,
         source_sha256: str = "",
         content_fingerprint: str = "",
@@ -101,8 +101,8 @@ class ScalarRainfallReplay:
     @classmethod
     def load_from_dict(
         cls,
-        data: Dict[str, Any],
-        expected_timestep_seconds: Optional[int] = None,
+        data: dict[str, Any],
+        expected_timestep_seconds: int | None = None,
         source_sha256: str = "",
     ) -> "ScalarRainfallReplay":
         """Validates schema and loads a ScalarRainfallReplay instance."""
@@ -130,7 +130,7 @@ class ScalarRainfallReplay:
         if not isinstance(raw_steps, list) or len(raw_steps) == 0:
             raise ValueError("Rainfall replay must contain a non-empty 'steps' array.")
 
-        parsed_steps: List[RainfallStep] = []
+        parsed_steps: list[RainfallStep] = []
         expected_minute = 1
 
         for idx, step_item in enumerate(raw_steps):
@@ -172,7 +172,7 @@ class ScalarRainfallReplay:
 class SpatialRainfallReplay:
     def __init__(
         self,
-        steps: List[SpatialRainfallStep],
+        steps: list[SpatialRainfallStep],
         timestep_seconds: int,
         source_sha256: str = "",
         content_fingerprint: str = "",
@@ -195,9 +195,9 @@ class SpatialRainfallReplay:
     @classmethod
     def load_from_dict(
         cls,
-        data: Dict[str, Any],
-        expected_timestep_seconds: Optional[int] = None,
-        valid_cell_ids: Optional[Set[str]] = None,
+        data: dict[str, Any],
+        expected_timestep_seconds: int | None = None,
+        valid_cell_ids: set[str] | None = None,
         strict_coverage: bool = False,
         source_sha256: str = "",
     ) -> "SpatialRainfallReplay":
@@ -219,7 +219,7 @@ class SpatialRainfallReplay:
         if not isinstance(raw_steps, list) or len(raw_steps) == 0:
             raise ValueError("Spatial rainfall replay must contain a non-empty 'steps' array.")
 
-        parsed_steps: List[SpatialRainfallStep] = []
+        parsed_steps: list[SpatialRainfallStep] = []
         for idx, s in enumerate(raw_steps):
             t_sec = int(s.get("timestamp", (idx + 1) * ts_sec))
             cells_map = s.get("cells", {})
@@ -239,7 +239,7 @@ class SpatialRainfallReplay:
                         raise ValueError(f"Strict coverage failed: {len(missing)} grid cells missing spatial rainfall at step {idx}.")
 
             # Validate values & sort keys deterministically
-            norm_cells: Dict[str, float] = {}
+            norm_cells: dict[str, float] = {}
             for cid in sorted(cells_map.keys()):
                 val = cells_map[cid]
                 if not isinstance(val, (int, float)) or math.isnan(val) or math.isinf(val) or val < 0:
@@ -265,11 +265,11 @@ class SpatialRainfallReplay:
 
 
 def load_rainfall_replay(
-    replay_path: Union[str, Path],
-    config_path: Union[str, Path] = "config.yaml",
-    valid_cell_ids: Optional[Set[str]] = None,
+    replay_path: str | Path,
+    config_path: str | Path = "config.yaml",
+    valid_cell_ids: set[str] | None = None,
     strict_coverage: bool = False,
-) -> Union[ScalarRainfallReplay, SpatialRainfallReplay]:
+) -> ScalarRainfallReplay | SpatialRainfallReplay:
     """
     Universal rainfall loader reading configuration timestep and validating schema,
     timestamps, and values.

@@ -5,20 +5,21 @@ Coordinates matching, bias estimation, spatial correction, and confidence scorin
 
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, Optional, Tuple, Any, Sequence, Union
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+
 import yaml
 
-from fusion.models import (
-    SensorObservation,
-    FusedCellResult,
-    FusionStepResult,
-)
+from fusion.bias import SensorBiasEstimator
+from fusion.confidence import ConfidenceEstimator
 from fusion.history import SensorHistoryTracker
 from fusion.matching import match_sensor_to_model
-from fusion.bias import SensorBiasEstimator
+from fusion.models import (
+    FusedCellResult,
+    FusionStepResult,
+    SensorObservation,
+)
 from fusion.spatial import SpatialBiasCorrector
-from fusion.confidence import ConfidenceEstimator
 
 
 class FusionPipeline:
@@ -79,9 +80,9 @@ class FusionPipeline:
         self,
         timestamp_seconds: int,
         model_depth_cm_by_cell: Mapping[str, float],
-        cell_coords_m_by_id: Mapping[str, Tuple[float, float]],
+        cell_coords_m_by_id: Mapping[str, tuple[float, float]],
         sensor_observations: Sequence[SensorObservation],
-        sensor_coords_m_by_id: Mapping[str, Tuple[float, float]],
+        sensor_coords_m_by_id: Mapping[str, tuple[float, float]],
     ) -> FusionStepResult:
         """
         Executes one full fusion timestep:
@@ -93,10 +94,10 @@ class FusionPipeline:
         """
         t = int(timestamp_seconds)
 
-        sensor_health_map: Dict[str, str] = {}
-        sensor_quality_map: Dict[str, float] = {}
-        sensor_last_updated_map: Dict[str, int] = {}
-        sensor_cell_id_map: Dict[str, str] = {}
+        sensor_health_map: dict[str, str] = {}
+        sensor_quality_map: dict[str, float] = {}
+        sensor_last_updated_map: dict[str, int] = {}
+        sensor_cell_id_map: dict[str, str] = {}
 
         # 1. Process and update each incoming observation
         for obs in sensor_observations:
@@ -152,7 +153,7 @@ class FusionPipeline:
         )
 
         # 5. Assemble Fused Cell Results
-        fused_cells: Dict[str, FusedCellResult] = {}
+        fused_cells: dict[str, FusedCellResult] = {}
         for cid, model_d in model_depth_cm_by_cell.items():
             corr, corrected_d = corrections_map.get(cid, (0.0, model_d))
             conf = confidence_map[cid]
@@ -172,7 +173,7 @@ class FusionPipeline:
         )
 
     @classmethod
-    def load_from_config(cls, config_path: Union[str, Path] = "config.yaml") -> FusionPipeline:
+    def load_from_config(cls, config_path: str | Path = "config.yaml") -> FusionPipeline:
         p = Path(config_path)
         if not p.exists():
             return cls()

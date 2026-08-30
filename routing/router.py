@@ -6,18 +6,20 @@ with automated avoided-road diagnostics and graceful fallback when no safe route
 
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from collections.abc import Mapping
+
 import networkx as nx
-from routing.models import RoadEdge, RoadEdgeState, AvoidedRoad, RouteResult
-from routing.graph import DirectedRoadGraph
+
 from routing.costs import calculate_cost
+from routing.graph import DirectedRoadGraph
+from routing.models import AvoidedRoad, RoadEdgeState, RouteResult
 
 
 class EmergencyRouter:
     def __init__(
         self,
         road_graph: DirectedRoadGraph,
-        risk_penalties: Optional[Mapping[str, float]] = None,
+        risk_penalties: Mapping[str, float] | None = None,
         uncertainty_weight: float = 120.0,
         unsafe_edges_blocked: bool = True,
     ):
@@ -39,7 +41,7 @@ class EmergencyRouter:
         """
         # Build weighted networkx graph
         g = nx.DiGraph()
-        avoided_roads: List[AvoidedRoad] = []
+        avoided_roads: list[AvoidedRoad] = []
 
         # Ensure all graph nodes are initialized
         for n in self.road_graph.graph.nodes():

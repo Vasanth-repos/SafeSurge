@@ -11,17 +11,15 @@ Generates:
 8. historical_floods.csv
 """
 
-import os
-import json
 import csv
+import json
 import math
-from typing import Dict, Any, List
-
+import os
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "raw")
 
 
-def generate_all_spec_datasets(output_dir: str = OUTPUT_DIR) -> Dict[str, str]:
+def generate_all_spec_datasets(output_dir: str = OUTPUT_DIR) -> dict[str, str]:
     """Compile and export all Section 15 standardized datasets."""
     os.makedirs(output_dir, exist_ok=True)
     generated_files = {}

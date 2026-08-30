@@ -12,17 +12,19 @@ Script to update drainage_ps.ipynb with all remaining steps:
 Also executes the cells and saves the outputs (text and plots) directly into the notebook JSON.
 """
 
-import json
-import os
-import io
 import base64
-import pandas as pd
-import numpy as np
+import io
+import json
+
 import matplotlib
+import numpy as np
+import pandas as pd
+
 matplotlib.use("Agg")
+import joblib
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import joblib
+
 
 def update_and_run_notebook():
     nb_path = "datasets_physics_model/drainage_ps.ipynb"

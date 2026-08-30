@@ -6,7 +6,7 @@ Data contracts for directed graph edges, dynamic flooded edge states, and shorte
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -36,7 +36,7 @@ class AvoidedRoad:
     risk: str
     depth_cm: float
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "road_id": self.road_id,
             "reason": self.reason,
@@ -52,15 +52,15 @@ class RouteResult:
     timestamp_seconds: int
     origin: str
     destination: str
-    road_path: Tuple[str, ...]
-    node_path: Tuple[str, ...]
+    road_path: tuple[str, ...]
+    node_path: tuple[str, ...]
     total_travel_time_seconds: float
     total_cost: float
     minimum_confidence: float
-    avoided_roads: Tuple[AvoidedRoad, ...]
-    reason: Optional[str] = None
+    avoided_roads: tuple[AvoidedRoad, ...]
+    reason: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "route_available": self.route_available,
             "simulation_id": self.simulation_id,

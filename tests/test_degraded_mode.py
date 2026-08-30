@@ -4,7 +4,6 @@ Disconnects a sensor mid-run, asserting graceful transition to STALE/OFFLINE,
 confidence score reduction, and fallback to model-only predictions.
 """
 
-import pytest
 from backend.services.simulation_service import SimulationService
 
 

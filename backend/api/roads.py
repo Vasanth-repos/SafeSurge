@@ -3,8 +3,9 @@ API Endpoints — Road Exposure & Risk States:
 Returns road-level aggregated depths, exposure fractions, risk classifications, and confidence.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, status
+
 from backend.dependencies import get_simulation_manager
 from backend.services.simulation_manager import SimulationManager
 
@@ -13,8 +14,8 @@ router = APIRouter(prefix="/api/roads", tags=["Roads"])
 
 @router.get("/risk")
 def get_roads_risk(
-    simulation_id: Optional[str] = None,
-    timestamp_seconds: Optional[int] = None,
+    simulation_id: str | None = None,
+    timestamp_seconds: int | None = None,
     manager: SimulationManager = Depends(get_simulation_manager),
 ):
     sim_id = simulation_id or manager.active_simulation_id

@@ -6,10 +6,11 @@ and proves that DepthEngine is strictly read-only with respect to hydrologic sto
 
 import pytest
 from shapely.geometry import Polygon
-from flood_engine.grid import ComputationalGrid
+
 from flood_engine.d8 import D8Terrain
-from flood_engine.surface import SurfaceStorageEngine
 from flood_engine.depth import DepthEngine, RoadFeature
+from flood_engine.grid import ComputationalGrid
+from flood_engine.surface import SurfaceStorageEngine
 
 
 def test_surface_to_depth_engine_integration_and_immutability():

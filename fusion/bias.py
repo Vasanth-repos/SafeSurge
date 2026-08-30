@@ -6,9 +6,8 @@ with minimum observation warm-up, large-residual protection, and bounded clampin
 
 from __future__ import annotations
 
-from typing import Dict, Optional, Tuple
-from fusion.models import SensorBiasState, SensorObservation
 from fusion.history import SensorHistoryTracker
+from fusion.models import SensorBiasState, SensorObservation
 
 
 def calculate_residual(observed_depth_cm: float, model_depth_cm: float) -> float:
@@ -47,7 +46,7 @@ class SensorBiasEstimator:
         self.max_residual_for_bias_update_cm = float(max_residual_for_bias_update_cm)
         self.max_bias_cm = float(max_bias_cm)
 
-        self._states: Dict[str, SensorBiasState] = {}
+        self._states: dict[str, SensorBiasState] = {}
 
     def get_state(self, sensor_id: str) -> SensorBiasState:
         if sensor_id not in self._states:
@@ -58,7 +57,7 @@ class SensorBiasEstimator:
         self,
         observation: SensorObservation,
         model_depth_cm: float,
-        history_tracker: Optional[SensorHistoryTracker] = None,
+        history_tracker: SensorHistoryTracker | None = None,
     ) -> SensorBiasState:
         """
         Updates sensor bias state:

@@ -2,10 +2,12 @@
 Simulation scenarios, replay execution, fault injection, and drainage topology endpoints.
 """
 
-from typing import Dict, Any, List, Optional
-import os
 import json
-from fastapi import APIRouter, HTTPException, Depends
+import os
+from typing import Any
+
+from fastapi import APIRouter, Depends
+
 from backend.models.schemas import FaultInjectionRequest
 
 router = APIRouter(prefix="/api", tags=["Scenarios & Faults"])
@@ -23,7 +25,7 @@ REPLAY_SCENARIOS = {
 }
 
 
-def load_replay_file(scenario_name: str) -> List[Dict[str, Any]]:
+def load_replay_file(scenario_name: str) -> list[dict[str, Any]]:
     path = REPLAY_SCENARIOS.get(scenario_name, "replay/rainfall/flash_flood.json")
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
@@ -31,7 +33,7 @@ def load_replay_file(scenario_name: str) -> List[Dict[str, Any]]:
     return []
 
 
-def load_sensors_replay() -> Dict[str, List[Dict[str, Any]]]:
+def load_sensors_replay() -> dict[str, list[dict[str, Any]]]:
     path = "replay/sensors/sensors_replay.json"
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:

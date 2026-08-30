@@ -2,13 +2,13 @@
 Mass conservation diagnostic and water balance verification.
 """
 
-from typing import Dict, Any, List
+from typing import Any
 
 
 class MassBalanceDiagnostic:
     def __init__(self, tolerance_m3: float = 0.05):
         self.tolerance_m3 = tolerance_m3
-        self.history: List[Dict[str, Any]] = []
+        self.history: list[dict[str, Any]] = []
         self.cumulative_input_m3: float = 0.0
         self.cumulative_drained_m3: float = 0.0
         self.cumulative_boundary_outflow_m3: float = 0.0
@@ -20,7 +20,7 @@ class MassBalanceDiagnostic:
         current_total_storage_m3: float,
         timestep_drained_m3: float,
         timestep_boundary_outflow_m3: float,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Calculates cumulative balance error:
         Balance_Error = Total_Input - (Current_Storage + Total_Drained + Total_Boundary_Outflow)

@@ -3,24 +3,28 @@ Simulation Service: Core orchestrator coupling hydrological flood engine,
 drainage network, sensor validation/fusion, road risk routing, and mass conservation.
 """
 
-from typing import Dict, List, Optional, Tuple, Any
 import os
-import yaml
-import json
-import numpy as np
+from typing import Any
 
+import numpy as np
+import yaml
+
+from flood_engine.conservation import MassBalanceDiagnostic
+from flood_engine.routing import compute_surface_outflows
 from flood_engine.runoff import CellRunoffState
 from flood_engine.storage import GridCellState, synchronous_storage_update
-from flood_engine.routing import compute_surface_outflows
-from flood_engine.conservation import MassBalanceDiagnostic
-from sensor.health import SensorNode
-from sensor.validation import validate_sensor_reading
-from sensor.fusion import update_sensor_bias, propagate_spatial_bias, apply_fused_depth_correction
-from sensor.anomaly import detect_sensor_anomalies
-from sensor.confidence import compute_confidence_score
+from replay.catchment_data import generate_demo_catchment
 from routing.road_graph import RoadNetwork
 from routing.safe_route import find_safe_route
-from replay.catchment_data import generate_demo_catchment
+from sensor.anomaly import detect_sensor_anomalies
+from sensor.confidence import compute_confidence_score
+from sensor.fusion import (
+    apply_fused_depth_correction,
+    propagate_spatial_bias,
+    update_sensor_bias,
+)
+from sensor.health import SensorNode
+from sensor.validation import validate_sensor_reading
 
 
 class SimulationService:
@@ -60,21 +64,21 @@ class SimulationService:
         # Generate catchment
         catchment = generate_demo_catchment(rows=self.rows, cols=self.cols, cell_size_m=self.cell_size_m)
         self.elevation_grid: np.ndarray = catchment["elevation_grid"]
-        self.flow_dirs: Dict[int, Optional[int]] = catchment["flow_dirs"]
+        self.flow_dirs: dict[int, int | None] = catchment["flow_dirs"]
         self.cn_grid: np.ndarray = catchment["cn_grid"]
         self.drainage = catchment["drainage"]
         self.roads: RoadNetwork = catchment["roads"]
-        self.sensor_list: List[SensorNode] = catchment["sensors"]
-        self.sensors: Dict[int, SensorNode] = {s.sensor_id: s for s in self.sensor_list}
+        self.sensor_list: list[SensorNode] = catchment["sensors"]
+        self.sensors: dict[int, SensorNode] = {s.sensor_id: s for s in self.sensor_list}
 
         # Spatial lookup caches
-        self.cell_positions: Dict[int, Tuple[int, int]] = {}
-        self.elevations: Dict[int, float] = {}
-        self.cells: Dict[int, GridCellState] = {}
-        self.runoff_states: Dict[int, CellRunoffState] = {}
-        self.fused_depths_cm: Dict[int, float] = {}
-        self.cell_confidences: Dict[int, float] = {}
-        self.sensor_positions: Dict[int, Tuple[int, int]] = {}
+        self.cell_positions: dict[int, tuple[int, int]] = {}
+        self.elevations: dict[int, float] = {}
+        self.cells: dict[int, GridCellState] = {}
+        self.runoff_states: dict[int, CellRunoffState] = {}
+        self.fused_depths_cm: dict[int, float] = {}
+        self.cell_confidences: dict[int, float] = {}
+        self.sensor_positions: dict[int, tuple[int, int]] = {}
 
         for r in range(self.rows):
             for c in range(self.cols):
@@ -94,13 +98,13 @@ class SimulationService:
 
         # Diagnostics & event logs
         self.diagnostic = MassBalanceDiagnostic(tolerance_m3=self.tolerance_m3)
-        self.event_logs: List[Dict[str, Any]] = []
-        self.active_faults: Dict[str, Any] = {}
+        self.event_logs: list[dict[str, Any]] = []
+        self.active_faults: dict[str, Any] = {}
 
         # Initial road risk update
         self.roads.update_all_risks(self.fused_depths_cm, self.cell_confidences)
 
-    def log_event(self, component: str, event_type: str, payload: Dict[str, Any]):
+    def log_event(self, component: str, event_type: str, payload: dict[str, Any]):
         self.event_logs.append({
             "step": self.current_step,
             "component": component,
@@ -111,9 +115,9 @@ class SimulationService:
     def step(
         self,
         rainfall_input: Any = 0.0,
-        sensor_readings: Optional[Dict[int, Dict[str, Any]]] = None,
-        dt_seconds: Optional[float] = None,
-    ) -> Dict[str, Any]:
+        sensor_readings: dict[int, dict[str, Any]] | None = None,
+        dt_seconds: float | None = None,
+    ) -> dict[str, Any]:
         """
         Advances the entire nowcasting & response pipeline by one timestep.
         """
@@ -121,7 +125,7 @@ class SimulationService:
         self.current_step += 1
 
         # 1. Compute Incremental Runoff per cell (SCS-CN)
-        incremental_runoffs: Dict[int, float] = {}
+        incremental_runoffs: dict[int, float] = {}
         total_input_m3 = 0.0
 
         for cid, cell in self.cells.items():
@@ -152,7 +156,7 @@ class SimulationService:
         )
 
         # 3. Dynamic Drainage Capture
-        drain_captures: Dict[int, float] = {}
+        drain_captures: dict[int, float] = {}
         timestep_drained_m3 = 0.0
 
         for cid, cell in self.cells.items():
@@ -184,7 +188,7 @@ class SimulationService:
 
         # 6. Sensor Ingestion, Validation & Health Update
         sensor_readings = sensor_readings or {}
-        active_biases: Dict[int, float] = {}
+        active_biases: dict[int, float] = {}
         r_crit = float(self.config.get("sensor_critical_rate_cm_min", 5.0))
         max_phys = float(self.config.get("max_physical_depth_cm", 300.0))
         alpha = float(self.config.get("bias_smoothing_alpha", 0.3))
@@ -344,7 +348,7 @@ class SimulationService:
         origin: str,
         destination: str,
         mode: str = "emergency",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         p = self.config.get("routing_penalties", {})
         l_risk = float(p.get("lambda_risk", 10.0))
         mu_unc = float(p.get("mu_uncertainty", 5.0))
@@ -357,7 +361,7 @@ class SimulationService:
             mu_uncertainty=mu_unc,
         )
 
-    def get_grid_state(self) -> List[Dict[str, Any]]:
+    def get_grid_state(self) -> list[dict[str, Any]]:
         cells_out = []
         for cid, cell in self.cells.items():
             fused_d = self.fused_depths_cm[cid]
@@ -385,7 +389,7 @@ class SimulationService:
             })
         return cells_out
 
-    def get_roads_state(self) -> List[Dict[str, Any]]:
+    def get_roads_state(self) -> list[dict[str, Any]]:
         roads_out = []
         for r in self.roads.roads.values():
             roads_out.append({
@@ -400,7 +404,7 @@ class SimulationService:
             })
         return roads_out
 
-    def get_sensors_state(self) -> List[Dict[str, Any]]:
+    def get_sensors_state(self) -> list[dict[str, Any]]:
         sensors_out = []
         for s in self.sensors.values():
             sensors_out.append({

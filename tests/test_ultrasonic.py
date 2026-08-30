@@ -5,6 +5,7 @@ and strict preservation of negative levels without silent clamping.
 """
 
 import pytest
+
 from sensors.models import SensorEnvelope
 from sensors.registry import SensorConfig
 from sensors.ultrasonic import distance_to_water_level, process_measurement

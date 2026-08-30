@@ -6,9 +6,10 @@ Evaluates physical, temporal, and structural invariants on actual pipeline outpu
 from __future__ import annotations
 
 import math
-from typing import Sequence, Dict, List, Any, Optional
+from collections.abc import Sequence
+
 from flood_engine.snapshot import SimulationSnapshot
-from prototype_validation.models import CheckResult, CheckStatus, CheckSeverity
+from prototype_validation.models import CheckResult, CheckSeverity, CheckStatus
 from prototype_validation.thresholds import ValidationThresholds
 
 

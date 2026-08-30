@@ -3,15 +3,15 @@ Tests for Layer 20–25 SimulationSnapshot immutability and contract serializati
 """
 
 import pytest
+
 from flood_engine.snapshot import (
-    SimulationSnapshot,
     CellSnapshot,
+    MassBalanceSnapshot,
+    RainfallStatus,
     RoadSnapshot,
     SensorSnapshot,
-    ForecastSnapshot,
-    MassBalanceSnapshot,
+    SimulationSnapshot,
     SystemStatus,
-    RainfallStatus,
 )
 
 

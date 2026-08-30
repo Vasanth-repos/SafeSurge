@@ -3,8 +3,9 @@ API Endpoints — Simulation Lifecycle & Snapshot Inspection:
 Retrieves simulation status, active snapshots, and diagnostics.
 """
 
+
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import Optional
+
 from backend.dependencies import get_simulation_manager
 from backend.services.simulation_manager import SimulationManager
 

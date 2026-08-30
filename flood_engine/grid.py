@@ -3,10 +3,11 @@ ComputationalGrid: Spatial domain representation distinguishing catchment bounda
 DEM nodata, boundary cells, and outlets with O(1) cell lookup and provenance metadata.
 """
 
-from typing import Dict, List, Optional, Tuple, Any, Union
+import json
 from dataclasses import dataclass
 from pathlib import Path
-import json
+from typing import Any
+
 import numpy as np
 
 
@@ -34,11 +35,11 @@ class ComputationalGrid:
         longitude: np.ndarray,
         resolution_m: float = 10.0,
         crs: str = "EPSG:32644",
-        catchment_mask: Optional[np.ndarray] = None,
-        dem_nodata_mask: Optional[np.ndarray] = None,
-        boundary_mask: Optional[np.ndarray] = None,
-        outlet_mask: Optional[np.ndarray] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        catchment_mask: np.ndarray | None = None,
+        dem_nodata_mask: np.ndarray | None = None,
+        boundary_mask: np.ndarray | None = None,
+        outlet_mask: np.ndarray | None = None,
+        metadata: dict[str, Any] | None = None,
     ):
         self.elevation_m = np.asarray(elevation_m, dtype=np.float64)
         self.latitude = np.asarray(latitude, dtype=np.float64)
@@ -139,7 +140,7 @@ class ComputationalGrid:
 
         return b_mask
 
-    def set_outlets(self, outlets: List[Union[str, Tuple[int, int]]]) -> None:
+    def set_outlets(self, outlets: list[str | tuple[int, int]]) -> None:
         """
         Assigns explicit catchment outlets.
         Validates:
@@ -173,7 +174,7 @@ class ComputationalGrid:
         index = r * self.columns + c + 1
         return f"C{index:05d}"
 
-    def cell_id_to_indices(self, cell_id: str) -> Tuple[int, int]:
+    def cell_id_to_indices(self, cell_id: str) -> tuple[int, int]:
         """Parses cell_id string back to (row, col) in O(1) time."""
         clean = cell_id.upper().replace("C", "")
         index = int(clean) - 1
@@ -200,7 +201,7 @@ class ComputationalGrid:
         )
 
     @property
-    def cells(self) -> Dict[str, GridCell]:
+    def cells(self) -> dict[str, GridCell]:
         """Returns all valid computational cells in the grid indexed by cell_id."""
         cell_dict = {}
         for r in range(self.rows):
@@ -210,11 +211,11 @@ class ComputationalGrid:
                     cell_dict[cid] = self.get_cell(cid)
         return cell_dict
 
-    def iter_cells(self) -> List[GridCell]:
+    def iter_cells(self) -> list[GridCell]:
         """Iterates across all valid computational cells in the grid."""
         return list(self.cells.values())
 
-    def save_to_file(self, output_path: Union[str, Path]) -> Tuple[Path, Path]:
+    def save_to_file(self, output_path: str | Path) -> tuple[Path, Path]:
         """
         Exports the computational grid to a compressed .npz archive alongside a .json metadata sidecar.
         """
@@ -240,7 +241,7 @@ class ComputationalGrid:
         return npz_path, json_path
 
     @classmethod
-    def load_from_file(cls, path: Union[str, Path]) -> "ComputationalGrid":
+    def load_from_file(cls, path: str | Path) -> "ComputationalGrid":
         """Loads a ComputationalGrid from .npz and .json artifacts."""
         base_path = Path(path)
         npz_path = base_path.with_suffix(".npz")

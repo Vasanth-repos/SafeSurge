@@ -5,9 +5,10 @@ A -> B -> D (safe baseline) -> A -> C -> D (when B->D unsafe) -> NO_SAFE_ROUTE (
 """
 
 import pytest
-from routing.models import RoadEdge, RoadEdgeState
-from routing.graph import DirectedRoadGraph
+
 from routing.costs import calculate_cost
+from routing.graph import DirectedRoadGraph
+from routing.models import RoadEdge, RoadEdgeState
 from routing.router import EmergencyRouter
 
 

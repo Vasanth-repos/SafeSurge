@@ -8,10 +8,7 @@ Tests the entire system integration:
 5. Dynamic Word report generation across different lead times and conditions
 """
 
-import os
-import pytest
 from fastapi.testclient import TestClient
-import docx
 
 from backend.app import app
 

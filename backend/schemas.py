@@ -6,7 +6,6 @@ Enforces strict input validation and uniform JSON responses across all API endpo
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
 
 
 class ReplayRequest(BaseModel):
@@ -14,7 +13,7 @@ class ReplayRequest(BaseModel):
 
 
 class RouteRequest(BaseModel):
-    simulation_id: Optional[str] = Field(None, description="Active simulation identifier")
+    simulation_id: str | None = Field(None, description="Active simulation identifier")
     origin: str = Field(..., description="Origin node identifier")
     destination: str = Field(..., description="Destination node identifier")
     lead_time_minutes: int = Field(0, ge=0, description="Nowcast forecast lead time in minutes")

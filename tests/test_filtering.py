@@ -5,6 +5,7 @@ and median calculation robustness against single-burst outlier spikes.
 """
 
 import pytest
+
 from sensors.filtering import filter_echoes
 
 

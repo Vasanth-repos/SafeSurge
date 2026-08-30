@@ -6,12 +6,14 @@ and projects modeled depths onto GIS road geometries via area-weighted spatial o
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Mapping, Sequence, Dict, List, Optional, Tuple, Any, Union
 import math
-from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString
-from shapely.ops import transform
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from typing import Any
+
 from pyproj import CRS, Transformer
+from shapely.geometry import LineString, MultiLineString, MultiPolygon, Polygon
+from shapely.ops import transform
 
 EPSILON_AREA_M2 = 1e-9
 EPSILON_STORAGE_M3 = 1e-9
@@ -95,7 +97,7 @@ class CellDepth:
     source: str = "MODEL"
 
 
-def depth_field_cm(cell_depths: Mapping[str, CellDepth]) -> Dict[str, float]:
+def depth_field_cm(cell_depths: Mapping[str, CellDepth]) -> dict[str, float]:
     return {cell_id: result.depth_cm for cell_id, result in cell_depths.items()}
 
 
@@ -108,7 +110,7 @@ class DepthThresholds:
 
 def classify_depth(
     depth_cm: float,
-    thresholds: Optional[DepthThresholds] = None,
+    thresholds: DepthThresholds | None = None,
 ) -> str:
     t = thresholds or DepthThresholds()
     d = float(depth_cm)
@@ -125,7 +127,7 @@ def classify_depth(
 class RoadFeature:
     road_id: str
     geometry: object
-    width_m: Optional[float] = None
+    width_m: float | None = None
     source_crs: str = "EPSG:4326"
     width_source: str = "ASSUMED"
 
@@ -156,9 +158,9 @@ class RoadCellContribution:
 class RoadDepth:
     road_id: str
     timestamp_seconds: int
-    weighted_depth_m: Optional[float]
-    weighted_depth_cm: Optional[float]
-    max_intersecting_cell_depth_cm: Optional[float]
+    weighted_depth_m: float | None
+    weighted_depth_cm: float | None
+    max_intersecting_cell_depth_cm: float | None
     total_road_area_m2: float
     covered_road_area_m2: float
     coverage_fraction: float
@@ -169,11 +171,11 @@ class RoadDepth:
 @dataclass(frozen=True)
 class DepthResult:
     timestamp_seconds: int
-    cells: Dict[str, CellDepth]
-    roads: Dict[str, RoadDepth]
+    cells: dict[str, CellDepth]
+    roads: dict[str, RoadDepth]
     source: str = "MODEL"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "timestamp_seconds": self.timestamp_seconds,
             "source": self.source,
@@ -214,7 +216,7 @@ def transform_geometry_to_grid(
 
 def road_to_polygon(
     geometry: Any,
-    width_m: Optional[float],
+    width_m: float | None,
 ) -> Any:
     if isinstance(geometry, (Polygon, MultiPolygon)):
         return geometry
@@ -242,7 +244,7 @@ class DepthEngine:
         grid: Any,
         surface_storage_m3_by_cell: Mapping[str, float],
         timestamp_seconds: int,
-    ) -> Dict[str, CellDepth]:
+    ) -> dict[str, CellDepth]:
         # Validate unknown cell IDs
         if hasattr(grid, "cells"):
             grid_cell_map = grid.cells
@@ -256,7 +258,7 @@ class DepthEngine:
         if unknown:
             raise ValueError(f"Unknown cell IDs in storage input: {sorted(unknown)}")
 
-        results: Dict[str, CellDepth] = {}
+        results: dict[str, CellDepth] = {}
         for cid, cell in grid_cell_map.items():
             storage = float(surface_storage_m3_by_cell.get(cid, 0.0))
             validate_cell_area(cell)
@@ -282,9 +284,9 @@ class DepthEngine:
         roads: Sequence[RoadFeature],
         timestamp_seconds: int,
         grid: Any,
-    ) -> Dict[str, RoadDepth]:
+    ) -> dict[str, RoadDepth]:
         # Build cell polygons dictionary
-        cell_polys: Dict[str, Polygon] = {}
+        cell_polys: dict[str, Polygon] = {}
         if hasattr(grid, "cells"):
             cells_iterable = grid.cells.values()
         elif hasattr(grid, "iter_cells"):
@@ -293,7 +295,7 @@ class DepthEngine:
             cells_iterable = []
 
         res_m = float(getattr(grid, "resolution_m", 10.0))
-        half_res = res_m / 2.0
+        _ = res_m
 
         for cell in cells_iterable:
             cid = cell.cell_id
@@ -317,7 +319,7 @@ class DepthEngine:
                     (min_x, min_y),
                 ])
 
-        road_results: Dict[str, RoadDepth] = {}
+        road_results: dict[str, RoadDepth] = {}
 
         for road in roads:
             # 1. Transform to grid CRS
@@ -349,7 +351,7 @@ class DepthEngine:
             # 3. Intersect against computational cells
             covered_area = 0.0
             weighted_depth_m_accum = 0.0
-            max_depth_cm: Optional[float] = None
+            max_depth_cm: float | None = None
 
             for cid, c_poly in cell_polys.items():
                 if not road_poly.intersects(c_poly):

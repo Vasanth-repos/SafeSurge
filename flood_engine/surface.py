@@ -4,16 +4,15 @@ Simulates time-evolving surface cell storage balance, synchronous 2D slope-weigh
 D8 downhill routing, boundary outflow discharge, and local water depths with strict mass conservation.
 """
 
-from typing import Dict, List, Optional, Tuple, Any, Union
+import math
 from dataclasses import dataclass
 from pathlib import Path
-import math
-import numpy as np
+from typing import Any
 
 from flood_engine.config import load_config
+from flood_engine.d8 import D8Terrain
 from flood_engine.grid import ComputationalGrid
-from flood_engine.d8 import D8Terrain, D8Cell
-from flood_engine.surface_diagnostics import classify_depth_risk, summarize_grid_depths
+from flood_engine.surface_diagnostics import summarize_grid_depths
 
 
 @dataclass
@@ -28,7 +27,7 @@ class CellSurfaceState:
     drainage_capture_m3: float
     new_storage_m3: float
     water_depth_m: float
-    downstream_cell: Optional[str]
+    downstream_cell: str | None
     terminal_state: str
 
 
@@ -36,7 +35,7 @@ class CellSurfaceState:
 class SurfaceStep:
     timestamp_seconds: int
     timestep_seconds: int
-    cells: Dict[str, CellSurfaceState]
+    cells: dict[str, CellSurfaceState]
     total_runoff_input_m3: float
     total_upstream_inflow_m3: float
     total_surface_outflow_m3: float
@@ -51,12 +50,12 @@ class SurfaceStorageEngine:
         self,
         grid: ComputationalGrid,
         terrain: D8Terrain,
-        routing_coefficient_k: Optional[float] = None,
-        max_routing_fraction: Optional[float] = None,
+        routing_coefficient_k: float | None = None,
+        max_routing_fraction: float | None = None,
         boundary_condition: str = "open",
-        effective_areas_m2: Optional[Dict[str, float]] = None,
+        effective_areas_m2: dict[str, float] | None = None,
         expected_timestep_seconds: int = 60,
-        config_path: Optional[Union[str, Path]] = "config.yaml",
+        config_path: str | Path | None = "config.yaml",
     ):
         self.grid = grid
         self.terrain = terrain
@@ -76,7 +75,7 @@ class SurfaceStorageEngine:
         self.max_routing_fraction = float(max_routing_fraction if max_routing_fraction is not None else cfg_fmax)
 
         # Effective surface ponding area per cell
-        self.effective_areas_m2: Dict[str, float] = {}
+        self.effective_areas_m2: dict[str, float] = {}
         eff_map = effective_areas_m2 or {}
         for cid in self.terrain.cells.keys():
             area = float(eff_map.get(cid, self.grid.cell_area_m2))
@@ -85,7 +84,7 @@ class SurfaceStorageEngine:
             self.effective_areas_m2[cid] = area
 
         # Pre-compute routing fractions f_i per cell
-        self.routing_fractions: Dict[str, float] = {}
+        self.routing_fractions: dict[str, float] = {}
         for cid, cell in self.terrain.cells.items():
             if cell.state == "downstream" and cell.slope_ratio > 0.0:
                 # f = clip(k * sqrt(s) * dt, 0, f_max)
@@ -99,15 +98,15 @@ class SurfaceStorageEngine:
                 self.routing_fractions[cid] = 0.0
 
         # State storage (m³)
-        self.storage_m3: Dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        self.storage_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
         self.cumulative_runoff_input_m3: float = 0.0
         self.cumulative_boundary_outflow_m3: float = 0.0
         self.cumulative_drainage_capture_m3: float = 0.0
-        self.last_timestamp_seconds: Optional[int] = None
-        self.history: List[SurfaceStep] = []
+        self.last_timestamp_seconds: int | None = None
+        self.history: list[SurfaceStep] = []
 
     @property
-    def cell_ids(self) -> List[str]:
+    def cell_ids(self) -> list[str]:
         return list(self.terrain.cells.keys())
 
     @property
@@ -129,16 +128,16 @@ class SurfaceStorageEngine:
 
     def route_available_water(
         self,
-        available_surface_m3_by_cell: Dict[str, float],
-        dt_seconds: Optional[float] = None,
-    ) -> Tuple[Dict[str, float], float, Dict[str, CellSurfaceState]]:
+        available_surface_m3_by_cell: dict[str, float],
+        dt_seconds: float | None = None,
+    ) -> tuple[dict[str, float], float, dict[str, CellSurfaceState]]:
         """
         Routes remaining available surface water across the D8 terrain network:
         O_t = min(S_avail, f * S_avail)
         S_{t+1} = S_avail - O_t + I_downstream
         """
-        outflows_m3: Dict[str, float] = {}
-        inflows_m3: Dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        outflows_m3: dict[str, float] = {}
+        inflows_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
         step_boundary_outflow_m3 = 0.0
 
         for cid, cell in self.terrain.cells.items():
@@ -152,8 +151,8 @@ class SurfaceStorageEngine:
             elif cell.state in ("boundary_exit", "outlet") and self.boundary_condition == "open":
                 step_boundary_outflow_m3 += outflow
 
-        new_storage_by_cell: Dict[str, float] = {}
-        cell_states: Dict[str, CellSurfaceState] = {}
+        new_storage_by_cell: dict[str, float] = {}
+        cell_states: dict[str, CellSurfaceState] = {}
 
         for cid, cell in sorted(self.terrain.cells.items()):
             avail = max(0.0, float(available_surface_m3_by_cell.get(cid, 0.0)))
@@ -184,7 +183,7 @@ class SurfaceStorageEngine:
 
         return new_storage_by_cell, step_boundary_outflow_m3, cell_states
 
-    def validate_timestamp(self, timestamp_seconds: int, dt_seconds: Optional[int] = None) -> None:
+    def validate_timestamp(self, timestamp_seconds: int, dt_seconds: int | None = None) -> None:
         """Enforces strictly advancing timestamps and timestep validation."""
         if not isinstance(timestamp_seconds, (int, float)) or math.isnan(timestamp_seconds) or math.isinf(timestamp_seconds):
             raise ValueError(f"Invalid timestamp: {timestamp_seconds}")
@@ -201,9 +200,9 @@ class SurfaceStorageEngine:
     def step(
         self,
         timestamp_seconds: int,
-        runoff_volume_m3_by_cell: Union[float, Dict[str, float]],
-        drainage_capture_m3_by_cell: Optional[Dict[str, float]] = None,
-        dt_seconds: Optional[int] = None,
+        runoff_volume_m3_by_cell: float | dict[str, float],
+        drainage_capture_m3_by_cell: dict[str, float] | None = None,
+        dt_seconds: int | None = None,
     ) -> SurfaceStep:
         """
         Advances the 2D surface storage and D8 routing simulation by one timestep:
@@ -218,7 +217,7 @@ class SurfaceStorageEngine:
         t = int(timestamp_seconds)
 
         # 1. Parse & validate runoff input
-        r_map: Dict[str, float] = {}
+        r_map: dict[str, float] = {}
         if isinstance(runoff_volume_m3_by_cell, (int, float)):
             val = float(runoff_volume_m3_by_cell)
             if val < 0.0 or math.isnan(val) or math.isinf(val):
@@ -240,7 +239,7 @@ class SurfaceStorageEngine:
             raise TypeError("runoff_volume_m3_by_cell must be a float or Dict[str, float].")
 
         # 2. Parse drainage capture (Layer 5 constraint: must be 0.0)
-        d_map: Dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        d_map: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
         if drainage_capture_m3_by_cell is not None:
             for cid, d_val in drainage_capture_m3_by_cell.items():
                 if d_val > 1e-9:
@@ -249,8 +248,8 @@ class SurfaceStorageEngine:
 
         # 3. Synchronous Outflow Calculation
         # Outflow is evaluated from available water S_t + R_t before receiving new upstream inflow I_t
-        outflows_m3: Dict[str, float] = {}
-        inflows_m3: Dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
+        outflows_m3: dict[str, float] = {}
+        inflows_m3: dict[str, float] = {cid: 0.0 for cid in self.terrain.cells.keys()}
         step_boundary_outflow_m3 = 0.0
 
         for cid, cell in self.terrain.cells.items():
@@ -272,7 +271,7 @@ class SurfaceStorageEngine:
                 pass
 
         # 4. Storage Update & Water Depth
-        cell_states: Dict[str, CellSurfaceState] = {}
+        cell_states: dict[str, CellSurfaceState] = {}
         step_runoff_total = sum(r_map.values())
         step_inflow_total = sum(inflows_m3.values())
         step_outflow_total = sum(outflows_m3.values())
@@ -338,7 +337,7 @@ class SurfaceStorageEngine:
         self.history.append(step_result)
         return step_result
 
-    def mass_balance(self) -> Dict[str, Any]:
+    def mass_balance(self) -> dict[str, Any]:
         """Returns cumulative mass conservation accounting."""
         total_current_storage = sum(self.storage_m3.values())
         error_m3 = (
@@ -358,11 +357,11 @@ class SurfaceStorageEngine:
             "is_conserved": is_conserved,
         }
 
-    def get_water_depths_by_cell(self) -> Dict[str, float]:
+    def get_water_depths_by_cell(self) -> dict[str, float]:
         """Returns mapping of cell_id to water depth in meters."""
         return {cid: self.storage_m3[cid] / self.effective_areas_m2[cid] for cid in self.terrain.cells.keys()}
 
-    def get_diagnostics(self) -> Dict[str, Any]:
+    def get_diagnostics(self) -> dict[str, Any]:
         """Returns spatial depth risk summary across the computational domain."""
         depths = self.get_water_depths_by_cell()
         return summarize_grid_depths(depths)
