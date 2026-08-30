@@ -701,7 +701,61 @@ function renderDrainageTanks(tanks, summary) {
       </div>
     `;
   }).join("");
+
+  // 4. Render Right Sidebar Mini Tanks Card
+  const sideNetBadge = document.getElementById("side-net-status-badge");
+  const sideStored = document.getElementById("side-net-stored");
+  const sideFill = document.getElementById("side-net-fill");
+  const sideSpill = document.getElementById("side-net-spill");
+  const sideList = document.getElementById("side-tanks-list");
+
+  if (sideNetBadge) {
+    sideNetBadge.innerText = netStat;
+    sideNetBadge.className = `card-badge ${netStat === "NORMAL" ? "success" : (netStat === "SURCHARGING" ? "danger" : "watch")}`;
+  }
+  if (sideStored && summary?.total_storage_liters !== undefined) {
+    sideStored.innerText = `${Math.round(summary.total_storage_liters).toLocaleString()} L`;
+  }
+  if (sideFill && summary?.network_fill_percentage !== undefined) {
+    sideFill.innerText = `${summary.network_fill_percentage}%`;
+  }
+  if (sideSpill) {
+    const count = summary?.active_surcharging_nodes?.length || 0;
+    sideSpill.innerText = `${count} Node${count === 1 ? '' : 's'}`;
+    sideSpill.className = `sm-val alert ${count > 0 ? 'active' : ''}`;
+  }
+
+  if (sideList) {
+    sideList.innerHTML = tankList.map(t => {
+      const statusLower = t.status.toLowerCase();
+      const fillPct = Math.min(100, Math.max(0, t.fill_percentage));
+      return `
+        <div class="side-tank-item ${statusLower}">
+          <div class="side-tank-item-hdr">
+            <span class="side-tank-item-title">${t.node_id} (${t.connected_cell_id})</span>
+            <span class="side-tank-item-fill">${fillPct}% &bull; ${t.status}</span>
+          </div>
+          <div class="side-tank-bar-track">
+            <div class="side-tank-bar-fill" style="width: ${fillPct}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // 5. Jump to full tanks button
+  const btnJump = document.getElementById("btn-jump-tanks");
+  if (btnJump && !btnJump._bound) {
+    btnJump._bound = true;
+    btnJump.addEventListener("click", () => {
+      const panel = document.querySelector(".drainage-network-panel");
+      if (panel) {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
 }
+
 
 
 // Update Visually Enhanced Safe Routing Guidance

@@ -7,8 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/app.css?v=3.0">
+  <link rel="stylesheet" href="/static/app.css?v=4.0">
 </head>
+
 <body>
 
   <!-- 1. TOP NAVIGATION HEADER -->
@@ -293,6 +294,39 @@
         </div>
       </div>
 
+      <!-- Card 2.5: Virtual Underground Drainage Network Summary -->
+      <div class="side-card" id="side-card-drainage">
+        <div class="card-header">
+          <div class="card-title">🚰 Underground Drainage Tanks</div>
+          <span id="side-net-status-badge" class="card-badge success">NORMAL</span>
+        </div>
+        
+        <div class="side-tanks-summary-bar">
+          <div class="summary-metric">
+            <span class="sm-lbl">Total Stored</span>
+            <span class="sm-val" id="side-net-stored">0 L</span>
+          </div>
+          <div class="summary-metric">
+            <span class="sm-lbl">Net Fill</span>
+            <span class="sm-val" id="side-net-fill">0%</span>
+          </div>
+          <div class="summary-metric">
+            <span class="sm-lbl">Surcharging</span>
+            <span class="sm-val alert" id="side-net-spill">0 Nodes</span>
+          </div>
+        </div>
+
+        <!-- Mini Tanks Fill Bars -->
+        <div class="side-tanks-list" id="side-tanks-list">
+          <!-- Dynamic mini tanks rows rendered by app.js -->
+        </div>
+
+        <!-- Jump Button -->
+        <button id="btn-jump-tanks" class="btn-jump-tanks" type="button" title="View Full 5-Tank Vertical Column Gauges & Pipe Topology">
+          📊 Inspect Full Tank Gauges & Stream ➔
+        </button>
+      </div>
+
       <!-- Card 3: Hydrological Mass Balance Invariant -->
       <div class="side-card">
         <div class="card-header">
@@ -347,6 +381,6 @@
     </aside>
   </main>
 
-  <script src="/static/app.js?v=3.0"></script>
+  <script src="/static/app.js?v=4.0"></script>
 </body>
 </html>
