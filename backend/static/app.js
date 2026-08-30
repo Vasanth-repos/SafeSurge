@@ -82,9 +82,9 @@ const hydroWrap = document.getElementById("hydrograph-wrap");
 const topRain = document.getElementById("top-rain-val");
 const topDepth = document.getElementById("top-depth-val");
 const topMb = document.getElementById("top-mb-val");
-const topRoute = document.getElementById("top-route-val");
 
 // Setup Layer Toggles
+
 function setupLayerToggles() {
   const toggleMap = [
     { id: "toggle-depth", key: "depth" },
