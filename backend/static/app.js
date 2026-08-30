@@ -22,7 +22,8 @@ const layers = {
   drainage: true,
   sensors: true,
   roads: true,
-  ambulance: true
+  ambulance: true,
+  radar: true
 };
 
 // Node Coordinates Map (500x500 SVG Space)
@@ -43,10 +44,10 @@ const GRAPH_EDGES = [
   { id: "R003", u: "A", v: "W", baseTime: 30.0, name: "West Bypass" },
   { id: "R004", u: "C", v: "D", baseTime: 40.0, name: "South Hwy" },
   { id: "R005", u: "E", v: "D", baseTime: 30.0, name: "East Underpass" },
-  { id: "R006", u: "A", v: "M", baseTime: 35.0, name: "Midtown Art" },
-  { id: "R007", u: "M", v: "D", baseTime: 35.0, name: "Hospital Expwy" },
-  { id: "R008", u: "W", v: "M", baseTime: 30.0, name: "West Cross" },
-  { id: "R009", u: "M", v: "E", baseTime: 25.0, name: "Midtown-East" },
+  { id: "R006", u: "A", v: "M", baseTime: 35.0, name: "Midtown West" },
+  { id: "R007", u: "M", v: "D", baseTime: 35.0, name: "Midtown East" },
+  { id: "R008", u: "W", v: "M", baseTime: 30.0, name: "West Connector" },
+  { id: "R009", u: "M", v: "E", baseTime: 25.0, name: "Central Link" },
   { id: "R010", u: "W", v: "C", baseTime: 30.0, name: "West Lower" }
 ];
 
@@ -91,6 +92,7 @@ function setupLayerToggles() {
     { id: "toggle-drainage", key: "drainage" },
     { id: "toggle-sensors", key: "sensors" },
     { id: "toggle-roads", key: "roads" },
+    { id: "toggle-radar", key: "radar" },
     { id: "toggle-ambulance", key: "ambulance" }
   ];
 
@@ -607,8 +609,34 @@ function updateDashboardUI(data) {
     }
   }
 
+  // 3.5. Radar Rainfall Nowcast Card
+  if (data.radar_nowcast && data.radar_nowcast.available) {
+    const rn = data.radar_nowcast;
+    const stBadge = document.getElementById("radar-status-badge");
+    const stName = document.getElementById("radar-station-name");
+    const stBand = document.getElementById("radar-band-text");
+    const spVal = document.getElementById("radar-speed-val");
+    const hdVal = document.getElementById("radar-heading-val");
+    const pkVal = document.getElementById("radar-peak-rate");
+    const gwVal = document.getElementById("radar-growth-val");
+    const cfTag = document.getElementById("radar-conf-tag");
+
+    if (stBadge) stBadge.innerText = `${rn.station_id || 'DWR'} ONLINE`;
+    if (stName) stName.innerText = rn.station_id || "DWR-MET-01";
+    if (stBand) stBand.innerText = rn.frequency_band || "C-Band (5.6 GHz)";
+    if (spVal) spVal.innerText = `${rn.speed_kmh.toFixed(1)} km/h`;
+    if (hdVal) hdVal.innerText = `${rn.direction_degrees.toFixed(0)}° (${rn.cardinal_direction})`;
+    if (pkVal) pkVal.innerText = `${rn.peak_rain_rate_mmh.toFixed(1)} mm/h`;
+    if (gwVal) gwVal.innerText = `${rn.growth_rate_dbz_hr >= 0 ? '+' : ''}${rn.growth_rate_dbz_hr.toFixed(1)} dBZ/h`;
+    if (cfTag) {
+      cfTag.innerText = `${rn.confidence_level} (${(rn.confidence_score * 100).toFixed(0)}%)`;
+      cfTag.style.color = rn.confidence_level === "HIGH" ? "#10b981" : (rn.confidence_level === "MEDIUM" ? "#f59e0b" : "#ef4444");
+    }
+  }
+
   // 4. Mass Balance Card
   if (data.mass_balance) {
+
     const mbBadge = document.getElementById("mb-status-badge");
     if (mbBadge) {
       mbBadge.innerText = data.mass_balance.status === "PASS" ? "BALANCED" : "REVIEW";
@@ -1444,11 +1472,73 @@ function renderSvgMap(data) {
     svgMap.appendChild(caption);
   });
 
-  // G. Live Animated Ambulance along current safe route corridor
+  // G. Doppler Weather Radar Storm Tracking Vector Overlay
+  if (layers.radar && data.radar_nowcast && data.radar_nowcast.available) {
+    const rn = data.radar_nowcast;
+    const radarG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    radarG.setAttribute("pointer-events", "none");
+
+    const rad = (rn.direction_degrees - 90.0) * (Math.PI / 180.0);
+    const startX = 65;
+    const startY = 85;
+    const arrowLen = 95;
+    const endX = startX + arrowLen * Math.cos(rad);
+    const endY = startY + arrowLen * Math.sin(rad);
+
+    // Vector line with glow
+    const trackLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    trackLine.setAttribute("x1", startX);
+    trackLine.setAttribute("y1", startY);
+    trackLine.setAttribute("x2", endX);
+    trackLine.setAttribute("y2", endY);
+    trackLine.setAttribute("stroke", "#38bdf8");
+    trackLine.setAttribute("stroke-width", "2.5");
+    trackLine.setAttribute("stroke-dasharray", "6,3");
+    trackLine.setAttribute("stroke-linecap", "round");
+    radarG.appendChild(trackLine);
+
+    // Arrowhead
+    const trackHead = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    const angleHead = Math.atan2(endY - startY, endX - startX);
+    const h1X = endX - 11 * Math.cos(angleHead - Math.PI / 6);
+    const h1Y = endY - 11 * Math.sin(angleHead - Math.PI / 6);
+    const h2X = endX - 11 * Math.cos(angleHead + Math.PI / 6);
+    const h2Y = endY - 11 * Math.sin(angleHead + Math.PI / 6);
+    trackHead.setAttribute("points", `${endX},${endY} ${h1X},${h1Y} ${h2X},${h2Y}`);
+    trackHead.setAttribute("fill", "#38bdf8");
+    radarG.appendChild(trackHead);
+
+    // Radar Tracking Badge
+    const badgeBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    badgeBg.setAttribute("x", startX - 5);
+    badgeBg.setAttribute("y", startY - 26);
+    badgeBg.setAttribute("width", 200);
+    badgeBg.setAttribute("height", 18);
+    badgeBg.setAttribute("rx", 4);
+    badgeBg.setAttribute("fill", "rgba(11, 17, 32, 0.88)");
+    badgeBg.setAttribute("stroke", "rgba(56, 189, 248, 0.55)");
+    badgeBg.setAttribute("stroke-width", "1");
+    radarG.appendChild(badgeBg);
+
+    const badgeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    badgeText.setAttribute("x", startX);
+    badgeText.setAttribute("y", startY - 13);
+    badgeText.setAttribute("fill", "#38bdf8");
+    badgeText.setAttribute("font-size", "8.5");
+    badgeText.setAttribute("font-family", "monospace");
+    badgeText.setAttribute("font-weight", "bold");
+    badgeText.textContent = `📡 Storm Track: ${rn.speed_kmh}km/h ${rn.cardinal_direction} (${rn.growth_rate_dbz_hr >= 0 ? '+' : ''}${rn.growth_rate_dbz_hr}dBZ/h)`;
+    radarG.appendChild(badgeText);
+
+    svgMap.appendChild(radarG);
+  }
+
+  // H. Live Animated Ambulance along current safe route corridor
   if (layers.ambulance) {
     renderAnimatedVehicle();
   }
 }
+
 
 // Render Animated Vehicle along Current Active Path
 function renderAnimatedVehicle() {

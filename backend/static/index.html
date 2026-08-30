@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/app.css?v=8.0">
+  <link rel="stylesheet" href="/static/app.css?v=10.0">
+
 
 
 </head>
@@ -83,6 +84,7 @@
       <button class="layer-chip active" id="toggle-drainage" title="Toggle Storm Drain Inlets">🚰 Storm Drains</button>
       <button class="layer-chip active" id="toggle-sensors" title="Toggle Monitoring Stations">📡 Sensor Nodes</button>
       <button class="layer-chip active" id="toggle-roads" title="Toggle Street Network">🛣️ Street Grid</button>
+      <button class="layer-chip active" id="toggle-radar" title="Toggle Doppler Weather Radar Nowcast Layer">🌧️ Radar Nowcast</button>
       <button class="layer-chip active" id="toggle-ambulance" title="Toggle Ambulance Route Dispatch">🚑 Ambulance</button>
     </div>
   </div>
@@ -230,8 +232,57 @@
         <div class="card-subtext" id="degraded-reasons-text">Continuous live city monitoring combining physical drainage simulation with AI nowcasting.</div>
       </div>
 
+      <!-- Card 1.5: Doppler Weather Radar Rainfall Nowcast -->
+      <div class="side-card">
+        <div class="card-header">
+          <div class="card-title">🌧️ Radar Rainfall Nowcasting</div>
+          <span id="radar-status-badge" class="card-badge success">DWR ONLINE</span>
+        </div>
+
+        <div class="radar-telemetry-box">
+          <div class="radar-station-row">
+            <span class="station-tag"><span class="pulse-dot-cyan"></span> <strong>Station:</strong> <span id="radar-station-name">DWR-MET-01</span></span>
+            <span class="station-meta" id="radar-band-text">C-Band (5.6 GHz)</span>
+          </div>
+
+          <div class="radar-stats-grid">
+            <div class="radar-stat-item">
+              <div class="radar-stat-lbl">Storm Speed</div>
+              <div class="radar-stat-val" id="radar-speed-val">24.7 km/h</div>
+            </div>
+            <div class="radar-stat-item">
+              <div class="radar-stat-lbl">Heading</div>
+              <div class="radar-stat-val" id="radar-heading-val">76° (ENE)</div>
+            </div>
+            <div class="radar-stat-item">
+              <div class="radar-stat-lbl">Peak Rain Rate</div>
+              <div class="radar-stat-val highlight" id="radar-peak-rate">0.0 mm/h</div>
+            </div>
+            <div class="radar-stat-item">
+              <div class="radar-stat-lbl">Convective Growth</div>
+              <div class="radar-stat-val" id="radar-growth-val">+2.5 dBZ/h</div>
+            </div>
+          </div>
+
+          <!-- Horizon Confidence Strip -->
+          <div class="radar-horizon-strip">
+            <div class="horizon-header">
+              <span>0–3h Nowcast Confidence:</span>
+              <strong id="radar-conf-tag" style="color: #10b981;">HIGH (85%)</strong>
+            </div>
+            <div class="horizon-pills">
+              <span class="h-pill high" title="+30m Lead Time">+30m: 91%</span>
+              <span class="h-pill high" title="+60m Lead Time">+60m: 84%</span>
+              <span class="h-pill med" title="+120m Lead Time">+120m: 61%</span>
+              <span class="h-pill low" title="+180m Lead Time">+180m: 35%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Card 2: Risk-Aware Safe Routing Guidance -->
       <div class="side-card">
+
         <div class="card-header">
           <div class="card-title">🚑 Emergency Safe Navigation</div>
           <button id="btn-recompute-route" class="btn-recompute">🔄 Recalculate Route</button>
@@ -385,6 +436,6 @@
     </aside>
   </main>
 
-  <script src="/static/app.js?v=9.0"></script>
+  <script src="/static/app.js?v=10.0"></script>
 </body>
 </html>

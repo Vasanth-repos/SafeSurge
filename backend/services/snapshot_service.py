@@ -303,6 +303,49 @@ class SnapshotService:
             sensor_list=sensor_list,
         )
 
+        # Doppler Radar Rainfall Nowcasting Engine
+        try:
+            from flood_engine.radar_nowcast import (
+                RadarNowcastEngine,
+                SyntheticRadarSimulator,
+                TemporalStormTracker,
+            )
+            r_sim = SyntheticRadarSimulator(grid_size=10)
+            r_engine = RadarNowcastEngine()
+            r_tracker = TemporalStormTracker()
+
+            curr_frame = r_sim.generate_sweep(elapsed_minutes=lead_time_minutes)
+            prev_frame = r_sim.generate_sweep(elapsed_minutes=max(0, lead_time_minutes - 10))
+            motion = r_tracker.track(prev_frame, curr_frame)
+            nowcasts = r_engine.generate_nowcast(
+                current_frame=curr_frame,
+                previous_frame=prev_frame,
+                lead_times_minutes=[lead_time_minutes],
+            )
+            h_data = nowcasts.get(lead_time_minutes)
+
+            # Cardinal direction helper
+            deg = motion.direction_degrees
+            dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+            c_dir = dirs[int((deg + 11.25) / 22.5) % 16]
+
+            radar_data = {
+                "available": True,
+                "station_id": curr_frame.radar_station_id,
+                "frequency_band": curr_frame.frequency_band,
+                "speed_kmh": motion.speed_kmh,
+                "direction_degrees": motion.direction_degrees,
+                "cardinal_direction": c_dir,
+                "growth_rate_dbz_hr": motion.growth_rate_dbz_per_hour,
+                "confidence_score": h_data.confidence_score if h_data else 0.85,
+                "confidence_level": h_data.confidence_level.value if h_data else "HIGH",
+                "mean_rain_rate_mmh": round(h_data.mean_intensity_mmh, 1) if h_data else 0.0,
+                "peak_rain_rate_mmh": round(h_data.peak_intensity_mmh, 1) if h_data else 0.0,
+                "cells": h_data.cells if h_data else {},
+            }
+        except Exception:
+            radar_data = {"available": False}
+
         return {
             "simulation_id": snap.simulation_id,
             "timestamp_seconds": snap.timestamp_seconds,
@@ -321,7 +364,9 @@ class SnapshotService:
             "active_faults": active_faults_list,
             "safe_route": best_route,
             "ml_nowcast": ml_data,
+            "radar_nowcast": radar_data,
         }
+
 
     def _compute_drainage_tanks_state(
         self,

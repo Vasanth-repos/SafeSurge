@@ -15,7 +15,9 @@ from backend.api.diagnostics import router as diagnostics_router
 from backend.api.drainage import router as drainage_router
 from backend.api.flood import router as flood_router
 from backend.api.ml import router as ml_router
+from backend.api.radar import router as radar_router
 from backend.api.rainfall import router as rainfall_router
+
 from backend.api.reports import router as reports_router
 from backend.api.roads import router as roads_router
 from backend.api.routes import router as routes_router
@@ -64,6 +66,8 @@ app.include_router(snapshots_router)
 app.include_router(dashboard_router)
 app.include_router(reports_router)
 app.include_router(ml_router)
+app.include_router(radar_router)
+
 
 
 
