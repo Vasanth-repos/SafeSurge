@@ -1003,35 +1003,42 @@ function renderSvgMap(data) {
       rect.setAttribute("rx", 3);
 
       // High-contrast, clearly defined cell background and boundary
-      let fillColor = "#161822";
-      let opacity = "0.92";
-      let strokeColor = "rgba(255, 255, 255, 0.12)";
-      let strokeWidth = "1.0";
+      let fillColor = "#111827"; // Dark slate navy
+      let opacity = "0.95";
+      let strokeColor = "#374151"; // Crisp visible border
+      let strokeWidth = "1.2";
 
       if (layers.depth) {
         if (cell.risk === "UNSAFE" || cell.depth_cm >= 25) {
           fillColor = "#dc2626";
-          opacity = "0.90";
-          strokeColor = "#ef4444";
-          strokeWidth = "1.5";
+          opacity = "0.95";
+          strokeColor = "#f87171";
+          strokeWidth = "1.6";
         } else if (cell.risk === "HIGH" || cell.depth_cm >= 15) {
           fillColor = "#ea580c";
-          opacity = "0.85";
-          strokeColor = "#f97316";
-          strokeWidth = "1.3";
+          opacity = "0.92";
+          strokeColor = "#fb923c";
+          strokeWidth = "1.5";
         } else if (cell.risk === "WATCH" || cell.depth_cm >= 5) {
           fillColor = "#d97706";
-          opacity = "0.80";
-          strokeColor = "#fbbf24";
-          strokeWidth = "1.1";
+          opacity = "0.88";
+          strokeColor = "#fcd34d";
+          strokeWidth = "1.3";
         } else if (cell.depth_cm > 0.5) {
           fillColor = "#0284c7";
-          opacity = "0.68";
+          opacity = "0.85";
           strokeColor = "#38bdf8";
+          strokeWidth = "1.2";
         } else if (cell.depth_cm > 0.02) {
-          fillColor = "#0f766e";
-          opacity = "0.45";
-          strokeColor = "#14b8a6";
+          fillColor = "#0d9488";
+          opacity = "0.75";
+          strokeColor = "#2dd4bf";
+          strokeWidth = "1.2";
+        } else {
+          // Normal/Safe terrain with subtle emerald safe tone (matching legend: Safe <5 cm)
+          fillColor = "#0f1f1d";
+          strokeColor = "#1e3a34";
+          strokeWidth = "1.1";
         }
       }
 
@@ -1039,6 +1046,32 @@ function renderSvgMap(data) {
       rect.setAttribute("opacity", opacity);
       rect.setAttribute("stroke", strokeColor);
       rect.setAttribute("stroke-width", strokeWidth);
+
+      // Cell ID Label (top-left of each cell, crisp and legible)
+      const cellLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      cellLabel.setAttribute("x", c * 48 + 14);
+      cellLabel.setAttribute("y", r * 48 + 20);
+      cellLabel.setAttribute("fill", cell.depth_cm >= 5.0 ? "#ffffff" : "#64748b");
+      cellLabel.setAttribute("font-size", "7.5");
+      cellLabel.setAttribute("font-weight", "600");
+      cellLabel.setAttribute("font-family", "monospace");
+      cellLabel.setAttribute("pointer-events", "none");
+      cellLabel.textContent = cell.cell_id;
+
+      // If active water depth, show depth badge in bottom-right
+      let depthText = null;
+      if (cell.depth_cm >= 1.0) {
+        depthText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        depthText.setAttribute("x", c * 48 + 33);
+        depthText.setAttribute("y", r * 48 + 42);
+        depthText.setAttribute("fill", "#ffffff");
+        depthText.setAttribute("font-size", "7.5");
+        depthText.setAttribute("font-weight", "700");
+        depthText.setAttribute("font-family", "monospace");
+        depthText.setAttribute("text-anchor", "middle");
+        depthText.setAttribute("pointer-events", "none");
+        depthText.textContent = `${cell.depth_cm.toFixed(1)}cm`;
+      }
 
       rect.addEventListener("mouseenter", () => {
         tooltip.classList.remove("hidden");
@@ -1076,6 +1109,8 @@ function renderSvgMap(data) {
       });
 
       cellG.appendChild(rect);
+      cellG.appendChild(cellLabel);
+      if (depthText) cellG.appendChild(depthText);
 
       // Hydrodynamic Flow Vectors Layer (only on inundated cells to keep map clean)
       if (layers.d8 && cell.depth_cm >= 3.0) {

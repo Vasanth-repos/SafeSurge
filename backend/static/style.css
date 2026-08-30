@@ -432,9 +432,9 @@ html, body {
 /* SVG Map Canvas */
 .svg-wrapper {
   flex-shrink: 0;
-  height: 330px;
+  height: 375px;
   position: relative;
-  background: #0d0e13;
+  background: #080a0f;
   margin: 6px 10px;
   border: 1px solid var(--border-strong);
   border-radius: 6px;
@@ -447,10 +447,11 @@ html, body {
 #flood-map {
   width: 100%;
   height: 100%;
-  max-width: 420px;
-  max-height: 420px;
+  max-width: 460px;
+  max-height: 460px;
   display: block;
 }
+
 
 
 /* Tooltip */
