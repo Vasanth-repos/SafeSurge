@@ -19,6 +19,12 @@
   --border-subtle: #1e1f28;
   --border-card: #252733;
   --border-strong: #383a4a;
+  --border-color: #252733;
+
+  /* Aliases for widgets */
+  --text-primary: #f4f4f7;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
 
   /* Semantic status colors: Restrained & balanced */
   --accent-cyan: #e4e4e7;
@@ -36,6 +42,7 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', Consolas, monospace;
 }
+
 
 * {
   box-sizing: border-box;
@@ -425,11 +432,11 @@ html, body {
 /* SVG Map Canvas */
 .svg-wrapper {
   flex-shrink: 0;
-  height: 380px;
+  height: 330px;
   position: relative;
-  background: var(--bg-panel-inner);
-  margin: 8px 10px;
-  border: 1px solid var(--border-card);
+  background: #0d0e13;
+  margin: 6px 10px;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   overflow: hidden;
   display: flex;
@@ -437,14 +444,14 @@ html, body {
   justify-content: center;
 }
 
-
 #flood-map {
   width: 100%;
   height: 100%;
-  max-width: 480px;
-  max-height: 480px;
+  max-width: 420px;
+  max-height: 420px;
   display: block;
 }
+
 
 /* Tooltip */
 .tooltip {
@@ -1265,15 +1272,17 @@ html, body {
 }
 
 .tank-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
+  background: #14161f;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 
 .tank-card.surcharging {
   border-color: rgba(239, 68, 68, 0.5);

@@ -385,6 +385,40 @@ function simulateCatchmentState(leadTimeMinutes, scenarioId) {
   roads.forEach(r => { roadMap[r.road_id] = r; });
   const safeRoute = computeDijkstra("A", "D", roadMap);
 
+  // Realistic Virtual Tank Simulation with Dynamic Fluid Storage & Stage
+  const d1_in = +(rainIntensity * 0.16).toFixed(1);
+  const d1_stored = Math.min(1000, Math.round(rainIntensity > 3 ? 1000 * Math.min(1.0, Math.pow(rainIntensity / 42, 1.4)) : 0));
+  const d1_out = d1_stored > 0 ? +(Math.min(d1_in + 0.5, 5.5 * Math.sqrt(d1_stored / 1000))).toFixed(1) : d1_in;
+  const d1_pct = Math.round((d1_stored / 1000) * 100);
+
+  const d2_in = +(rainIntensity * 0.20 + d1_out).toFixed(1);
+  const d2_stored = Math.min(1500, Math.round(rainIntensity > 3 ? 1500 * Math.min(1.0, Math.pow(rainIntensity / 36, 1.3)) : 0));
+  const d2_out = d2_stored > 0 ? +(Math.min(d2_in, 7.5 * Math.sqrt(d2_stored / 1500))).toFixed(1) : d2_in;
+  const d2_pct = Math.round((d2_stored / 1500) * 100);
+
+  const d3_cap = 2000;
+  const d3_in = +(rainIntensity * (isBlockage ? 0.38 : 0.28) + d2_out).toFixed(1);
+  const d3_stored = (isBlockage && stepIdx >= 25) || rainIntensity >= 30 ? 2000 : Math.round(d3_cap * Math.min(1.0, Math.pow(rainIntensity / 30, 1.4)));
+  const d3_eff_cap = isBlockage ? 2.7 : 9.0;
+  const d3_out = d3_stored > 0 ? +(Math.min(d3_in, d3_eff_cap * Math.sqrt(d3_stored / d3_cap))).toFixed(1) : d3_in;
+  const d3_overflow = d3_stored >= d3_cap && d3_in > d3_out ? +(d3_in - d3_out).toFixed(1) : 0.0;
+  const d3_pct = Math.round((d3_stored / d3_cap) * 100);
+
+  const d4_in = +(rainIntensity * 0.18 + d3_out).toFixed(1);
+  const d4_stored = Math.min(2500, Math.round(rainIntensity > 3 ? 2500 * Math.min(1.0, Math.pow(rainIntensity / 36, 1.3)) : 0));
+  const d4_out = d4_stored > 0 ? +(Math.min(d4_in, 12.0 * Math.sqrt(d4_stored / 2500))).toFixed(1) : d4_in;
+  const d4_pct = Math.round((d4_stored / 2500) * 100);
+
+  const d5_in = d4_out;
+  const d5_stored = Math.min(3000, Math.round(rainIntensity > 3 ? 1650 * Math.min(1.0, Math.pow(rainIntensity / 32, 1.2)) : 0));
+  const d5_out = d5_stored > 0 ? +(Math.min(d5_in, 13.5 * Math.sqrt(d5_stored / 3000))).toFixed(1) : d5_in;
+  const d5_pct = Math.round((d5_stored / 3000) * 100);
+
+  const totalStored = d1_stored + d2_stored + d3_stored + d4_stored + d5_stored;
+  const totalCap = 10000;
+  const isNetSurcharging = d3_overflow > 0 || d3_pct >= 100 || d2_pct >= 100 || d4_pct >= 100;
+  const getStat = (pct, ov) => ov > 0 || pct >= 100 ? "SURCHARGING" : (pct >= 80 ? "NEAR_CAPACITY" : (pct >= 60 ? "WATCH" : "NORMAL"));
+
   return {
     simulation_id: scenarioId,
     timestamp_seconds: t,
@@ -416,85 +450,38 @@ function simulateCatchmentState(leadTimeMinutes, scenarioId) {
       { sensor_id: "S005", location_id: "C061", status: "ONLINE", last_valid_reading_cm: cellDepthMap["C061"] || 0.0, bias_cm: 0.0 },
       { sensor_id: "S006", location_id: "C088", status: "ONLINE", last_valid_reading_cm: cellDepthMap["C088"] || 0.0, bias_cm: 0.2 }
     ],
-    // Realistic Virtual Tank Simulation with Dynamic Fluid Storage & Stage
-    const d1_in = +(rainIntensity * 0.16).toFixed(1);
-    const d1_stored = Math.min(1000, Math.round(rainIntensity > 3 ? 1000 * Math.min(1.0, Math.pow(rainIntensity / 42, 1.4)) : 0));
-    const d1_out = d1_stored > 0 ? +(Math.min(d1_in + 0.5, 5.5 * Math.sqrt(d1_stored / 1000))).toFixed(1) : d1_in;
-    const d1_pct = Math.round((d1_stored / 1000) * 100);
-
-    const d2_in = +(rainIntensity * 0.20 + d1_out).toFixed(1);
-    const d2_stored = Math.min(1500, Math.round(rainIntensity > 3 ? 1500 * Math.min(1.0, Math.pow(rainIntensity / 36, 1.3)) : 0));
-    const d2_out = d2_stored > 0 ? +(Math.min(d2_in, 7.5 * Math.sqrt(d2_stored / 1500))).toFixed(1) : d2_in;
-    const d2_pct = Math.round((d2_stored / 1500) * 100);
-
-    const d3_cap = 2000;
-    const d3_in = +(rainIntensity * (isBlockage ? 0.38 : 0.28) + d2_out).toFixed(1);
-    const d3_stored = (isBlockage && stepIdx >= 25) || rainIntensity >= 30 ? 2000 : Math.round(d3_cap * Math.min(1.0, Math.pow(rainIntensity / 30, 1.4)));
-    const d3_eff_cap = isBlockage ? 2.7 : 9.0;
-    const d3_out = d3_stored > 0 ? +(Math.min(d3_in, d3_eff_cap * Math.sqrt(d3_stored / d3_cap))).toFixed(1) : d3_in;
-    const d3_overflow = d3_stored >= d3_cap && d3_in > d3_out ? +(d3_in - d3_out).toFixed(1) : 0.0;
-    const d3_pct = Math.round((d3_stored / d3_cap) * 100);
-
-    const d4_in = +(rainIntensity * 0.18 + d3_out).toFixed(1);
-    const d4_stored = Math.min(2500, Math.round(rainIntensity > 3 ? 2500 * Math.min(1.0, Math.pow(rainIntensity / 36, 1.3)) : 0));
-    const d4_out = d4_stored > 0 ? +(Math.min(d4_in, 12.0 * Math.sqrt(d4_stored / 2500))).toFixed(1) : d4_in;
-    const d4_pct = Math.round((d4_stored / 2500) * 100);
-
-    const d5_in = d4_out;
-    const d5_stored = Math.min(3000, Math.round(rainIntensity > 3 ? 1650 * Math.min(1.0, Math.pow(rainIntensity / 32, 1.2)) : 0));
-    const d5_out = d5_stored > 0 ? +(Math.min(d5_in, 13.5 * Math.sqrt(d5_stored / 3000))).toFixed(1) : d5_in;
-    const d5_pct = Math.round((d5_stored / 3000) * 100);
-
-    const totalStored = d1_stored + d2_stored + d3_stored + d4_stored + d5_stored;
-    const totalCap = 10000;
-    const isNetSurcharging = d3_overflow > 0 || d3_pct >= 100 || d2_pct >= 100 || d4_pct >= 100;
-
-    const getStat = (pct, ov) => ov > 0 || pct >= 100 ? "SURCHARGING" : (pct >= 80 ? "NEAR_CAPACITY" : (pct >= 60 ? "WATCH" : "NORMAL"));
-
-    return {
-      time_minutes: stepIdx,
-      rain_intensity_mm_hr: rainIntensity,
-      total_inflow_m3: totalRunoff,
-      sensors: [
-        { sensor_id: "S001", location_id: "C022", status: "ONLINE", last_valid_reading_cm: Math.round(d1_stored / 1000 * 120 * 0.1), bias_cm: 0.1 },
-        { sensor_id: "S002", location_id: "C045", status: "ONLINE", last_valid_reading_cm: Math.round(d2_stored / 1500 * 140 * 0.1), bias_cm: 0.0 },
-        { sensor_id: "S003", location_id: "C058", status: isOffline ? "FAULT_OFFLINE" : "ONLINE", last_valid_reading_cm: Math.round(d3_stored / 2000 * 160 * 0.1), bias_cm: 0.0 },
-        { sensor_id: "S004", location_id: "C068", status: "ONLINE", last_valid_reading_cm: cellDepthMap["C068"] || 0.0, bias_cm: -0.2 },
-        { sensor_id: "S005", location_id: "C061", status: "ONLINE", last_valid_reading_cm: cellDepthMap["C061"] || 0.0, bias_cm: 0.0 },
-        { sensor_id: "S006", location_id: "C088", status: "ONLINE", last_valid_reading_cm: cellDepthMap["C088"] || 0.0, bias_cm: 0.2 }
-      ],
-      drainage_tanks: {
-        "D01": { node_id: "D01", connected_cell_id: "C022", capacity_liters: 1000, current_storage_liters: d1_stored, inflow_lps: d1_in, outflow_lps: d1_out, overflow_lps: 0.0, fill_percentage: d1_pct, status: getStat(d1_pct, 0), simulated_water_level_cm: Math.round((d1_pct / 100) * 120), drainage_degradation_factor: 1.0 },
-        "D02": { node_id: "D02", connected_cell_id: "C045", capacity_liters: 1500, current_storage_liters: d2_stored, inflow_lps: d2_in, outflow_lps: d2_out, overflow_lps: 0.0, fill_percentage: d2_pct, status: getStat(d2_pct, 0), simulated_water_level_cm: Math.round((d2_pct / 100) * 140), drainage_degradation_factor: 1.0 },
-        "D03": {
-          node_id: "D03", connected_cell_id: "C058", capacity_liters: 2000,
-          current_storage_liters: d3_stored,
-          inflow_lps: d3_in,
-          outflow_lps: d3_out,
-          overflow_lps: d3_overflow,
-          fill_percentage: d3_pct,
-          status: getStat(d3_pct, d3_overflow),
-          simulated_water_level_cm: Math.round((d3_pct / 100) * 160),
-          drainage_degradation_factor: isBlockage ? 0.3 : 1.0,
-          sensor_comparison: { simulated_level_cm: Math.round((d3_pct / 100) * 160), sensor_reading_cm: Math.round((d3_pct / 100) * 155), agreement: "EXCELLENT" }
-        },
-        "D04": { node_id: "D04", connected_cell_id: "C065", capacity_liters: 2500, current_storage_liters: d4_stored, inflow_lps: d4_in, outflow_lps: d4_out, overflow_lps: 0.0, fill_percentage: d4_pct, status: getStat(d4_pct, 0), simulated_water_level_cm: Math.round((d4_pct / 100) * 180), drainage_degradation_factor: 1.0 },
-        "D05": { node_id: "D05", connected_cell_id: "C089", capacity_liters: 3000, current_storage_liters: d5_stored, inflow_lps: d5_in, outflow_lps: d5_out, overflow_lps: 0.0, fill_percentage: d5_pct, status: getStat(d5_pct, 0), simulated_water_level_cm: Math.round((d5_pct / 100) * 200), drainage_degradation_factor: 1.0 }
+    drainage_tanks: {
+      "D01": { node_id: "D01", connected_cell_id: "C022", capacity_liters: 1000, current_storage_liters: d1_stored, inflow_lps: d1_in, outflow_lps: d1_out, overflow_lps: 0.0, fill_percentage: d1_pct, status: getStat(d1_pct, 0), simulated_water_level_cm: Math.round((d1_pct / 100) * 120), drainage_degradation_factor: 1.0 },
+      "D02": { node_id: "D02", connected_cell_id: "C045", capacity_liters: 1500, current_storage_liters: d2_stored, inflow_lps: d2_in, outflow_lps: d2_out, overflow_lps: 0.0, fill_percentage: d2_pct, status: getStat(d2_pct, 0), simulated_water_level_cm: Math.round((d2_pct / 100) * 140), drainage_degradation_factor: 1.0 },
+      "D03": {
+        node_id: "D03", connected_cell_id: "C058", capacity_liters: 2000,
+        current_storage_liters: d3_stored,
+        inflow_lps: d3_in,
+        outflow_lps: d3_out,
+        overflow_lps: d3_overflow,
+        fill_percentage: d3_pct,
+        status: getStat(d3_pct, d3_overflow),
+        simulated_water_level_cm: Math.round((d3_pct / 100) * 160),
+        drainage_degradation_factor: isBlockage ? 0.3 : 1.0,
+        sensor_comparison: { simulated_level_cm: Math.round((d3_pct / 100) * 160), sensor_reading_cm: Math.round((d3_pct / 100) * 155), agreement: "EXCELLENT" }
       },
-      drainage_network_summary: {
-        network_status: isNetSurcharging ? "SURCHARGING" : (totalStored > 3000 ? "WATCH" : "NORMAL"),
-        total_nodes: 5,
-        total_capacity_liters: totalCap,
-        total_storage_liters: totalStored,
-        network_fill_percentage: Math.round((totalStored / totalCap) * 100),
-        active_surcharging_nodes: isNetSurcharging ? ["D03"] : []
-      },
-
+      "D04": { node_id: "D04", connected_cell_id: "C065", capacity_liters: 2500, current_storage_liters: d4_stored, inflow_lps: d4_in, outflow_lps: d4_out, overflow_lps: 0.0, fill_percentage: d4_pct, status: getStat(d4_pct, 0), simulated_water_level_cm: Math.round((d4_pct / 100) * 180), drainage_degradation_factor: 1.0 },
+      "D05": { node_id: "D05", connected_cell_id: "C089", capacity_liters: 3000, current_storage_liters: d5_stored, inflow_lps: d5_in, outflow_lps: d5_out, overflow_lps: 0.0, fill_percentage: d5_pct, status: getStat(d5_pct, 0), simulated_water_level_cm: Math.round((d5_pct / 100) * 200), drainage_degradation_factor: 1.0 }
+    },
+    drainage_network_summary: {
+      network_status: isNetSurcharging ? "SURCHARGING" : (totalStored > 3000 ? "WATCH" : "NORMAL"),
+      total_nodes: 5,
+      total_capacity_liters: totalCap,
+      total_storage_liters: totalStored,
+      network_fill_percentage: Math.round((totalStored / totalCap) * 100),
+      active_surcharging_nodes: isNetSurcharging ? ["D03"] : []
+    },
     cells: cells,
     roads: roads,
     safe_route: safeRoute
   };
 }
+
 
 // Load and Render Snapshot
 async function loadSnapshot(leadTimeMinutes) {
@@ -989,32 +976,43 @@ function renderSvgMap(data) {
       rect.setAttribute("height", 46);
       rect.setAttribute("rx", 3);
 
-      let fillColor = "#14151b";
-      let opacity = "0.7";
+      // High-contrast, clearly defined cell background and boundary
+      let fillColor = "#161822";
+      let opacity = "0.92";
+      let strokeColor = "rgba(255, 255, 255, 0.12)";
+      let strokeWidth = "1.0";
 
       if (layers.depth) {
         if (cell.risk === "UNSAFE" || cell.depth_cm >= 25) {
           fillColor = "#dc2626";
-          opacity = "0.85";
+          opacity = "0.90";
+          strokeColor = "#ef4444";
+          strokeWidth = "1.5";
         } else if (cell.risk === "HIGH" || cell.depth_cm >= 15) {
           fillColor = "#ea580c";
-          opacity = "0.80";
+          opacity = "0.85";
+          strokeColor = "#f97316";
+          strokeWidth = "1.3";
         } else if (cell.risk === "WATCH" || cell.depth_cm >= 5) {
           fillColor = "#d97706";
-          opacity = "0.72";
+          opacity = "0.80";
+          strokeColor = "#fbbf24";
+          strokeWidth = "1.1";
         } else if (cell.depth_cm > 0.5) {
-          fillColor = "#0d9488";
-          opacity = "0.55";
+          fillColor = "#0284c7";
+          opacity = "0.68";
+          strokeColor = "#38bdf8";
         } else if (cell.depth_cm > 0.02) {
-          fillColor = "#115e59";
-          opacity = "0.35";
+          fillColor = "#0f766e";
+          opacity = "0.45";
+          strokeColor = "#14b8a6";
         }
       }
 
       rect.setAttribute("fill", fillColor);
       rect.setAttribute("opacity", opacity);
-      rect.setAttribute("stroke", "#1f2028");
-      rect.setAttribute("stroke-width", "0.8");
+      rect.setAttribute("stroke", strokeColor);
+      rect.setAttribute("stroke-width", strokeWidth);
 
       rect.addEventListener("mouseenter", () => {
         tooltip.classList.remove("hidden");
@@ -1053,56 +1051,60 @@ function renderSvgMap(data) {
 
       cellG.appendChild(rect);
 
+      // Subtle cell ID corner tag for clear spatial grid visibility
+      const cellLbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      cellLbl.setAttribute("x", c * 48 + 14);
+      cellLbl.setAttribute("y", r * 48 + 20);
+      cellLbl.setAttribute("fill", "rgba(255, 255, 255, 0.25)");
+      cellLbl.setAttribute("font-size", "7.5");
+      cellLbl.setAttribute("font-family", "monospace");
+      cellLbl.setAttribute("pointer-events", "none");
+      cellLbl.textContent = cell.cell_id;
+      cellG.appendChild(cellLbl);
+
       // High-Contrast D8 Hydrodynamic Flow Vectors Layer
       if (layers.d8 && (cell.depth_cm > 0.2 || (currentMinute > 0 && layers.depth))) {
         const cx = c * 48 + 33;
         const cy = r * 48 + 33;
 
-        // Calculate true topographic gradient descent (dRow = South/Down, dCol = East/Right)
-        let dRow = 1.0; // Gravity component South (+Y)
-        let dCol = 1.0; // Gravity component East (+X)
-
-        // Influence of Lowland Basin Sink (at row 5, col 8)
-        if (c < 8 && r <= 6) {
-          dRow += 0.8;
-          dCol += 0.8;
+        let dRow = 1.0;
+        let dCol = 1.0;
+        if (cell.flow_vector) {
+          dRow = cell.flow_vector.dRow !== undefined ? cell.flow_vector.dRow : 1.0;
+          dCol = cell.flow_vector.dCol !== undefined ? cell.flow_vector.dCol : 1.0;
+        } else {
+          dRow = r <= 4 ? 1.0 : (r >= 7 ? -0.3 : 0.8);
+          dCol = c <= 5 ? 1.0 : -0.4;
         }
 
-        // True screen-space angle from +X (East) clockwise towards +Y (South)
-        const angle = Math.atan2(dRow, dCol) * (180 / Math.PI);
+        const angleRad = Math.atan2(dRow, dCol);
+        const angleDeg = angleRad * (180 / Math.PI);
 
         const flowG = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        flowG.setAttribute("transform", `translate(${cx}, ${cy}) rotate(${angle})`);
-        flowG.setAttribute("pointer-events", "none");
+        flowG.setAttribute("transform", `translate(${cx}, ${cy}) rotate(${angleDeg})`);
 
-        // High-contrast dark shadow backdrop (Base arrow points East: +X)
-        const arrowShadow = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        arrowShadow.setAttribute("d", "M 8 0 L 1 -5 L 1 -2 L -7 -2 L -7 2 L 1 2 L 1 5 Z");
-        arrowShadow.setAttribute("fill", "rgba(0, 0, 0, 0.85)");
-        arrowShadow.setAttribute("transform", "scale(1.1) translate(0.5, 0.5)");
-        flowG.appendChild(arrowShadow);
+        let markerId = "arrow-safe";
+        let strokeCol = "#10b981";
+        if (cell.risk === "UNSAFE" || cell.depth_cm >= 25.0) {
+          markerId = "arrow-unsafe";
+          strokeCol = "#ef4444";
+        } else if (cell.risk === "HIGH" || cell.depth_cm >= 15.0) {
+          markerId = "arrow-high";
+          strokeCol = "#f97316";
+        } else if (cell.risk === "WATCH" || cell.depth_cm >= 5.0) {
+          markerId = "arrow-watch";
+          strokeCol = "#f59e0b";
+        }
 
-        // High-contrast neutral arrow core
-        const arrowCore = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        arrowCore.setAttribute("d", "M 8 0 L 1 -5 L 1 -2 L -7 -2 L -7 2 L 1 2 L 1 5 Z");
-        
-        let arrowFill = cell.depth_cm >= 5.0 ? "#ffffff" : "#71717a";
-
-        arrowCore.setAttribute("fill", arrowFill);
-        arrowCore.setAttribute("stroke", "#0b0c10");
+        const arrowCore = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        arrowCore.setAttribute("x1", "-7");
+        arrowCore.setAttribute("y1", "0");
+        arrowCore.setAttribute("x2", "7");
+        arrowCore.setAttribute("y2", "0");
+        arrowCore.setAttribute("stroke", strokeCol);
         arrowCore.setAttribute("stroke-width", "1.2");
         arrowCore.setAttribute("stroke-linejoin", "round");
         flowG.appendChild(arrowCore);
-
-        // Dynamic center dot for high-velocity flow
-        if (cell.depth_cm >= 10.0) {
-          const flowDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-          flowDot.setAttribute("cx", "1");
-          flowDot.setAttribute("cy", "0");
-          flowDot.setAttribute("r", "1.2");
-          flowDot.setAttribute("fill", "#f59e0b");
-          flowG.appendChild(flowDot);
-        }
 
         cellG.appendChild(flowG);
       }
@@ -1111,51 +1113,103 @@ function renderSvgMap(data) {
     });
   }
 
-  // B. Drainage Inlets Layer
+  // B. Underground Virtual Tank Drainage Network Layer
   if (layers.drainage) {
     const isBlockageActive = activeFaults.blockage || (data.active_faults && data.active_faults.some(f => f.includes("CAPACITY_REDUCTION") || f.includes("E001"))) || (data.simulation_id === "capacity_reduction" && currentMinute >= 45 && currentMinute <= 60);
-    const drainNodes = [
-      { id: "IN01", x: 274, y: 226, label: "Midtown Inlet", clogged: false },
-      { id: "E001", x: 418, y: 370, label: "East Culvert", clogged: isBlockageActive },
-      { id: "OUT1", x: 466, y: 466, label: "South Outfall", clogged: false }
+
+    // 5 Virtual Tank nodes on the 500x500 canvas (at cell centers)
+    const tankNodes = [
+      { id: "D01", cell: "C022", x: 129, y: 129, name: "D01 Inlet" },
+      { id: "D02", cell: "C045", x: 273, y: 225, name: "D02 Midtown" },
+      { id: "D03", cell: "C058", x: 417, y: 273, name: "D03 Underpass" },
+      { id: "D04", cell: "C065", x: 273, y: 321, name: "D04 Trunk" },
+      { id: "D05", cell: "C089", x: 465, y: 417, name: "D05 Outfall" }
     ];
 
-    drainNodes.forEach(dn => {
-      const dg = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    // Pipeline connecting D01 -> D02 -> D03 -> D04 -> D05
+    const pipePoints = tankNodes.map(t => `${t.x},${t.y}`).join(" ");
+    const pipeBack = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    pipeBack.setAttribute("points", pipePoints);
+    pipeBack.setAttribute("fill", "none");
+    pipeBack.setAttribute("stroke", "rgba(56, 189, 248, 0.25)");
+    pipeBack.setAttribute("stroke-width", "5");
+    pipeBack.setAttribute("stroke-linecap", "round");
+    pipeBack.setAttribute("stroke-linejoin", "round");
+    svgMap.appendChild(pipeBack);
 
-      if (dn.clogged) {
+    const pipeFlow = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    pipeFlow.setAttribute("points", pipePoints);
+    pipeFlow.setAttribute("fill", "none");
+    pipeFlow.setAttribute("stroke", "#38bdf8");
+    pipeFlow.setAttribute("stroke-width", "2");
+    pipeFlow.setAttribute("stroke-dasharray", "6,4");
+    pipeFlow.setAttribute("stroke-linecap", "round");
+    pipeFlow.setAttribute("stroke-linejoin", "round");
+    svgMap.appendChild(pipeFlow);
+
+    // Render each tank node station
+    tankNodes.forEach(tn => {
+      const tg = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      const tankData = (data.drainage_tanks && data.drainage_tanks[tn.id]) || {};
+      const fillPct = tankData.fill_percentage || 0;
+      const isSurcharging = tankData.status === "SURCHARGING" || (tn.id === "D03" && isBlockageActive);
+
+      if (isSurcharging) {
         const clogHalo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        clogHalo.setAttribute("cx", dn.x);
-        clogHalo.setAttribute("cy", dn.y);
-        clogHalo.setAttribute("r", 16);
+        clogHalo.setAttribute("cx", tn.x);
+        clogHalo.setAttribute("cy", tn.y);
+        clogHalo.setAttribute("r", 15);
         clogHalo.setAttribute("fill", "rgba(239, 68, 68, 0.35)");
         clogHalo.setAttribute("stroke", "#ef4444");
         clogHalo.setAttribute("stroke-width", "1.5");
         clogHalo.setAttribute("stroke-dasharray", "3,2");
         clogHalo.setAttribute("filter", "url(#glow-pulse)");
-        dg.appendChild(clogHalo);
+        tg.appendChild(clogHalo);
       }
 
-      const dIcon = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      dIcon.setAttribute("cx", dn.x);
-      dIcon.setAttribute("cy", dn.y);
-      dIcon.setAttribute("r", 8.5);
-      dIcon.setAttribute("fill", dn.clogged ? "#ef4444" : "#06b6d4");
-      dIcon.setAttribute("stroke", "#ffffff");
-      dIcon.setAttribute("stroke-width", "1.5");
-      dg.appendChild(dIcon);
+      // Tank node circle
+      const nodeCol = isSurcharging ? "#ef4444" : (fillPct >= 80 ? "#f97316" : (fillPct >= 50 ? "#fbbf24" : "#0284c7"));
+      const tIcon = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      tIcon.setAttribute("cx", tn.x);
+      tIcon.setAttribute("cy", tn.y);
+      tIcon.setAttribute("r", 9.0);
+      tIcon.setAttribute("fill", nodeCol);
+      tIcon.setAttribute("stroke", "#ffffff");
+      tIcon.setAttribute("stroke-width", "1.5");
+      tIcon.setAttribute("cursor", "pointer");
+      tg.appendChild(tIcon);
 
-      const dLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      dLabel.setAttribute("x", dn.x);
-      dLabel.setAttribute("y", dn.y + 3);
-      dLabel.setAttribute("fill", "#ffffff");
-      dLabel.setAttribute("font-size", "8");
-      dLabel.setAttribute("font-weight", "bold");
-      dLabel.setAttribute("text-anchor", "middle");
-      dLabel.textContent = dn.clogged ? "!" : "D";
-      dg.appendChild(dLabel);
+      const tText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tText.setAttribute("x", tn.x);
+      tText.setAttribute("y", tn.y + 3);
+      tText.setAttribute("fill", "#ffffff");
+      tText.setAttribute("font-size", "7.5");
+      tText.setAttribute("font-weight", "bold");
+      tText.setAttribute("font-family", "monospace");
+      tText.setAttribute("text-anchor", "middle");
+      tText.setAttribute("pointer-events", "none");
+      tText.textContent = tn.id;
+      tg.appendChild(tText);
 
-      svgMap.appendChild(dg);
+      // Tooltip hover
+      tIcon.addEventListener("mouseenter", () => {
+        tooltip.classList.remove("hidden");
+        tooltip.innerHTML = `
+          <div style="font-size: 11px; font-weight: 700; color: #38bdf8; border-bottom: 1px solid #2d2f3c; padding-bottom: 3px; margin-bottom: 4px;">
+            🚰 Virtual Tank ${tn.id} (${tn.cell})
+          </div>
+          <div style="font-size: 10px; line-height: 1.4;">
+            <div>Status: <strong style="color: ${nodeCol};">${tankData.status || 'NORMAL'}</strong></div>
+            <div>Stored: <strong>${tankData.current_storage_liters || 0} L</strong> / ${tankData.capacity_liters || 1000} L (${fillPct}%)</div>
+            <div>Inflow: <strong>${tankData.inflow_lps || 0} L/s</strong> | Outflow: <strong>${tankData.outflow_lps || 0} L/s</strong></div>
+          </div>
+        `;
+      });
+      tIcon.addEventListener("mouseleave", () => {
+        tooltip.classList.add("hidden");
+      });
+
+      svgMap.appendChild(tg);
     });
   }
 
