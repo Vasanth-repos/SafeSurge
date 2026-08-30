@@ -1071,31 +1071,37 @@ function renderSvgMap(data) {
         flowG.setAttribute("transform", `translate(${cx}, ${cy}) rotate(${angleDeg})`);
         flowG.setAttribute("pointer-events", "none");
 
-        let markerId = "arrow-safe";
         let strokeCol = "#10b981";
         if (cell.risk === "UNSAFE" || cell.depth_cm >= 25.0) {
-          markerId = "arrow-unsafe";
           strokeCol = "#ef4444";
         } else if (cell.risk === "HIGH" || cell.depth_cm >= 15.0) {
-          markerId = "arrow-high";
           strokeCol = "#f97316";
         } else if (cell.risk === "WATCH" || cell.depth_cm >= 5.0) {
-          markerId = "arrow-watch";
           strokeCol = "#f59e0b";
         }
 
-        const arrowCore = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        arrowCore.setAttribute("x1", "-6");
-        arrowCore.setAttribute("y1", "0");
-        arrowCore.setAttribute("x2", "6");
-        arrowCore.setAttribute("y2", "0");
-        arrowCore.setAttribute("stroke", strokeCol);
-        arrowCore.setAttribute("stroke-width", "1.2");
-        arrowCore.setAttribute("stroke-linejoin", "round");
-        flowG.appendChild(arrowCore);
+        // Arrow Shaft
+        const arrowShaft = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        arrowShaft.setAttribute("x1", "-8");
+        arrowShaft.setAttribute("y1", "0");
+        arrowShaft.setAttribute("x2", "3");
+        arrowShaft.setAttribute("y2", "0");
+        arrowShaft.setAttribute("stroke", strokeCol);
+        arrowShaft.setAttribute("stroke-width", "1.8");
+        arrowShaft.setAttribute("stroke-linecap", "round");
+        flowG.appendChild(arrowShaft);
+
+        // Prominent Arrow Head Polygon
+        const arrowHead = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        arrowHead.setAttribute("points", "2,-4 9,0 2,4");
+        arrowHead.setAttribute("fill", strokeCol);
+        arrowHead.setAttribute("stroke", "#0b0c10");
+        arrowHead.setAttribute("stroke-width", "0.6");
+        flowG.appendChild(arrowHead);
 
         cellG.appendChild(flowG);
       }
+
 
       svgMap.appendChild(cellG);
     });
