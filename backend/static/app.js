@@ -625,8 +625,11 @@ function updateDashboardUI(data) {
     if (stName) stName.innerText = rn.station_id || "DWR-MET-01";
     if (stBand) stBand.innerText = rn.frequency_band || "C-Band (5.6 GHz)";
     if (spVal) spVal.innerText = `${rn.speed_kmh.toFixed(1)} km/h`;
-    if (hdVal) hdVal.innerText = `${rn.direction_degrees.toFixed(0)}° (${rn.cardinal_direction})`;
+    if (hdVal) {
+      hdVal.innerHTML = `<span style="color: #38bdf8; font-weight: 700;">${rn.direction_degrees.toFixed(0)}° (${rn.cardinal_direction})</span> <span style="display: inline-block; transform: rotate(${rn.direction_degrees - 90}deg); color: #38bdf8; font-size: 13px; font-weight: 900; margin-left: 4px;">➔</span>`;
+    }
     if (pkVal) pkVal.innerText = `${rn.peak_rain_rate_mmh.toFixed(1)} mm/h`;
+
     if (gwVal) gwVal.innerText = `${rn.growth_rate_dbz_hr >= 0 ? '+' : ''}${rn.growth_rate_dbz_hr.toFixed(1)} dBZ/h`;
     if (cfTag) {
       cfTag.innerText = `${rn.confidence_level} (${(rn.confidence_score * 100).toFixed(0)}%)`;
@@ -1507,62 +1510,115 @@ function renderSvgMap(data) {
     svgMap.appendChild(caption);
   });
 
-  // G. Doppler Weather Radar Storm Tracking Vector Overlay
+  // G. Doppler Weather Radar Storm Tracking Vector & Compass Rose Overlay
   if (layers.radar && data.radar_nowcast && data.radar_nowcast.available) {
     const rn = data.radar_nowcast;
     const radarG = document.createElementNS("http://www.w3.org/2000/svg", "g");
     radarG.setAttribute("pointer-events", "none");
 
+    // 1. Subtle Doppler Radar Range Rings
+    const ring1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    ring1.setAttribute("cx", 250);
+    ring1.setAttribute("cy", 250);
+    ring1.setAttribute("r", 140);
+    ring1.setAttribute("fill", "none");
+    ring1.setAttribute("stroke", "rgba(56, 189, 248, 0.15)");
+    ring1.setAttribute("stroke-width", "1");
+    ring1.setAttribute("stroke-dasharray", "4,4");
+    radarG.appendChild(ring1);
+
+    const ring2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    ring2.setAttribute("cx", 250);
+    ring2.setAttribute("cy", 250);
+    ring2.setAttribute("r", 220);
+    ring2.setAttribute("fill", "none");
+    ring2.setAttribute("stroke", "rgba(56, 189, 248, 0.10)");
+    ring2.setAttribute("stroke-width", "1");
+    ring2.setAttribute("stroke-dasharray", "4,4");
+    radarG.appendChild(ring2);
+
+    // 2. High-Visibility Storm Advection Vector across Catchment
     const rad = (rn.direction_degrees - 90.0) * (Math.PI / 180.0);
-    const startX = 65;
-    const startY = 85;
-    const arrowLen = 95;
+    const startX = 110;
+    const startY = 150;
+    const arrowLen = 140;
     const endX = startX + arrowLen * Math.cos(rad);
     const endY = startY + arrowLen * Math.sin(rad);
 
-    // Vector line with glow
+    // Deep Shadow Line for max contrast against any background
+    const shadowLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    shadowLine.setAttribute("x1", startX);
+    shadowLine.setAttribute("y1", startY);
+    shadowLine.setAttribute("x2", endX);
+    shadowLine.setAttribute("y2", endY);
+    shadowLine.setAttribute("stroke", "#000000");
+    shadowLine.setAttribute("stroke-width", "8");
+    shadowLine.setAttribute("stroke-linecap", "round");
+    shadowLine.setAttribute("opacity", "0.95");
+    radarG.appendChild(shadowLine);
+
+    // Glowing Neon Cyan Vector Core Line
     const trackLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
     trackLine.setAttribute("x1", startX);
     trackLine.setAttribute("y1", startY);
     trackLine.setAttribute("x2", endX);
     trackLine.setAttribute("y2", endY);
-    trackLine.setAttribute("stroke", "#38bdf8");
-    trackLine.setAttribute("stroke-width", "2.5");
-    trackLine.setAttribute("stroke-dasharray", "6,3");
+    trackLine.setAttribute("stroke", "#00f0ff");
+    trackLine.setAttribute("stroke-width", "4.2");
+    trackLine.setAttribute("stroke-dasharray", "9,4");
     trackLine.setAttribute("stroke-linecap", "round");
+    trackLine.setAttribute("filter", "url(#glow-cyan)");
     radarG.appendChild(trackLine);
 
-    // Arrowhead
-    const trackHead = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    // Intermediate Directional Chevrons
     const angleHead = Math.atan2(endY - startY, endX - startX);
-    const h1X = endX - 11 * Math.cos(angleHead - Math.PI / 6);
-    const h1Y = endY - 11 * Math.sin(angleHead - Math.PI / 6);
-    const h2X = endX - 11 * Math.cos(angleHead + Math.PI / 6);
-    const h2Y = endY - 11 * Math.sin(angleHead + Math.PI / 6);
+    [0.45, 0.75].forEach(pct => {
+      const mx = startX + arrowLen * pct * Math.cos(rad);
+      const my = startY + arrowLen * pct * Math.sin(rad);
+      const chev = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      const c1X = mx - 10 * Math.cos(angleHead - Math.PI / 5);
+      const c1Y = my - 10 * Math.sin(angleHead - Math.PI / 5);
+      const c2X = mx - 10 * Math.cos(angleHead + Math.PI / 5);
+      const c2Y = my - 10 * Math.sin(angleHead + Math.PI / 5);
+      chev.setAttribute("points", `${mx},${my} ${c1X},${c1Y} ${c2X},${c2Y}`);
+      chev.setAttribute("fill", "#00f0ff");
+      chev.setAttribute("stroke", "#000000");
+      chev.setAttribute("stroke-width", "1.2");
+      radarG.appendChild(chev);
+    });
+
+    // Prominent Arrowhead
+    const trackHead = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    const h1X = endX - 16 * Math.cos(angleHead - Math.PI / 6);
+    const h1Y = endY - 16 * Math.sin(angleHead - Math.PI / 6);
+    const h2X = endX - 16 * Math.cos(angleHead + Math.PI / 6);
+    const h2Y = endY - 16 * Math.sin(angleHead + Math.PI / 6);
     trackHead.setAttribute("points", `${endX},${endY} ${h1X},${h1Y} ${h2X},${h2Y}`);
-    trackHead.setAttribute("fill", "#38bdf8");
+    trackHead.setAttribute("fill", "#00f0ff");
+    trackHead.setAttribute("stroke", "#000000");
+    trackHead.setAttribute("stroke-width", "2.0");
     radarG.appendChild(trackHead);
 
-    // Radar Tracking Badge
+    // 3. Prominent Radar Direction HUD Badge
     const badgeBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    badgeBg.setAttribute("x", startX - 5);
-    badgeBg.setAttribute("y", startY - 26);
-    badgeBg.setAttribute("width", 200);
-    badgeBg.setAttribute("height", 18);
-    badgeBg.setAttribute("rx", 4);
-    badgeBg.setAttribute("fill", "rgba(11, 17, 32, 0.88)");
-    badgeBg.setAttribute("stroke", "rgba(56, 189, 248, 0.55)");
-    badgeBg.setAttribute("stroke-width", "1");
+    badgeBg.setAttribute("x", 14);
+    badgeBg.setAttribute("y", 14);
+    badgeBg.setAttribute("width", 255);
+    badgeBg.setAttribute("height", 24);
+    badgeBg.setAttribute("rx", 6);
+    badgeBg.setAttribute("fill", "rgba(6, 11, 25, 0.94)");
+    badgeBg.setAttribute("stroke", "#00f0ff");
+    badgeBg.setAttribute("stroke-width", "1.4");
     radarG.appendChild(badgeBg);
 
     const badgeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    badgeText.setAttribute("x", startX);
-    badgeText.setAttribute("y", startY - 13);
-    badgeText.setAttribute("fill", "#38bdf8");
-    badgeText.setAttribute("font-size", "8.5");
+    badgeText.setAttribute("x", 24);
+    badgeText.setAttribute("y", 30);
+    badgeText.setAttribute("fill", "#00f0ff");
+    badgeText.setAttribute("font-size", "10");
     badgeText.setAttribute("font-family", "monospace");
     badgeText.setAttribute("font-weight", "bold");
-    badgeText.textContent = `📡 Storm Track: ${rn.speed_kmh}km/h ${rn.cardinal_direction} (${rn.growth_rate_dbz_hr >= 0 ? '+' : ''}${rn.growth_rate_dbz_hr}dBZ/h)`;
+    badgeText.textContent = `📡 STORM DIRECTION: ${rn.direction_degrees.toFixed(0)}° (${rn.cardinal_direction}) ➔ ${rn.speed_kmh.toFixed(1)} km/h`;
     radarG.appendChild(badgeText);
 
     svgMap.appendChild(radarG);
@@ -1573,6 +1629,7 @@ function renderSvgMap(data) {
     renderAnimatedVehicle();
   }
 }
+
 
 
 // Render Animated Vehicle along Current Active Path
