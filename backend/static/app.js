@@ -936,9 +936,9 @@ function updateRouteDispatch(data) {
 
   // Corridor descriptions
   const pathStr = path.join(" → ");
-  if (topRoute) topRoute.innerText = `${pathStr} (${etaSec.toFixed(0)}s)`;
 
   if (path.includes("W") && path.includes("C")) {
+
     if (descRow) descRow.innerHTML = `Via <strong>West Elevated Ridge (R003 → R010 → R004)</strong> • Avoids flooded lowlands`;
     if (statTerrain) statTerrain.innerText = "Elevated Bypass";
   } else if (path.includes("M")) {
