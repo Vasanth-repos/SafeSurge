@@ -1,0 +1,545 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2072,
+            13.0662
+          ],
+          [
+            80.2162,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E01",
+        "from_node": "N02",
+        "to_node": "N01",
+        "length_m": 999.0,
+        "diameter_mm": 900,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 19.2,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 19.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.059
+          ],
+          [
+            80.2162,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E02",
+        "from_node": "N03",
+        "to_node": "N01",
+        "length_m": 799.2,
+        "diameter_mm": 600,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 12.9,
+        "condition_factor": 0.5,
+        "effective_capacity_m3_per_min": 6.45
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.209,
+            13.0662
+          ],
+          [
+            80.2072,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E03",
+        "from_node": "N04",
+        "to_node": "N02",
+        "length_m": 199.8,
+        "diameter_mm": 900,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 19.5,
+        "condition_factor": 0.5,
+        "effective_capacity_m3_per_min": 9.75
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0644
+          ],
+          [
+            80.2162,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E04",
+        "from_node": "N05",
+        "to_node": "N01",
+        "length_m": 199.8,
+        "diameter_mm": 450,
+        "slope": 0.0014,
+        "base_capacity_m3_per_min": 15.7,
+        "condition_factor": 0.7,
+        "effective_capacity_m3_per_min": 10.99
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0608
+          ],
+          [
+            80.2162,
+            13.059
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E05",
+        "from_node": "N06",
+        "to_node": "N03",
+        "length_m": 199.8,
+        "diameter_mm": 600,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 11.6,
+        "condition_factor": 0.5,
+        "effective_capacity_m3_per_min": 5.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0572
+          ],
+          [
+            80.2162,
+            13.059
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E06",
+        "from_node": "N07",
+        "to_node": "N03",
+        "length_m": 199.8,
+        "diameter_mm": 900,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 6.8,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 6.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0626
+          ],
+          [
+            80.2162,
+            13.0644
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E07",
+        "from_node": "N08",
+        "to_node": "N05",
+        "length_m": 199.8,
+        "diameter_mm": 300,
+        "slope": 0.0013,
+        "base_capacity_m3_per_min": 10.1,
+        "condition_factor": 0.5,
+        "effective_capacity_m3_per_min": 5.05
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2144,
+            13.059
+          ],
+          [
+            80.2162,
+            13.059
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E08",
+        "from_node": "N09",
+        "to_node": "N03",
+        "length_m": 199.8,
+        "diameter_mm": 450,
+        "slope": 0.0021,
+        "base_capacity_m3_per_min": 13.8,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 13.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.209,
+            13.0644
+          ],
+          [
+            80.209,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E09",
+        "from_node": "N10",
+        "to_node": "N04",
+        "length_m": 199.8,
+        "diameter_mm": 300,
+        "slope": 0.0022,
+        "base_capacity_m3_per_min": 15.6,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 15.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2054,
+            13.0662
+          ],
+          [
+            80.2072,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E10",
+        "from_node": "N11",
+        "to_node": "N02",
+        "length_m": 199.8,
+        "diameter_mm": 450,
+        "slope": 0.0028,
+        "base_capacity_m3_per_min": 6.0,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 6.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2126,
+            13.0662
+          ],
+          [
+            80.209,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E11",
+        "from_node": "N12",
+        "to_node": "N04",
+        "length_m": 399.6,
+        "diameter_mm": 600,
+        "slope": 0.0013,
+        "base_capacity_m3_per_min": 6.1,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 6.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2108,
+            13.0662
+          ],
+          [
+            80.2126,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E12",
+        "from_node": "N13",
+        "to_node": "N12",
+        "length_m": 199.8,
+        "diameter_mm": 600,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 15.0,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 15.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0554
+          ],
+          [
+            80.2162,
+            13.0572
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E13",
+        "from_node": "N14",
+        "to_node": "N07",
+        "length_m": 199.8,
+        "diameter_mm": 450,
+        "slope": 0.0023,
+        "base_capacity_m3_per_min": 15.9,
+        "condition_factor": 0.5,
+        "effective_capacity_m3_per_min": 7.95
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2072,
+            13.0644
+          ],
+          [
+            80.2072,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E14",
+        "from_node": "N15",
+        "to_node": "N02",
+        "length_m": 199.8,
+        "diameter_mm": 900,
+        "slope": 0.0034,
+        "base_capacity_m3_per_min": 8.6,
+        "condition_factor": 0.7,
+        "effective_capacity_m3_per_min": 6.02
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2108,
+            13.0662
+          ],
+          [
+            80.2162,
+            13.0572
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E15",
+        "from_node": "N13",
+        "to_node": "N07",
+        "length_m": 1165.0,
+        "diameter_mm": 300,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 5.9,
+        "condition_factor": 0.6,
+        "effective_capacity_m3_per_min": 3.54
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0554
+          ],
+          [
+            80.2126,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E16",
+        "from_node": "N14",
+        "to_node": "N12",
+        "length_m": 1263.6,
+        "diameter_mm": 300,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 11.7,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 11.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2126,
+            13.0662
+          ],
+          [
+            80.2162,
+            13.0608
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E17",
+        "from_node": "N12",
+        "to_node": "N06",
+        "length_m": 720.4,
+        "diameter_mm": 300,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 7.5,
+        "condition_factor": 0.9,
+        "effective_capacity_m3_per_min": 6.75
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2144,
+            13.059
+          ],
+          [
+            80.2162,
+            13.0626
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E18",
+        "from_node": "N09",
+        "to_node": "N08",
+        "length_m": 446.8,
+        "diameter_mm": 300,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 9.2,
+        "condition_factor": 0.8,
+        "effective_capacity_m3_per_min": 7.36
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0626
+          ],
+          [
+            80.209,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E19",
+        "from_node": "N08",
+        "to_node": "N04",
+        "length_m": 893.5,
+        "diameter_mm": 300,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 9.4,
+        "condition_factor": 1.0,
+        "effective_capacity_m3_per_min": 9.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2072,
+            13.0644
+          ],
+          [
+            80.2108,
+            13.0662
+          ]
+        ]
+      },
+      "properties": {
+        "edge_id": "E20",
+        "from_node": "N15",
+        "to_node": "N13",
+        "length_m": 446.8,
+        "diameter_mm": 300,
+        "slope": 0.001,
+        "base_capacity_m3_per_min": 6.7,
+        "condition_factor": 0.6,
+        "effective_capacity_m3_per_min": 4.02
+      }
+    }
+  ]
+}

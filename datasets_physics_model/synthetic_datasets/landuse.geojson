@@ -1,0 +1,1605 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0000",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0001",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0002",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0003",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0004",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0005",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0006",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0007",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0008",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.05
+        ]
+      },
+      "properties": {
+        "cell_id": "C0009",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0100",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0101",
+        "land_use": "WATER_BODY",
+        "impervious_fraction": 0.02,
+        "curve_number": 100
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0102",
+        "land_use": "WATER_BODY",
+        "impervious_fraction": 0.02,
+        "curve_number": 100
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0103",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0104",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0105",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0106",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0107",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0108",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0518
+        ]
+      },
+      "properties": {
+        "cell_id": "C0109",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0200",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0201",
+        "land_use": "WATER_BODY",
+        "impervious_fraction": 0.02,
+        "curve_number": 100
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0202",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0203",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0204",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0205",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0206",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0207",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0208",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0536
+        ]
+      },
+      "properties": {
+        "cell_id": "C0209",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0300",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0301",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0302",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0303",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0304",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0305",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0306",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0307",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0308",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0554
+        ]
+      },
+      "properties": {
+        "cell_id": "C0309",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0400",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0401",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0402",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0403",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0404",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0405",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0406",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0407",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0408",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0572
+        ]
+      },
+      "properties": {
+        "cell_id": "C0409",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0500",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0501",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0502",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0503",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0504",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0505",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0506",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0507",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0508",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.059
+        ]
+      },
+      "properties": {
+        "cell_id": "C0509",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0600",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0601",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0602",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0603",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0604",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0605",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0606",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0607",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0608",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0608
+        ]
+      },
+      "properties": {
+        "cell_id": "C0609",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0700",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0701",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0702",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0703",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0704",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0705",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0706",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0707",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0708",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0626
+        ]
+      },
+      "properties": {
+        "cell_id": "C0709",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0800",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0801",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0802",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0803",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0804",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0805",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0806",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0807",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0808",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0644
+        ]
+      },
+      "properties": {
+        "cell_id": "C0809",
+        "land_use": "PARK",
+        "impervious_fraction": 0.15,
+        "curve_number": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0900",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2018,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0901",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2036,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0902",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0903",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0904",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0905",
+        "land_use": "RESIDENTIAL",
+        "impervious_fraction": 0.65,
+        "curve_number": 88
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0906",
+        "land_use": "ROAD",
+        "impervious_fraction": 0.95,
+        "curve_number": 96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0907",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0908",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0662
+        ]
+      },
+      "properties": {
+        "cell_id": "C0909",
+        "land_use": "COMMERCIAL",
+        "impervious_fraction": 0.85,
+        "curve_number": 92
+      }
+    }
+  ]
+}

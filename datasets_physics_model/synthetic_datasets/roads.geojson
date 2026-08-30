@@ -1,0 +1,265 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2,
+            13.05
+          ],
+          [
+            80.2036,
+            13.0536
+          ],
+          [
+            80.2072,
+            13.0572
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R001",
+        "road_name": "Synthetic Road 1",
+        "road_class": "collector",
+        "speed_kmph": 30
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2072,
+            13.0572
+          ],
+          [
+            80.2108,
+            13.0608
+          ],
+          [
+            80.2144,
+            13.0644
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R002",
+        "road_name": "Synthetic Road 2",
+        "road_class": "collector",
+        "speed_kmph": 30
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2144,
+            13.0518
+          ],
+          [
+            80.2108,
+            13.0554
+          ],
+          [
+            80.2072,
+            13.059
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R003",
+        "road_name": "Synthetic Road 3",
+        "road_class": "arterial",
+        "speed_kmph": 40
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2,
+            13.0662
+          ],
+          [
+            80.2018,
+            13.0626
+          ],
+          [
+            80.2036,
+            13.059
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R004",
+        "road_name": "Synthetic Road 4",
+        "road_class": "arterial",
+        "speed_kmph": 40
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.209,
+            13.05
+          ],
+          [
+            80.209,
+            13.0536
+          ],
+          [
+            80.209,
+            13.0572
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R005",
+        "road_name": "Synthetic Road 5",
+        "road_class": "collector",
+        "speed_kmph": 40
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2,
+            13.059
+          ],
+          [
+            80.2054,
+            13.059
+          ],
+          [
+            80.2108,
+            13.059
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R006",
+        "road_name": "Synthetic Road 6",
+        "road_class": "collector",
+        "speed_kmph": 40
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0536
+          ],
+          [
+            80.2126,
+            13.0572
+          ],
+          [
+            80.209,
+            13.0608
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R007",
+        "road_name": "Synthetic Road 7",
+        "road_class": "local",
+        "speed_kmph": 50
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2018,
+            13.0644
+          ],
+          [
+            80.2072,
+            13.0644
+          ],
+          [
+            80.2126,
+            13.0644
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R008",
+        "road_name": "Synthetic Road 8",
+        "road_class": "local",
+        "speed_kmph": 50
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.05
+          ],
+          [
+            80.2126,
+            13.0536
+          ],
+          [
+            80.209,
+            13.0572
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R009",
+        "road_name": "Synthetic Road 9",
+        "road_class": "local",
+        "speed_kmph": 40
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            80.2162,
+            13.0662
+          ],
+          [
+            80.2126,
+            13.0626
+          ],
+          [
+            80.209,
+            13.059
+          ]
+        ]
+      },
+      "properties": {
+        "road_id": "R010",
+        "road_name": "Synthetic Road 10",
+        "road_class": "arterial",
+        "speed_kmph": 30
+      }
+    }
+  ]
+}

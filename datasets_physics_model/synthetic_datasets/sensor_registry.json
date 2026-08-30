@@ -1,0 +1,68 @@
+[
+  {
+    "sensor_id": "S001",
+    "role": "HEADWATER",
+    "latitude": 13.0662,
+    "longitude": 80.2162,
+    "reference_height_cm": 100,
+    "min_range_cm": 2,
+    "max_range_cm": 400,
+    "max_rate_cm_per_min": 15,
+    "sampling_interval_sec": 30
+  },
+  {
+    "sensor_id": "S002",
+    "role": "ARTERIAL",
+    "latitude": 13.059,
+    "longitude": 80.209,
+    "reference_height_cm": 80,
+    "min_range_cm": 2,
+    "max_range_cm": 400,
+    "max_rate_cm_per_min": 15,
+    "sampling_interval_sec": 30
+  },
+  {
+    "sensor_id": "S003",
+    "role": "BASIN",
+    "latitude": 13.0518,
+    "longitude": 80.2018,
+    "reference_height_cm": 80,
+    "min_range_cm": 2,
+    "max_range_cm": 400,
+    "max_rate_cm_per_min": 15,
+    "sampling_interval_sec": 30
+  },
+  {
+    "sensor_id": "S004",
+    "role": "DEPRESSION",
+    "latitude": 13.0536,
+    "longitude": 80.2036,
+    "reference_height_cm": 120,
+    "min_range_cm": 2,
+    "max_range_cm": 400,
+    "max_rate_cm_per_min": 15,
+    "sampling_interval_sec": 30
+  },
+  {
+    "sensor_id": "S005",
+    "role": "ELEVATED",
+    "latitude": 13.0644,
+    "longitude": 80.2036,
+    "reference_height_cm": 120,
+    "min_range_cm": 2,
+    "max_range_cm": 400,
+    "max_rate_cm_per_min": 15,
+    "sampling_interval_sec": 30
+  },
+  {
+    "sensor_id": "S006",
+    "role": "OUTFALL",
+    "latitude": 13.0662,
+    "longitude": 80.2162,
+    "reference_height_cm": 120,
+    "min_range_cm": 2,
+    "max_range_cm": 400,
+    "max_rate_cm_per_min": 15,
+    "sampling_interval_sec": 30
+  }
+]

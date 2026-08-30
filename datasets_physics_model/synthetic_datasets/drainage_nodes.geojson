@@ -1,0 +1,260 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0662
+        ]
+      },
+      "properties": {
+        "node_id": "N01",
+        "source_cell": "C0909",
+        "node_type": "OUTFALL",
+        "invert_elevation_m": 11.83,
+        "base_capacity_m3_per_min": 30.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0662
+        ]
+      },
+      "properties": {
+        "node_id": "N02",
+        "source_cell": "C0904",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 11.91,
+        "base_capacity_m3_per_min": 23.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.059
+        ]
+      },
+      "properties": {
+        "node_id": "N03",
+        "source_cell": "C0509",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 12.66,
+        "base_capacity_m3_per_min": 13.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0662
+        ]
+      },
+      "properties": {
+        "node_id": "N04",
+        "source_cell": "C0905",
+        "node_type": "INLET",
+        "invert_elevation_m": 11.67,
+        "base_capacity_m3_per_min": 15.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0644
+        ]
+      },
+      "properties": {
+        "node_id": "N05",
+        "source_cell": "C0809",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 12.44,
+        "base_capacity_m3_per_min": 12.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0608
+        ]
+      },
+      "properties": {
+        "node_id": "N06",
+        "source_cell": "C0609",
+        "node_type": "INLET",
+        "invert_elevation_m": 13.04,
+        "base_capacity_m3_per_min": 16.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0572
+        ]
+      },
+      "properties": {
+        "node_id": "N07",
+        "source_cell": "C0409",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 12.26,
+        "base_capacity_m3_per_min": 13.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0626
+        ]
+      },
+      "properties": {
+        "node_id": "N08",
+        "source_cell": "C0709",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 12.88,
+        "base_capacity_m3_per_min": 11.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2144,
+          13.059
+        ]
+      },
+      "properties": {
+        "node_id": "N09",
+        "source_cell": "C0508",
+        "node_type": "INLET",
+        "invert_elevation_m": 12.34,
+        "base_capacity_m3_per_min": 17.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.209,
+          13.0644
+        ]
+      },
+      "properties": {
+        "node_id": "N10",
+        "source_cell": "C0805",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 12.64,
+        "base_capacity_m3_per_min": 23.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2054,
+          13.0662
+        ]
+      },
+      "properties": {
+        "node_id": "N11",
+        "source_cell": "C0903",
+        "node_type": "INLET",
+        "invert_elevation_m": 12.2,
+        "base_capacity_m3_per_min": 8.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2126,
+          13.0662
+        ]
+      },
+      "properties": {
+        "node_id": "N12",
+        "source_cell": "C0907",
+        "node_type": "INLET",
+        "invert_elevation_m": 13.25,
+        "base_capacity_m3_per_min": 12.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2108,
+          13.0662
+        ]
+      },
+      "properties": {
+        "node_id": "N13",
+        "source_cell": "C0906",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 13.5,
+        "base_capacity_m3_per_min": 24.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2162,
+          13.0554
+        ]
+      },
+      "properties": {
+        "node_id": "N14",
+        "source_cell": "C0309",
+        "node_type": "INLET",
+        "invert_elevation_m": 12.21,
+        "base_capacity_m3_per_min": 21.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.2072,
+          13.0644
+        ]
+      },
+      "properties": {
+        "node_id": "N15",
+        "source_cell": "C0804",
+        "node_type": "JUNCTION",
+        "invert_elevation_m": 13.52,
+        "base_capacity_m3_per_min": 21.0
+      }
+    }
+  ]
+}

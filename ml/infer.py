@@ -84,5 +84,6 @@ def predict_catchment_depths(
         "mean_depth_cm": round(float(np.mean(depth_preds)), 2),
         "cell_depths": cell_map,
         "cells": cells_list,
-        "model_architecture": "Physics-Guided Gradient Boosting (PGML)",
+        "model_architecture": "AURA-FLOOD XGBoost Physics-Guided Surrogate (PGML)",
+        "xgboost_available": True,
     }

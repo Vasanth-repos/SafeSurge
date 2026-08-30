@@ -1,0 +1,8 @@
+test_id,name,trigger_condition,injected_in,expected_behavior
+A,Sensor failure,S003 communication lost from t=100min to t=140min,"sensors.csv (status=STALE then OFFLINE, sensor_id=S003)",Physics model continues running; confidence score decreases due to reduced observational coverage
+B,Sensor spike,S005 reports an implausible 90cm depth jump at t=95min,"sensors.csv (is_injected_spike=True, sensor_id=S005, t=95)",Rate-of-rise validation rejects the reading; previous valid state is retained
+C,Drainage capacity reduction,Drainage condition_factor reduced from 1.0 to 0.3 on affected edges,"drainage_edges.geojson (condition_factor field, some edges already set as low as 0.3)",Effective drainage capacity drops; surface storage increases; flood depth increases
+D,Extreme rainfall,Storm peak intensity set to 60mm/hr (vs. 28mm/hr baseline),Not pre-generated - run the Colab physics engine with peak_mm_hr=60,Runoff increases; flood depth increases; road risk escalates to HIGH/UNSAFE
+E,No rainfall,Storm peak intensity set to 0mm/hr,Not pre-generated - run the Colab physics engine with peak_mm_hr=0,System reports 'forecast unavailable' rather than a fabricated non-zero prediction
+F,No sensor coverage,All 6 sensors set to OFFLINE simultaneously,Not pre-generated - filter sensors.csv to status=OFFLINE for all sensor_ids,Physics model continues; confidence score drops sharply (coverage term -> 0)
+G,Flooded shortest route,Road R006 forced to UNSAFE (depth >= 25cm) at t=100min,historical_floods.csv includes an R006 event at 18.5cm as a reference point; force to 25+cm for the live demo,Router assigns cost=infinity to R006's edge; shortest-path alternative is selected instead

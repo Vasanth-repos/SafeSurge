@@ -1,0 +1,7 @@
+scenario_tag,n_rows,mae_cm,rmse_cm,r2,risk_class_accuracy,true_depth_max_cm,pred_depth_max_cm
+edge_combo_worst_case,3700,0.989,5.789,0.9228,0.9841,266.36,180.86
+edge_drainage_failure,3700,0.223,0.593,0.9961,0.9973,133.39,127.64
+edge_extreme_rain,3700,0.682,4.038,0.9509,0.9903,242.27,179.82
+edge_prolonged_drizzle,3700,0.061,0.217,0.951,0.9973,13.73,11.76
+edge_zero_rain,3700,0.0,0.002,,1.0,0.0,0.02
+normal,37000,0.845,5.496,0.9111,0.9843,315.34,180.86
