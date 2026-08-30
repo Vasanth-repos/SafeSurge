@@ -1,0 +1,116 @@
+{
+  "scenario_level": {
+    "dataset": "validation_data_scenario_level.csv",
+    "n_samples": 250,
+    "mae_cm": 0.781,
+    "rmse_cm": 1.512,
+    "r2": 0.9652,
+    "bias_cm": -0.096,
+    "max_error_cm": 9.013,
+    "baseline_comparison": {
+      "baseline_mae_cm": 8.27,
+      "baseline_rmse_cm": 13.57,
+      "baseline_r2": 0.98,
+      "verdict": "GO"
+    }
+  },
+  "spatio_temporal_grid": {
+    "overall": {
+      "overall_mae_cm": 0.694,
+      "overall_rmse_cm": 4.846,
+      "overall_r2": 0.9175,
+      "overall_risk_accuracy": 0.9874,
+      "n_validation_rows": 55500,
+      "n_validation_scenarios": 15
+    },
+    "by_scenario_type": [
+      {
+        "scenario_tag": "edge_combo_worst_case",
+        "n_rows": 3700,
+        "mae_cm": 0.989,
+        "rmse_cm": 5.789,
+        "r2": 0.9228,
+        "risk_class_accuracy": 0.9841,
+        "true_depth_max_cm": 266.36,
+        "pred_depth_max_cm": 180.86
+      },
+      {
+        "scenario_tag": "edge_drainage_failure",
+        "n_rows": 3700,
+        "mae_cm": 0.223,
+        "rmse_cm": 0.593,
+        "r2": 0.9961,
+        "risk_class_accuracy": 0.9973,
+        "true_depth_max_cm": 133.39,
+        "pred_depth_max_cm": 127.64
+      },
+      {
+        "scenario_tag": "edge_extreme_rain",
+        "n_rows": 3700,
+        "mae_cm": 0.682,
+        "rmse_cm": 4.038,
+        "r2": 0.9509,
+        "risk_class_accuracy": 0.9903,
+        "true_depth_max_cm": 242.27,
+        "pred_depth_max_cm": 179.82
+      },
+      {
+        "scenario_tag": "edge_prolonged_drizzle",
+        "n_rows": 3700,
+        "mae_cm": 0.061,
+        "rmse_cm": 0.217,
+        "r2": 0.951,
+        "risk_class_accuracy": 0.9973,
+        "true_depth_max_cm": 13.73,
+        "pred_depth_max_cm": 11.76
+      },
+      {
+        "scenario_tag": "edge_zero_rain",
+        "n_rows": 3700,
+        "mae_cm": 0.0,
+        "rmse_cm": 0.002,
+        "r2": null,
+        "risk_class_accuracy": 1.0,
+        "true_depth_max_cm": 0.0,
+        "pred_depth_max_cm": 0.02
+      },
+      {
+        "scenario_tag": "normal",
+        "n_rows": 37000,
+        "mae_cm": 0.845,
+        "rmse_cm": 5.496,
+        "r2": 0.9111,
+        "risk_class_accuracy": 0.9843,
+        "true_depth_max_cm": 315.34,
+        "pred_depth_max_cm": 180.86
+      }
+    ]
+  },
+  "sensor_telemetry": {
+    "dataset": "validation_sensors.csv",
+    "n_samples": 222,
+    "n_stations": 6,
+    "status_distribution": {
+      "ONLINE": 222
+    },
+    "clean_reading_mae_cm": 0.218,
+    "clean_reading_rmse_cm": 0.277,
+    "clean_reading_r2": 0.9995
+  },
+  "historical_events": {
+    "dataset": "validation_historical_events.csv",
+    "n_events": 12,
+    "roads_covered": [
+      "R008",
+      "R007",
+      "R004",
+      "R006",
+      "R005",
+      "R010"
+    ],
+    "depth_range_cm": [
+      10.5,
+      41.8
+    ]
+  }
+}
