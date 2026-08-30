@@ -1258,16 +1258,35 @@ html, body {
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 
-/* Tanks Grid Deck */
+/* Tanks Grid Deck: 3 on row 1, 2 on row 2 for spacious visibility */
 .tanks-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+
+/* Row 1: Tanks D01, D02, D03 (span 2 each: 2+2+2 = 6) */
+.tanks-grid .tank-card:nth-child(1),
+.tanks-grid .tank-card:nth-child(2),
+.tanks-grid .tank-card:nth-child(3) {
+  grid-column: span 2;
+}
+
+/* Row 2: Tanks D04, D05 (span 3 each: 3+3 = 6) */
+.tanks-grid .tank-card:nth-child(4),
+.tanks-grid .tank-card:nth-child(5) {
+  grid-column: span 3;
 }
 
 @media (max-width: 900px) {
   .tanks-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .tanks-grid .tank-card:nth-child(n) {
+    grid-column: span 1 !important;
+  }
+  .tanks-grid .tank-card:nth-child(5) {
+    grid-column: span 2 !important;
   }
 }
 
@@ -1275,15 +1294,16 @@ html, body {
   background: #14161f;
   border: 1px solid var(--border-strong);
   border-radius: 6px;
-  padding: 8px 9px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 5px;
+  gap: 6px;
   min-height: 155px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 
 
 
@@ -1351,9 +1371,9 @@ html, body {
   background: rgba(239, 68, 68, 0.2);
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #f87171;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
-  padding: 2px 4px;
+  padding: 2.5px 6px;
   border-radius: 3px;
   text-align: center;
   white-space: nowrap;
@@ -1365,9 +1385,9 @@ html, body {
   background: rgba(249, 115, 22, 0.15);
   border: 1px solid rgba(249, 115, 22, 0.35);
   color: #fb923c;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
-  padding: 2px 4px;
+  padding: 2.5px 6px;
   border-radius: 3px;
   text-align: center;
   white-space: nowrap;
@@ -1378,9 +1398,9 @@ html, body {
   background: rgba(16, 185, 129, 0.08);
   border: 1px solid rgba(16, 185, 129, 0.2);
   color: #34d399;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
-  padding: 2px 4px;
+  padding: 2.5px 6px;
   border-radius: 3px;
   text-align: center;
   white-space: nowrap;
@@ -1390,23 +1410,23 @@ html, body {
 /* Vertical Tank Visual Column */
 .tank-visual-wrap {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .tank-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 38px;
+  width: 42px;
   flex-shrink: 0;
 }
 
 .tank-cylinder {
   position: relative;
-  width: 32px;
-  height: 76px;
+  width: 34px;
+  height: 80px;
   background: rgba(15, 23, 42, 0.85);
   border: 1.5px solid #475569;
   border-radius: 4px;
@@ -1451,20 +1471,20 @@ html, body {
 }
 
 .tank-pct-label {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
   font-family: var(--font-mono);
   color: var(--text-primary);
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 /* Tank Metrics Details */
 .tank-metrics {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   flex: 1;
-  font-size: 8.5px;
+  font-size: 10px;
   font-family: var(--font-mono);
   overflow: hidden;
 }
@@ -1474,20 +1494,20 @@ html, body {
   justify-content: space-between;
   align-items: center;
   white-space: nowrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .m-lbl {
   color: var(--text-tertiary);
   font-family: var(--font-sans);
-  font-size: 8px;
+  font-size: 9.5px;
   flex-shrink: 0;
 }
 
 .m-val {
   color: var(--text-primary);
   font-weight: 600;
-  font-size: 8.5px;
+  font-size: 10px;
   white-space: nowrap;
   text-align: right;
 }
@@ -1499,15 +1519,16 @@ html, body {
 
 .metric-row.sensor {
   border-top: 1px dashed rgba(255, 255, 255, 0.08);
-  padding-top: 2px;
-  margin-top: 1px;
+  padding-top: 3px;
+  margin-top: 2px;
 }
 
 .m-val.sensor {
-  font-size: 8px;
+  font-size: 9.5px;
   color: #34d399;
   white-space: nowrap;
 }
+
 
 
 /* Sidebar Tank Summary Widget */
