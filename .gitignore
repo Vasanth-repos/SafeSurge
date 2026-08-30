@@ -7,5 +7,8 @@ __pycache__/
 *.docx
 !AURA_FLOOD_ML_Training_and_Validation_Report.docx
 !docs/AURA_FLOOD_ML_Training_and_Validation_Report.docx
-!datasets_physics_model/AURA_FLOOD_ML_Training_and_Validation_Report.docx
 !outputs/reports/AURA_FLOOD_ML_Training_and_Validation_Report.docx
+!*Comprehensive_Validation_Report.docx
+!docs/*Comprehensive_Validation_Report.docx
+!outputs/reports/*Comprehensive_Validation_Report.docx
+
