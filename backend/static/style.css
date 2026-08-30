@@ -165,10 +165,8 @@ html, body {
 .telemetry-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex: 1;
-  justify-content: center;
-  overflow: hidden;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .kpi-pill {
@@ -177,7 +175,7 @@ html, body {
   gap: 5px;
   background: var(--bg-panel-inner);
   border: 1px solid var(--border-card);
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 5px;
   font-size: 11px;
   font-family: var(--font-mono);
@@ -214,18 +212,23 @@ html, body {
   gap: 6px;
   font-size: 11px;
   color: var(--text-sub);
+  white-space: nowrap;
 }
 
 .scenario-select {
   background: var(--bg-panel-inner);
   color: var(--text-main);
   border: 1px solid var(--border-card);
-  padding: 4px 9px;
+  padding: 4px 8px;
   border-radius: 6px;
   outline: none;
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
+  max-width: 220px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .scenario-select:hover, .scenario-select:focus {
@@ -236,15 +239,16 @@ html, body {
   background: #232530;
   color: #f4f4f7;
   border: 1px solid #363848;
-  padding: 4px 11px;
+  padding: 4px 10px;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 500;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.15s ease;
 }
 
@@ -259,40 +263,51 @@ html, body {
   min-height: 38px;
   background: var(--bg-header);
   border-bottom: 1px solid var(--border-card);
-  padding: 0 16px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sub-toolbar::-webkit-scrollbar {
+  display: none;
 }
 
 .fault-deck {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .toolbar-lbl {
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  margin-right: 2px;
+  margin-right: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .chip-btn {
   background: var(--bg-pill);
   border: 1px solid var(--border-card);
   color: var(--text-sub);
-  padding: 3px 9px;
+  padding: 3px 8px;
   border-radius: 5px;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.15s ease;
   user-select: none;
 }
@@ -336,17 +351,24 @@ html, body {
   display: flex;
   align-items: center;
   gap: 5px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .layer-chip {
   background: var(--bg-pill);
   border: 1px solid var(--border-card);
   color: var(--text-dim);
-  padding: 3px 8px;
+  padding: 3px 7px;
   border-radius: 4px;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   transition: all 0.15s ease;
   user-select: none;
 }
@@ -361,6 +383,7 @@ html, body {
   color: #ffffff;
   border-color: #3f4254;
 }
+
 
 /* 3. MAIN WORKSPACE */
 .main-workspace {

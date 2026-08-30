@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/app.css?v=13.0">
+  <link rel="stylesheet" href="/static/app.css?v=14.0">
+
 
 
 
@@ -24,8 +25,8 @@
   <header class="top-navbar">
     <div class="brand-section">
       <span class="brand-logo">🌐</span>
+
       <span class="brand-title">SafeSurge</span>
-      <span class="brand-subtitle">Flood Intelligence & Emergency Navigation</span>
       <div class="status-badge" id="system-status-badge">
         <span class="dot"></span>
         <span id="system-status-text">Normal Operations</span>
@@ -48,7 +49,6 @@
       </div>
     </div>
 
-
     <!-- Header Right Actions -->
     <div class="header-actions">
       <div class="scenario-wrap">
@@ -70,24 +70,25 @@
   <!-- 2. SUB-TOOLBAR: FAULT DECK & LAYER TOGGLES -->
   <div class="sub-toolbar">
     <div class="fault-deck">
-      <span class="toolbar-lbl">⚡ Simulate Scenario:</span>
-      <button class="chip-btn" id="fault-spike" title="Simulate a sudden +90 cm water level surge on Sensor S001">⚡ Water Surge (+90 cm)</button>
-      <button class="chip-btn" id="fault-offline" title="Simulate signal loss on Sensor S001">🔌 Disconnect Sensor</button>
-      <button class="chip-btn" id="fault-blockage" title="Simulate debris clogging 70% of East Culvert E001">🚧 Clog Drain (70%)</button>
-      <button class="chip-btn reset-btn" id="fault-reset" title="Restore nominal conditions">🔄 Normal State</button>
+      <span class="toolbar-lbl">Simulate:</span>
+      <button class="chip-btn" id="fault-spike" title="Simulate a sudden +90 cm water level surge on Sensor S001">⚡ Water Surge</button>
+      <button class="chip-btn" id="fault-offline" title="Simulate signal loss on Sensor S001">🔌 Disconnect</button>
+      <button class="chip-btn" id="fault-blockage" title="Simulate debris clogging 70% of East Culvert E001">🚧 Clog Drain</button>
+      <button class="chip-btn reset-btn" id="fault-reset" title="Restore nominal conditions">🔄 Normal</button>
     </div>
 
     <div class="layer-deck">
-      <span class="toolbar-lbl">Map View:</span>
-      <button class="layer-chip active" id="toggle-depth" title="Toggle Flood Inundation Heatmap">🌊 Water Depth</button>
-      <button class="layer-chip active" id="toggle-d8" title="Toggle Downhill Water Flow Vectors">↗️ Flow Direction</button>
-      <button class="layer-chip active" id="toggle-drainage" title="Toggle Storm Drain Inlets">🚰 Storm Drains</button>
-      <button class="layer-chip active" id="toggle-sensors" title="Toggle Monitoring Stations">📡 Sensor Nodes</button>
-      <button class="layer-chip active" id="toggle-roads" title="Toggle Street Network">🛣️ Street Grid</button>
-      <button class="layer-chip active" id="toggle-radar" title="Toggle Doppler Weather Radar Nowcast Layer">🌧️ Radar Nowcast</button>
-      <button class="layer-chip active" id="toggle-ambulance" title="Toggle Ambulance Route Dispatch">🚑 Ambulance</button>
+      <span class="toolbar-lbl">Layers:</span>
+      <button class="layer-chip active" id="toggle-depth" title="Toggle Flood Inundation Heatmap">🌊 Depth</button>
+      <button class="layer-chip active" id="toggle-d8" title="Toggle Downhill Water Flow Vectors">↗️ Vectors</button>
+      <button class="layer-chip active" id="toggle-drainage" title="Toggle Storm Drain Inlets">🚰 Drains</button>
+      <button class="layer-chip active" id="toggle-sensors" title="Toggle Monitoring Stations">📡 Sensors</button>
+      <button class="layer-chip active" id="toggle-roads" title="Toggle Street Network">🛣️ Streets</button>
+      <button class="layer-chip active" id="toggle-radar" title="Toggle Doppler Weather Radar Nowcast Layer">🌧️ Radar</button>
+      <button class="layer-chip active" id="toggle-ambulance" title="Toggle Ambulance Route Dispatch">🚑 Dispatch</button>
     </div>
   </div>
+
 
   <!-- 3. MAIN WORKSPACE: 2-COLUMN GRID -->
   <main class="main-workspace">
@@ -436,6 +437,6 @@
     </aside>
   </main>
 
-  <script src="/static/app.js?v=13.0"></script>
+  <script src="/static/app.js?v=14.0"></script>
 </body>
 </html>
