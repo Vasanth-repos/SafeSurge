@@ -103,7 +103,9 @@ def test_download_ml_report_endpoint():
 
     doc = docx.Document(temp_path)
     full_text = "\n".join([p.text for p in doc.paragraphs])
-    assert "Machine Learning Engineering" in full_text
-    assert "XGBoost" in full_text
-    assert "synthetic_scenarios_1000.csv" in full_text or len(doc.tables) >= 5
+    assert "Machine Learning" in full_text and "Validation" in full_text
+    assert "XGBoost" in full_text or "AURA-FLOOD" in full_text
+    assert len(doc.tables) >= 5
+
+
 

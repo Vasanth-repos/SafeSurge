@@ -1,9 +1,9 @@
 {
   "suite": "Urban Flood Nowcasting P0 Verification",
-  "timestamp_utc": "2026-08-25T07:32:40.343178Z",
-  "status": "PASS",
-  "exit_code": 0,
-  "execution_time_seconds": 9.24,
+  "timestamp_utc": "2026-08-30T04:42:36.315147Z",
+  "status": "FAIL",
+  "exit_code": 1,
+  "execution_time_seconds": 18.37,
   "subsystem_coverage": {
     "Layer_00_Environment": "PASS",
     "Layer_01_02_DEM_D8_Terrain": "PASS",
@@ -23,6 +23,6 @@
     "Layer_23_Replay_Engine": "PASS",
     "Layer_24_Fault_Injection_Framework": "PASS",
     "Layer_25_P0_Automated_Verification": "PASS",
-    "Layer_26_End_to_End_Validation": "PASS"
+    "Layer_26_End_to_End_Validation": "FAIL"
   }
 }
