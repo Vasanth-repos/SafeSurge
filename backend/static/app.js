@@ -267,8 +267,10 @@ function simulateCatchmentState(leadTimeMinutes, scenarioId) {
   const t = stepIdx * 60;
   
   let rainIntensity = 15.0 * Math.sin(Math.min(Math.PI, (stepIdx / 120) * Math.PI));
+  if (stepIdx === 0) rainIntensity = 2.5;
   if (stepIdx > 120) rainIntensity = 0.0;
   if (scenarioId === "e2e_validation") rainIntensity *= 1.4;
+
 
   const intFactor = Math.sin(Math.min(Math.PI, (stepIdx / numSteps) * Math.PI));
 
